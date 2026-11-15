@@ -2,23 +2,24 @@
 
 | Field | Value |
 |---|---|
-| Status | DRAFT rev 2, pending review of Section 0.3 (Open Decisions) |
-| Revision | rev 1: core systems. rev 2: kid-friendly, accessibility, forgiving logic, expression systems, integration test specs |
+| Status | DRAFT rev 3, pending review of Section 0.5 (Open Decisions) |
+| Revision | rev 1: core systems. rev 2: kid-friendly, accessibility, forgiving logic, expression systems, integration tests. rev 3: D1 to D4 resolved (dig-anywhere blocky voxels, jump and double jump, context-aware interaction with dedicated critical states, crafting flow confirmed) |
 | Engine | Godot 4.7 stable (4.7.2 latest patch found, 2026-08-18), GDScript |
 | Physics | Jolt Physics (built-in module) |
+| Voxels | Zylann Voxel Tools 1.7, GDExtension edition (MIT), released 2026-08-20, targets Godot 4.5+ |
 | Renderer | Forward+ (see D13) |
 | Tests | gdUnit4 v6.2.3 (latest release found, 2026-11-01) |
-| Targets | Windows, Linux, macOS desktop |
+| Targets | Windows x86_64, Linux x86_64, macOS (x86_64 and arm64) |
 | Audience | Kids and families; single player, offline |
 
-Section map: 0 scope and decisions, 1 architecture, 2 input and automation, 3 data structures, 4 FSMs, 5 UI and pause, 6 forgiving game logic, 7 expression systems, 8 testing.
+Section map: 0 scope and decisions, 1 architecture, 2 input and automation, 3 data structures, 4 FSMs, 5 UI and pause, 6 forgiving game logic, 7 expression systems, 8 testing, 9 voxel terrain.
 
 ---
 
 ## 0. Scope, Constraints, and Verified Facts
 
 ### 0.1 Scope (v1)
-- 3D third-person cozy life sim: tall humanoid player, outfit customizer, ducking, foraging (apple trees), mining (resources, currency, non-violent discoveries), grid building with hammering/screwing.
+- 3D third-person cozy life sim: tall humanoid player, outfit customizer, ducking, **jump and double jump**, foraging (apple trees), **dig-anywhere blocky voxel terrain** outside protected zones (ores, currency, geodes, buried treasure), grid building with hammering/screwing, placing dug blocks back.
 - Economy: coin wallet, shops, starter cabin, house plot purchasing.
 - Jobs: Builder, Tailor (Tailor also makes pet accessories).
 - NPCs: dialogue, gifting, job and shop access, Museum curator.
@@ -29,22 +30,23 @@ Section map: 0 scope and decisions, 1 architecture, 2 input and automation, 3 da
 - Painting and stamping placed objects, interactive furniture, emote and instrument wheel.
 - Gamepad-primary input with keyboard/mouse secondary; every menu pauses the game.
 
-Out of scope for v1: multiplayer or any network feature, farming (see D9), procedural voxel terrain (D1), Steam Input-specific handling, mobile/web, localization beyond key-based strings.
+Out of scope for v1: multiplayer or any network feature, farming (see D9), smooth (Transvoxel) terrain, gravity or collapse simulation for voxels or buildings, Steam Input-specific handling, mobile/web, localization beyond key-based strings.
 
 ### 0.2 Design pillars (kid-friendly rules, apply to every system)
 | ID | Rule | Enforcement |
 |---|---|---|
-| K1 | No fail states. Nothing the player does loses items, coins, progress, or the pet. | All commands are all-or-nothing; overflow items drop as pickups; tests assert no loss (8.5) |
-| K2 | No damage, no enemies, no hazards. | No health stat exists. Falls and water are handled by SafeGround (6.3) |
+| K1 | No fail states. Nothing the player does loses items, coins, progress, or the pet. | All commands are all-or-nothing; overflow items drop as pickups; save ordering prefers duplication over loss (9.6); tests assert no loss (8.4, 8.5) |
+| K2 | No damage, no enemies, no hazards. | No health stat exists. Falls, pits and water are handled by SafeGround and Go Home (6.3) |
 | K3 | Icon-first communication. Every prompt is readable without reading text. | World prompts are glyph + pictogram; labels optional (2.8) |
 | K4 | Never color-only. Every color signal has a shape, icon, or pattern twin. | Colorblind palettes and patterns (2.7, 2.8) |
-| K5 | Forgiving input. Generous snap and aim radii, auto-tool, toggle instead of hold, no timing-critical inputs. | Settings defaults (5.10) |
+| K5 | Forgiving input. Generous snap and aim radii, auto-tool, auto-jump, coyote time, jump buffer, toggle instead of hold, no timing-critical inputs. | Settings defaults (5.10), 4.2.1 |
 | K6 | Fair randomness. Bad-luck protection on all drop tables; unlocks never duplicate. | Pity counters and unique pools (6.4) |
 | K7 | Gentle pacing. Low stamina is a nudge, not a punishment. Exhaustion is a cozy event. | 6.1, 6.2 |
 | K8 | Offline and private. No accounts, telemetry, chat, or purchases. | No network code in v1 |
+| K9 | The world cannot be broken. Digging never leaves authored objects floating and never traps the player for good. | Protection rules (9.3), bedrock floor and Go Home (6.3) |
 
-### 0.3 Engine and test-framework facts this spec relies on
-Godot facts verified against `godotengine/godot` tag `4.7-stable` class reference XML. gdUnit4 facts verified against `MikeSchulze/gdUnit4` tag `v6.2.3` source.
+### 0.3 Engine and framework facts this spec relies on
+Godot facts verified against `godotengine/godot` tag `4.7-stable` class reference XML. gdUnit4 facts verified against `MikeSchulze/gdUnit4` tag `v6.2.3` source. Voxel Tools facts verified against `Zylann/godot_voxel` `master` docs (`doc/source/*.md`, `doc/source/api/*.md`) and its GitHub releases page.
 
 | Fact | Consequence |
 |---|---|
@@ -65,27 +67,43 @@ Godot facts verified against `godotengine/godot` tag `4.7-stable` class referenc
 | gdUnit4: `GdUnitSceneRunner.simulate_frames()` awaits `process_frame`, not `physics_frame`. | Area3D overlap tests explicitly await `get_tree().physics_frame` (8.2). |
 | gdUnit4 headless: "InputEvents are not transported by the Godot engine in headless mode". | Integration tests inject `InputFrame`s and call commands; no simulated button events (8.2). |
 | gdUnit4 signal asserts: `await assert_signal(obj).wait_until(ms).is_emitted(name, args...)` and `is_not_emitted(...)`. | Used in all integration specs. |
+| Voxel Tools GDExtension works with official Godot builds and regular export templates; ships Windows x86_64, Linux x86_64, macOS x86_64 and arm64. | No custom engine build; the headless test command stays valid. |
+| Voxel Tools docs: the GDExtension "has gone through less testing, so it might have bugs that are not present in the Module edition"; `FastNoise2` is not included. | Plan1 starts with a spike. World generation uses Godot's built-in noise. Fallback: module edition (custom Godot 4.7.2 build). |
+| `VoxelTerrain` uses a simple grid of blocks with Minecraft-like view distance; `VoxelMesherBlocky` batches per-type voxel models. | Chosen terrain node and mesher. |
+| `VoxelTerrain.save_modified_blocks()` is asynchronous and returns a `VoxelSaveCompletionTracker` (`is_complete()`, `is_aborted()`, `get_remaining_tasks()`, `get_total_tasks()`). | Save waits on the tracker (9.6). |
+| Streams available: `VoxelStreamSQLite` (`database_path`), `VoxelStreamRegionFiles`, `VoxelStreamScript`. | SQLite per save slot (9.6). |
+| `VoxelTool` (from `get_voxel_tool()`): `get_voxel`, `set_voxel`, `raycast`, `do_box`, `do_sphere`, `is_area_editable`, `get_voxel_metadata`, `set_voxel_metadata`. | Wrapped by `IVoxelWorld` (9.1). Game-rule protection is our own layer (9.3). |
+| Mesh-based voxel collision rebuilds trimesh shapes on each edit; upstream docs call this "very slow" (upstream issue 54). `VoxelBoxMover` is a fast Minecraft-like alternative with step climbing (`set_step_climbing_enabled`, `set_max_step_height`, `get_motion`). | Collision latency budget and spike; `VoxelBoxMover` fallback (9.5). |
+| Upstream: "currently there is no general solution" for AI navigation on dynamic voxel terrain; navmeshes are not supported out of the box. `VoxelAStarGrid3D` (`set_terrain`, `set_region`, `find_path`, `find_path_async`) "is tuned for agents 2 voxels tall and 1 voxel wide" that "can jump 1 voxel high". | Pet uses `VoxelAStarGrid3D` on voxel ground; NPCs stay in protected areas with baked navmeshes (9.4). |
 
-### 0.4 Open decisions (owner confirmation needed before plan1)
+### 0.4 Resolved decisions
+| ID | Decision | Applied in |
+|---|---|---|
+| D1 | Dig-anywhere terrain: **blocky voxels, 1.0 m**, diggable everywhere **except protected zones**, built on **Voxel Tools GDExtension** | 9, 1.3, 1.6, 2.6, 3.4, 4.3, 6.4 |
+| D2 | **Jump and double jump**, both available from the start. **A = jump, X = interact, Y = secondary interact**; build mode moves to D-pad up | 1.4, 2.2, 2.3, 2.8, 4.2 |
+| D3 | **Context-aware `Interact`** for most interactions; **dedicated states** for critical ones, chosen by explicit criteria C1 to C5 | 4.5 |
+| D4 | Recipe chosen in a paused menu; timed `Craft` state runs in the world and is cancellable | 4.2, 4.5 |
+
+### 0.5 Open decisions (owner confirmation needed before plan1)
 | ID | Question | Proposed default | Alternative |
 |---|---|---|---|
-| D1 | Mining model | Discrete resource nodes on a 1 m grid | Destructible voxel terrain (roughly 10x cost) |
-| D2 | Jump | None in v1; button reserved | Add `Jump`/`Fall` states |
-| D3 | Forage/Talk as states | One generic `Interact` state | Separate states |
-| D4 | Crafting time vs pause-on-menu | Choose recipe in paused menu, timed `Craft` state runs in world | Instant crafting |
 | D5 | House purchase | Upfront coins | Mortgage by mail |
 | D6 | Day length | 20 real minutes, 06:00 to 02:00 | Any |
 | D7 | Saving | 3 manual slots + autosave on every sleep (bed, late night, exhaustion) | Save anywhere |
-| D8 | "Axe/picker for trees": can apple trees be chopped? | **No.** Fruit trees use the `FRUIT_PICKER` and are never destroyable. A separate `timber_tree` and `fallen_log` use the `AXE` for wood. Prevents a child destroying their orchard by accident. | Single tree type; axe chops apple trees |
-| D9 | "Crops" for museum donation, but farming is not in scope | v1 crops = **foraged produce** category `PRODUCE` (apples, wild berries, mushrooms, flowers) | Add a farming system (new spec) |
-| D10 | "Wake at home" before the player owns a house | Player starts with a free **starter cabin** (bed + mailbox). Any owned bed can be set as Home. | Wake at inn |
-| D11 | Pets | One pet in v1, choice of dog or cat on day 1, delivered by letter | Multiple pets, shelter adoption |
+| D8 | "Axe/picker for trees": can apple trees be chopped? | **No.** Fruit trees use the `FRUIT_PICKER` and are never destroyable. A separate `timber_tree` and `fallen_log` use the `AXE` for wood. | Single tree type; axe chops apple trees |
+| D9 | "Crops" for museum donation, but farming is not in scope | v1 crops = **foraged produce** category `PRODUCE` | Add a farming system (new spec) |
+| D10 | "Wake at home" before the player owns a house | Free **starter cabin** (bed + mailbox). Any owned bed can be set as Home. | Wake at inn |
+| D11 | Pets | One pet in v1, dog or cat, delivered by letter on day 1 | Multiple pets |
 | D12 | Dyes | Dye is an **unlock**, never consumed | Consumable dye items |
-| D13 | Renderer | **Forward+** (Decals for stamps). Low-end fallback without stamps is not supported in v1. | Compatibility renderer with mesh-projected stamp quads (more work, wider hardware) |
-| D14 | Read-aloud (TTS) for letters, prompts, dialogue | Setting, default off; uses OS voices | Recorded VO; none |
-| D15 | Auto-tool after leaving all target zones | Revert to empty hands after 1.0 s | Keep last tool |
+| D13 | Renderer | **Forward+** (Decals for stamps) | Compatibility renderer with mesh-projected stamp quads |
+| D14 | Read-aloud (TTS) | Setting, default off; uses OS voices | Recorded VO; none |
+| D15 | Auto-tool after no targets | Revert to empty hands after 1.0 s | Keep last tool |
+| D16 | Renewable ore, now that overworld digs are permanent | **Overworld edits persist; the Deep Mine regenerates daily** from a per-day seed and its edits are discarded at rollover | All ore finite; or ore slowly regrows in the overworld |
+| D17 | Can dug blocks be placed back? | **Yes.** Natural blocks drop as `BLOCK` items and can be placed on the 1 m grid with the Build Place tool | Digging only |
+| D18 | Auto-jump onto 1-voxel ledges | **On by default**, setting to disable | Off by default |
+| D19 | Go Home (unstuck) button in the pause menu | **Yes**: fade home at no cost and no time skip | None |
 
-### 0.5 Known issues and risks raised
+### 0.6 Known issues and risks raised
 1. **CLAUDE.md test command is wrong for gdUnit4 v6.2.3.** The entry script is `res://addons/gdUnit4/bin/GdUnitCmdTool.gd`; headless runs exit with `RETURN_ERROR_HEADLESS_NOT_SUPPORTED` unless `--ignoreHeadlessMode` is passed; tests are selected with `-a`. Proposed (verify in plan1 task 1):
    `godot --headless --path . -s -d res://addons/gdUnit4/bin/GdUnitCmdTool.gd --ignoreHeadlessMode -a res://test`
 2. **Headless tests cannot drive UI via InputEvents.** Integration tests assert on signals and direct calls.
@@ -93,9 +111,9 @@ Godot facts verified against `godotengine/godot` tag `4.7-stable` class referenc
 4. **Pause ownership.** Only `PauseManager` writes `get_tree().paused`, with ref-counted reasons.
 5. **Input bleed on unpause.** Resume-frame guard (5.5).
 6. **EventBus is not a transaction mechanism.** Commands (direct calls returning results) vs events (1.5).
-7. **Untrusted `.tres` saves.** Saves are JSON only.
+7. **Untrusted `.tres` saves.** Saves are JSON only. The voxel SQLite file holds voxel data only and is opened only by `VoxelStreamSQLite`, never by `ResourceLoader`.
 8. **Red/green placement boxes fail for the most common color-vision deficiencies.** Requested green/red stays the default palette, but every state also has an icon and pattern, and blue/orange and high-contrast palettes exist (2.7).
-9. **"Glowing green A / DualShock Cross" is not one color.** Xbox A is green; the classic PlayStation Cross is blue. Prompts use each glyph set's native colors plus the glyph shape; "green" is not a cross-platform meaning (2.8).
+9. **D2 replaces the rev 2 "glowing green A / Cross" requirement.** A is now jump. Primary world prompts are X (Xbox blue X, PlayStation pink Square); secondary prompts are Y (Xbox yellow Y, PlayStation green Triangle). Menus still confirm with A, so a child presses X to talk and A to advance dialogue; the dialogue box shows the A glyph on its advance arrow to bridge this.
 10. **Auto-tool can fight the player.** Without debounce, hysteresis, action locks, and manual override, tools flicker at zone borders or switch mid-swing (2.6).
 11. **Day rollover must not depend on signal connection order.** Exhaustion letters must be scheduled before mail delivery runs. Rollover is an explicit ordered pipeline (6.2).
 12. **Exhaustion snack farming.** Free snacks on every exhaustion invite deliberate exhaustion. Snack is limited to once per in-game day; the real cost of exhaustion is losing the rest of the day.
@@ -103,7 +121,15 @@ Godot facts verified against `godotengine/godot` tag `4.7-stable` class referenc
 14. **gdUnit4 `monitor_signals` frees the monitored object by default.** Must pass `false` for autoloads.
 15. **Paused state leaking between tests.** A failing test that leaves the tree paused stalls all following tests. `PauseManager.reset_for_tests()` runs in every `after_test`.
 16. **Zone overlaps need physics ticks.** `simulate_frames` advances process frames; tests must await physics frames.
-17. **Instrument mode reuses B (duck) and triggers as notes.** Safe only because instrument actions are a disjoint FSM context; rebinding validation must enforce context disjointness (2.5).
+17. **Context reuse of buttons** (instrument notes on A/B/X/Y/shoulders/triggers, Build overrides on D-pad and shoulders). Safe only because contexts are disjoint; rebinding validation enforces it (2.5).
+18. **Voxel GDExtension maturity.** Less tested than the module edition. Plan1 starts with a spike: load, dig, place, save and reload, headless test run, exported build on all three OSes. Fallback is the module edition, which needs a custom editor binary, custom export templates, and a CI change.
+19. **Voxel collision rebuild latency.** Each dig rebuilds the trimesh collision of that data block. Budget: collision updated within 100 ms of an edit and no frame over 20 ms while digging continuously on min-spec hardware (defined in plan1). Fallback: `VoxelBoxMover` for player terrain collision (9.5).
+20. **Navigation on editable voxels is unsolved upstream.** Pet uses `VoxelAStarGrid3D` (fits its 1x2 agent assumption) with teleport fallback; NPCs are confined to protected areas with baked navmeshes and never path across dug terrain.
+21. **Headless voxel behavior is unverified** (meshing, collision, worker threads with the headless display server). All gameplay talks to terrain through `IVoxelWorld`; tests use `FakeVoxelWorld` (9.7). One real-terrain smoke suite, tagged `@voxel_real`, must pass in the spike.
+22. **Two-file save consistency.** JSON state and the voxel SQLite file can diverge after a crash. Slot files change only at explicit saves through a working copy, with an epoch check (9.6). Copying the SQLite file while the stream holds it open after the save tracker completes is **unverified**; the spike confirms it or switches to a fresh `database_path` per save.
+23. **Tall player on a 1 m grid.** The 2.1 m standing height needs 3 free voxels; 2-voxel tunnels force Duck; jumps need headroom. Level generation and auto-jump checks use these numbers.
+24. **Kids digging deep pits.** A double jump clears 2 voxels; deeper pits need stairs. Digging the voxel directly under your feet is blocked (9.3 P6), and Go Home (D19) guarantees escape.
+25. **Floating trees and structures.** Support voxels under fruit trees, interactables, placed pieces and spawn points are protected (9.3 P3, P4).
 
 ---
 
@@ -115,7 +141,8 @@ Godot facts verified against `godotengine/godot` tag `4.7-stable` class referenc
 | Presentation   scenes/ (3D), ui/ (Controls)                |
 +------------------------------------------------------------+
 | Adapters       Node wrappers: Player, Pet, Interactables,  |
-|                ToolAutoSelector, SnapAssist, UI            |
+|                ToolAutoSelector, SnapAssist,               |
+|                VoxelWorldAdapter, UI                       |
 +------------------------------------------------------------+
 | Services       GameSession-owned; validate commands, emit  |
 |                EventBus events                             |
@@ -123,10 +150,12 @@ Godot facts verified against `godotengine/godot` tag `4.7-stable` class referenc
 | Models         RefCounted pure logic, no SceneTree access  |
 +------------------------------------------------------------+
 | Data           resources/*.tres (read-only definitions)    |
-|                user://saves/*.json, user://settings.cfg    |
+|                user://saves/slot_n.json                    |
+|                user://saves/slot_n.voxels.sqlite           |
+|                user://settings.cfg                         |
 +------------------------------------------------------------+
 ```
-Rule: Models never call `get_tree()`, never read `Input`, never emit EventBus signals.
+Rule: Models never call `get_tree()`, never read `Input`, never emit EventBus signals, and never touch Voxel Tools classes directly (only through `IVoxelWorld`, 9.1).
 
 ### 1.2 Autoloads (order is significant)
 | # | Name | process_mode | Responsibility |
@@ -137,7 +166,7 @@ Rule: Models never call `get_tree()`, never read `Input`, never emit EventBus si
 | 4 | `InputService` | ALWAYS | Device detection, glyph set, rebinding, joypad events |
 | 5 | `PauseManager` | ALWAYS | Sole writer of `get_tree().paused` |
 | 6 | `GameClock` | PAUSABLE | In-game day/minute; triggers `DayRollover` (6.2) |
-| 7 | `SaveService` | ALWAYS | Serialize/deserialize, slots, migrations |
+| 7 | `SaveService` | ALWAYS | JSON and voxel DB save/load, slots, migrations (9.6) |
 | 8 | `SceneRouter` | ALWAYS | Zone transitions with fade |
 
 ### 1.3 Main scene tree (`res://scenes/main.tscn`)
@@ -152,8 +181,9 @@ Main (Node)                                   PAUSABLE
 |   +-- JobService                            Builder, Tailor contracts
 |   +-- MailService                           inbox, scheduled mail
 |   +-- NpcService                            friendship, schedules
-|   +-- BuildService                          pieces, fastening, paint, stamps, furniture state
-|   +-- WorldStateService                     mine nodes, trees, chests, respawns
+|   +-- BuildService                          pieces, fastening, paint, stamps, furniture state, block placement
+|   +-- TerrainService                        dig/place commands, protection rules, voxel drops (9)
+|   +-- WorldStateService                     fruit trees, timber trees, chests, respawns
 |   +-- StaminaService                        stamina, regen, depletion edge
 |   +-- SleepDirector                         ALWAYS: bed / late-night / exhaustion transitions
 |   +-- DiscoveryService                      geodes, treasure chests, pity counters
@@ -165,18 +195,22 @@ Main (Node)                                   PAUSABLE
 +-- World (Node3D)                            PAUSABLE
 |   +-- WorldEnvironment, Sun
 |   +-- ZoneRoot (Node3D)                     current zone
-|   |   +-- <Zone: Town | Orchard | Mine | Museum | StarterCabin | Plot_N>
-|   |       +-- Terrain, NavigationRegion3D
-|   |       +-- ResourceNodes                 MineNode (ore/geode-bearing), TimberTree, FallenLog
-|   |       +-- FruitTrees                    AppleTree
+|   |   +-- <Zone: Town | Wilderness | Orchard | DeepMine | Museum | StarterCabin | Plot_N>
+|   |       +-- VoxelTerrain                  VoxelMesherBlocky; stream per 9.6 (absent in STATIC zones)
+|   |       +-- VoxelWorldAdapter (Node)      implements IVoxelWorld over VoxelTool
+|   |       +-- ProtectionVolumes (Node3D)    ProtectionVolume AABBs (9.3)
+|   |       +-- StaticTown (Node3D)           hand-built meshes inside protected volumes
+|   |       +-- NavigationRegion3D            protected areas only (NPCs)
+|   |       +-- FruitTrees, TimberTrees, FallenLogs
 |   |       +-- Interactables                 Mailbox, ShopCounter, JobBoard, Workbench,
 |   |       |                                 TailorBench, Wardrobe, PetWardrobe, PlotSign,
-|   |       |                                 Bed, DonationDesk, DisplayCase, TrophyPedestal
-|   |       +-- Chests                        spawned TreasureChest instances
+|   |       |                                 Bed, DonationDesk, DisplayCase, TrophyPedestal,
+|   |       |                                 MineEntrance
+|   |       +-- Chests                        TreasureChest instances
 |   |       +-- BuildGrid                     BuildGridView on owned plots / job sites
 |   |       +-- NPCs, SpawnPoints
 |   |       +-- SafetyVolumes                 KillPlane, DeepWater (Area3D, 6.3)
-|   +-- Player (CharacterBody3D)              1.4
+|   +-- Player (CharacterBody3D)              1.4, has a VoxelViewer child
 |   +-- Pet (CharacterBody3D)                 7.1
 +-- UI (CanvasLayer, layer 10)                PAUSABLE
 |   +-- HUD                                   clock, stamina, wallet, hotbar, tool icon
@@ -189,16 +223,24 @@ Main (Node)                                   PAUSABLE
 ### 1.4 Player (`res://scenes/player/player.tscn`)
 | Parameter | Value |
 |---|---|
-| Standing capsule height / radius | 2.10 m / 0.35 m |
-| Ducking capsule height | 1.30 m |
+| Standing capsule height / radius | 2.10 m / 0.35 m (needs 3 free voxels) |
+| Ducking capsule height | 1.30 m (fits 2-voxel tunnels) |
 | Walk / Run / Duck-walk speed | 2.2 / 5.0 / 1.2 m/s |
-| Door clearance (build pieces) | 2.40 m |
-| Mine tunnel clearance | 1.50 m (requires Duck) |
+| Gravity | 24 m/s^2 |
+| Jump | apex 1.30 m (clears a 1-voxel step), initial vertical velocity 7.9 m/s |
+| Double jump | vertical velocity set (not added) to 7.6 m/s, +1.20 m; about 2.5 m total from the ground, clears 2 voxels |
+| Coyote time / jump buffer | 0.12 s / 0.15 s |
+| Air control | 80% of ground acceleration |
+| Max fall speed | 20 m/s |
+| Reach (dig, place, aim) | 4.5 m from camera and 3.0 m from player center |
+| Door clearance (build pieces) | 2.40 m (3-voxel openings) |
 
 ```
 Player (CharacterBody3D)
 +-- CollisionStanding, CollisionDucking (CollisionShape3D)
-+-- HeadClearance (ShapeCast3D)
++-- HeadClearance (ShapeCast3D)        stand-up and jump headroom
++-- StepProbe (ShapeCast3D)            auto-jump ledge test (4.2.1)
++-- VoxelViewer                        drives VoxelTerrain loading around the player
 +-- Visual/Rig/Skeleton3D
 |   +-- BodyMesh, OutfitSlots (Head, Top, Bottom, Feet, Accessory)
 |   +-- ToolSocket (BoneAttachment3D, right hand)
@@ -207,13 +249,13 @@ Player (CharacterBody3D)
 +-- CameraRig/Pitch/SpringArm3D/Camera3D
 +-- InteractionProbe (Area3D)          interactable candidates within 2.0 m
 +-- ToolDetector (Area3D)              detects ToolTargetZone areas (2.6)
-+-- AimRay (RayCast3D)                 from camera
++-- AimRay (RayCast3D)                 physics targets: pieces, NPCs, props
 +-- InputReader (Node)                 only node that reads Input (2.1)
 +-- ToolAutoSelector (Node)            2.6
 +-- SafeGroundTracker (Node)           6.3
 +-- StateMachine (Node)
-    +-- Idle, Walk, Run, Duck, Mine, Build, Craft, Interact,
-        Sit, Emote, PlayInstrument, Exhausted
+    +-- Idle, Walk, Run, Duck, Jump, Fall, Mine, Build, Craft, Interact,
+        Talk, Sit, Sleep, Emote, PlayInstrument
 ```
 
 ### 1.5 Commands vs events
@@ -222,15 +264,18 @@ Player (CharacterBody3D)
 | Command | Direct call on a service via `GameSession` | imperative | `Result {ok, error: StringName, data}` |
 | Event | `EventBus` signal | past tense | nothing |
 
-Services do not reference each other, except `TransactionCoordinator` (Economy), `SleepDirector`, `DayRollover`, and `MuseumService` reward granting, which receive collaborators by constructor injection. Transaction rule: validate everything, then mutate, then emit.
+Services do not reference each other, except `TransactionCoordinator` (Economy), `SleepDirector`, `DayRollover`, `MuseumService` reward granting, and `TerrainService` (needs `IVoxelWorld`, Inventory, Discovery, Build occupancy), which receive collaborators by constructor injection. Transaction rule: validate everything, then mutate, then emit.
 
-### 1.6 Build grid
-Custom grid (GridMap cannot hold per-piece state). 1.0 m structure cells, 0.5 m furniture sub-grid, 3.0 m storeys, 90-degree rotations. `BuildService` holds `Dictionary[Vector3i, PieceInstance]` plus footprint occupancy. Snap assist in 2.7.
+### 1.6 Build grid and voxel lattice
+- Custom grid (GridMap cannot hold per-piece state). 1.0 m structure cells, 0.5 m furniture sub-grid, 90-degree rotations. `BuildService` holds `Dictionary[Vector3i, PieceInstance]` plus footprint occupancy. Snap assist in 2.7.
+- Build cells and voxels share one lattice: cell `(x, y, z)` spans `[x, x+1) x [y, y+1) x [z, z+1)` meters.
+- A cell holds a voxel **or** part of a build piece footprint, never both. `TerrainService` and `BuildService` both consult the shared occupancy check.
+- Storey height 3 cells (3.0 m), clearing the 2.1 m player and 2.4 m doors.
 
 ### 1.7 Physics layers
 | Layer | Name | Used by |
 |---|---|---|
-| 1 | world | terrain, static props |
+| 1 | world | VoxelTerrain collision, static town meshes, props |
 | 2 | player | Player body |
 | 3 | npc | NPC bodies |
 | 4 | pet | Pet body (does not collide with player, 7.1) |
@@ -250,11 +295,12 @@ Custom grid (GridMap cannot hold per-piece state). 1.0 m structure cells, 0.5 m 
 | Housing | `grant_deed`, `set_home_bed` | `deed_granted`, `home_changed` |
 | Jobs | `accept_contract`, `submit_contract` | `contract_completed`, `job_rank_up` |
 | Mail | `schedule`, `deliver_due(day)`, `claim_attachments` | `mail_delivered`, `mail_claimed` |
-| Build | `try_place`, `fasten_step`, `try_remove`, `try_paint`, `try_stamp`, `undo_decor`, `toggle_furniture` | `piece_placed`, `piece_fastened`, `piece_painted`, `piece_stamped`, `furniture_toggled` |
-| WorldState | `damage_node`, `harvest_tree`, `open_chest` | `node_depleted`, `tree_harvested`, `chest_opened` |
+| Build | `try_place`, `fasten_step`, `try_remove`, `try_place_block`, `try_paint`, `try_stamp`, `undo_decor`, `toggle_furniture` | `piece_placed`, `piece_fastened`, `block_placed`, `piece_painted`, `piece_stamped`, `furniture_toggled` |
+| Terrain | `hit_voxel(cell, tool_type)`, `can_dig(cell) -> Result`, `can_place(cell) -> Result`, `daily_reset(day)` | `voxel_damaged(cell, hits_left)`, `voxel_dug(cell, material_id)`, `voxel_placed(cell, material_id)` |
+| WorldState | `harvest_tree`, `chop_tree`, `open_chest` | `tree_harvested`, `tree_chopped`, `chest_opened` |
 | Stamina | `spend(amount, reason)`, `restore(amount, reason)`, `refill()` | `stamina_changed`, `stamina_low(level)`, `stamina_depleted` |
-| SleepDirector | `begin_sleep(reason)` | `sleep_transition_started(reason)`, `player_woke(reason, day)` |
-| Discovery | `roll_on_depletion(node_key)`, `open_geode(item_id)` | `geode_found`, `chest_spawned`, `unlock_granted(kind, id)` |
+| SleepDirector | `begin_sleep(reason)`, `go_home()` | `sleep_transition_started(reason)`, `player_woke(reason, day)`, `player_sent_home` |
+| Discovery | `roll_on_voxel_dug(material_id, cell)`, `open_geode(item_id)` | `geode_found`, `chest_spawned`, `unlock_granted(kind, id)` |
 | Museum | `try_donate(item_id)`, `try_donate_batch(ids)` | `item_donated`, `display_case_unlocked`, `trophy_unlocked` |
 | Collection | `mark_discovered(item_id)` | `entry_discovered` |
 | Pet | `adopt`, `pat`, `try_feed(item_id)`, `equip_accessory`, `remove_accessory` | `pet_fed`, `pet_happiness_changed`, `pet_accessory_changed` |
@@ -272,49 +318,52 @@ Economy rules: integer coins only; buy price rounded up, sell rounded down; defa
 3. Only `Player/InputReader` polls gameplay actions, producing an `InputFrame` consumed by the FSM. `InputReader.inject(frame)` is the test seam.
 4. Mouse motion delta is the one raw event, read only in `InputReader`.
 
-`InputFrame` fields: `move: Vector2`, `look: Vector2`, `run_held`, `duck_pressed`, `duck_held`, `interact_pressed`, `interact_alt_pressed`, `use_pressed`, `use_held`, `use_released`, `alt_pressed`, `alt_held`, `build_toggle_pressed`, `rotate_cw_pressed`, `rotate_ccw_pressed`, `hotbar_next_pressed`, `hotbar_prev_pressed`, `hotbar_select: int`, `catalog_pressed`, `undo_pressed`, `wheel_pressed`, `quick_eat_pressed`, `notes_pressed: int` (bitmask of 8 notes), `frame: int`.
+`InputFrame` fields: `move: Vector2`, `look: Vector2`, `run_held`, `jump_pressed`, `jump_held`, `duck_pressed`, `duck_held`, `interact_pressed`, `interact_alt_pressed`, `use_pressed`, `use_held`, `use_released`, `alt_pressed`, `alt_held`, `build_toggle_pressed`, `rotate_cw_pressed`, `rotate_ccw_pressed`, `build_tool_next_pressed`, `build_tool_prev_pressed`, `hotbar_next_pressed`, `hotbar_prev_pressed`, `hotbar_select: int`, `catalog_pressed`, `undo_pressed`, `wheel_pressed`, `pet_call_pressed`, `quick_eat_pressed`, `notes_pressed: int` (bitmask of 8 notes), `frame: int`.
 
 ### 2.2 Gameplay actions
 | Action | Xbox | PlayStation | Godot joypad event | KB/M | Behavior |
 |---|---|---|---|---|---|
 | `move_*` | Left stick | Left stick | `JOY_AXIS_LEFT_X/Y` | W/A/S/D | deadzone 0.2 |
 | `look_*` | Right stick | Right stick | `JOY_AXIS_RIGHT_X/Y` | Mouse | sensitivity, invert-Y |
-| `run` | L3 | L3 | `JOY_BUTTON_LEFT_STICK` | Left Shift | toggle (default) or hold |
+| `jump` | A | Cross | `JOY_BUTTON_A` | Space | jump; second press in the air = double jump |
 | `duck` | B | Circle | `JOY_BUTTON_B` | C, Left Ctrl | toggle (default) or hold |
-| `interact` | A | Cross | `JOY_BUTTON_A` | E | primary world prompt |
-| `interact_alt` | X | Square | `JOY_BUTTON_X` | F | secondary world prompt |
-| `use_tool` | RT | R2 | `JOY_AXIS_TRIGGER_RIGHT` (0.5) | LMB | use auto-selected tool |
+| `interact` | X | Square | `JOY_BUTTON_X` | E | primary world prompt |
+| `interact_alt` | Y | Triangle | `JOY_BUTTON_Y` | F | secondary world prompt |
+| `run` | L3 | L3 | `JOY_BUTTON_LEFT_STICK` | Left Shift | toggle (default) or hold |
+| `use_tool` | RT | R2 | `JOY_AXIS_TRIGGER_RIGHT` (0.5) | LMB | dig, chop, pick, fasten, place (auto-selected tool) |
 | `use_alt` | LT | L2 | `JOY_AXIS_TRIGGER_LEFT` (0.5) | RMB | build: remove (hold) |
-| `hotbar_next` / `hotbar_prev` | RB / LB | R1 / L1 | shoulders | Wheel, ] / [ | hotbar (food, placeables, pet food) |
+| `hotbar_next` / `hotbar_prev` | RB / LB | R1 / L1 | shoulders | Wheel, ] / [ | hotbar (food, blocks, placeables, pet food) |
 | `hotbar_1..8` | none | none | none | 1..8 | KB only |
-| `build_mode` | Y | Triangle | `JOY_BUTTON_Y` | B | toggle Build mode |
-| `emote_wheel` | D-pad up | D-pad up | `JOY_BUTTON_DPAD_UP` | G | opens wheel (menu, pauses) |
+| `build_mode` | D-pad up | D-pad up | `JOY_BUTTON_DPAD_UP` | B | toggle Build mode |
+| `emote_wheel` | D-pad left | D-pad left | `JOY_BUTTON_DPAD_LEFT` | G | opens wheel (menu, pauses) |
+| `pet_call` | D-pad right | D-pad right | `JOY_BUTTON_DPAD_RIGHT` | H | pet comes to the player (7.1) |
 | `quick_eat` | D-pad down | D-pad down | `JOY_BUTTON_DPAD_DOWN` | Q | eat best food for stamina |
 | `camera_reset` | R3 | R3 | `JOY_BUTTON_RIGHT_STICK` | Middle mouse | recenter |
 | `open_inventory` | View | Touchpad / Create | `JOY_BUTTON_BACK`, `JOY_BUTTON_TOUCHPAD` | I | Backpack, Outfit, Pet, Collection, Jobs, Map |
 | `pause_menu` | Menu | Options | `JOY_BUTTON_START` | Esc | pause menu |
-| `jump` | reserved | reserved | unbound | unbound | D2 |
 
 There is no manual tool-cycling action in gameplay. Tools come from the ToolBelt via auto-select (2.6) or the wheel's Tools page (manual override).
 
 ### 2.3 Context overrides
-Meaning changes by FSM context, never by rebinding. Contexts are disjoint; validation in 2.5.
+Meaning changes by FSM context, never by rebinding. Contexts: `GAMEPLAY`, `AIRBORNE`, `BUILD`, `INSTRUMENT`, `UI`. Contexts are disjoint; validation in 2.5.
 
 | Action | Build: Place | Build: Paint | Build: Stamp | PlayInstrument |
 |---|---|---|---|---|
-| `use_tool` | place ghost / fasten snapped socket | paint selected region | place stamp | note 8 |
-| `use_alt` (hold 0.6 s) | remove piece | none | remove stamp under aim | note 7 |
-| `rotate_cw/ccw` (D-pad R/L, R / Shift+R) | rotate ghost | cycle paint region | rotate stamp 45 deg | none |
-| `hotbar_next/prev` (RB/LB) | next/prev Build tool (Place, Paint, Stamp) | same | same | notes 6 / 5 |
-| `interact_alt` (X) as `build_catalog` | piece catalog | dye palette | sticker sheet + size | note 3 |
-| `undo` (D-pad down / Z) | none | undo last decor op | undo last decor op | none |
-| `interact` (A) | pick piece under aim | eyedropper (copy dye) | none | note 1 |
-| `duck` (B) | exit Build | exit Build | exit Build | note 2 |
-| `build_mode` (Y) | exit Build | exit Build | exit Build | note 4 |
+| `use_tool` (RT) | place ghost or block / fasten snapped socket | paint selected region | place stamp | note 8 |
+| `use_alt` hold 0.6 s (LT) | remove piece or placed block | none | remove stamp under aim | note 7 |
+| `rotate_cw/ccw` (RB / LB) | rotate ghost | cycle paint region | rotate stamp 45 deg | notes 6 / 5 |
+| `build_tool_next/prev` (D-pad right / left) | next/prev Build tool (Place, Paint, Stamp) | same | same | none / reopens wheel |
+| `undo` (D-pad down) | none | undo last decor op | undo last decor op | none |
+| `build_mode` (D-pad up) | exit Build | exit Build | exit Build | none |
+| `interact` (X) | pick piece or block type under aim | eyedropper (copy dye) | none | note 3 |
+| `interact_alt` (Y) as `build_catalog` | catalog (pieces, blocks) | dye palette | sticker sheet + size | note 4 |
+| `jump` (A) | jump (allowed) | jump | jump | note 1 |
+| `duck` (B) | exit Build / cancel fasten | exit Build | exit Build | note 2 |
 | `move` | walk | walk | walk | exits instrument |
-| `emote_wheel` | none | none | none | reopens wheel |
 
-Instrument KB/M: notes on keys 1..8.
+KB/M in Build: rotate R / Shift+R or mouse wheel; Build tools 1 / 2 / 3; undo Z; catalog F; pick/eyedropper E; exit B or C. Instrument KB/M: notes on keys 1..8.
+
+`AIRBORNE` (Jump, Fall): only `move`, `look`, `jump` (double jump), `use_tool` (single-shot dig or block place, 4.2.1) and `interact` on pickups are read.
 
 ### 2.4 UI actions (explicit events)
 | Action | Gamepad | KB/M |
@@ -334,39 +383,41 @@ Instrument KB/M: notes on keys 1..8.
 - Mouse captured in gameplay, visible in menus or when window unfocused.
 - Active pad disconnect opens Pause with `DeviceBanner`.
 - Rebinds stored as plain dictionaries in `user://settings.cfg`; never serialized `InputEvent` objects.
-- Conflict rule: one physical input may map to several actions only if they belong to disjoint contexts. Context table: `GAMEPLAY`, `BUILD`, `INSTRUMENT`, `UI`. `pause_menu`, `ui_accept`, `ui_cancel` cannot be unbound from the gamepad.
+- Conflict rule: one physical input may map to several actions only if they belong to disjoint contexts. Context table: `GAMEPLAY`, `AIRBORNE`, `BUILD`, `INSTRUMENT`, `UI`. `jump`, `pause_menu`, `ui_accept`, `ui_cancel` cannot be unbound from the gamepad.
 
 ### 2.6 Auto-tool context switching
 Tools live in the **ToolBelt**, not in inventory slots. Acquiring a `TOOL` item grants it to the belt. For each `ToolType`, the highest owned tier is the active instance.
 
-`ToolType`: `PICKAXE, AXE, FRUIT_PICKER, HAMMER, SCREWDRIVER, PAINTBRUSH, STAMP`.
+`ToolType`: `PICKAXE, SHOVEL, AXE, FRUIT_PICKER, HAMMER, SCREWDRIVER, PAINTBRUSH, STAMP`. Starter kit: SHOVEL, PICKAXE (tier 1), FRUIT_PICKER.
 
-**Targets** carry a `ToolTargetZone` (Area3D, layer `tool_zones`):
+Two target sources:
+1. **Voxel targets (aim-based).** `IVoxelWorld.raycast(camera_origin, camera_forward, 4.5)` returns the first solid voxel within reach. Required tool = that material's `preferred_tool` (SHOVEL for soft materials, PICKAXE for hard). A voxel failing `TerrainService.can_dig` yields no tool and a lock prompt with the reason pictogram.
+2. **Zone targets (proximity-based).** `ToolTargetZone` (Area3D, layer `tool_zones`):
+
 | Target | `required_tool` | Enter radius | Priority | Active when |
 |---|---|---|---|---|
-| MineNode (ore, gem, geode-bearing) | PICKAXE | 2.5 m | 30 | always |
 | TimberTree, FallenLog | AXE | 2.5 m | 20 | always |
 | AppleTree (fruit > 0) | FRUIT_PICKER | 3.0 m | 20 | fruit > 0 |
 | Loose structural piece, fastener NAILS | HAMMER | 3.0 m | 40 | Build mode, Place tool |
 | Loose structural piece, fastener SCREWS | SCREWDRIVER | 3.0 m | 40 | Build mode, Place tool |
 | Blueprint frame at job site (loose) | by fastener | 3.0 m | 40 | Build mode, Place tool |
 
-PAINTBRUSH and STAMP are selected by the Build tool cycle, not by zones.
+PAINTBRUSH and STAMP are selected by the Build tool cycle, not by targets.
 
 **Selection model** (`ToolSelectionModel`, pure RefCounted; `ToolAutoSelector` is the node adapter):
-1. Candidate set = zones currently overlapping `ToolDetector` and active for the current context.
-2. Best candidate: zone whose target is hit by `AimRay`; else highest priority; else nearest by distance; ties by stable `zone_key` order.
+1. Candidates = active zones overlapping `ToolDetector`, plus the aimed voxel if within reach and diggable.
+2. Best candidate: the aimed target (aimed voxel, or a zone whose target `AimRay` hits); else highest-priority zone; else nearest zone; ties by stable key order.
 3. **Debounce**: a new best candidate must remain best for 0.15 s before a switch.
-4. **Hysteresis**: a zone stays a candidate until distance exceeds enter radius + 0.5 m, even after the Area3D reports exit. Implemented as an exit-distance check, not a second shape.
-5. **Action lock**: no switch while Mine sub-FSM is past `Ready`, Fasten is in progress, or in Craft, Interact, Sit, Emote, PlayInstrument, Exhausted. Pending switch evaluates when the lock ends.
-6. **Manual override**: choosing a tool on the wheel suspends auto-select until the player leaves all candidate zones or 10 s pass.
+4. **Hysteresis**: a zone stays a candidate until distance exceeds enter radius + 0.5 m (exit-distance check, not a second shape). A voxel target keeps its tool while aim stays on the same material class, or aim is lost for less than 0.3 s.
+5. **Action lock**: no switch while Mine is past `Ready`, Fasten is in progress, or in Craft, Interact, Talk, Sit, Sleep, Emote, PlayInstrument. Airborne does not lock. A pending switch is evaluated when the lock ends.
+6. **Manual override**: choosing a tool on the wheel suspends auto-select until no candidates remain or 10 s pass.
 7. **Missing tool**: equipment unchanged; prompt shows the required tool pictogram with a lock badge (`prompt_changed(target, &"missing_tool", tool_type)`).
-8. **Tier too low** (pickaxe vs hardness): tool equips; prompt shows tier-lock badge; using it shows a friendly toast, no stamina spent.
-9. **Leave all zones**: after 1.0 s with no candidates, unequip to empty hands (D15).
+8. **Tier too low** (pickaxe vs hardness): tool equips; tier-lock badge; using it shows a friendly toast, no stamina spent, voxel unchanged.
+9. **No candidates** for 1.0 s: unequip to empty hands (D15).
 10. **Setting off** (`auto_tool = false`): selector inert; wheel Tools page is the only way to equip.
 11. **Paused**: selector does not tick (PAUSABLE).
 
-Emitted by ToolBelt: `tool_equipped(tool_type, item_id, &"auto" | &"manual")`, `tool_unequipped(&"auto" | &"manual")`. `ToolAutoSelector` additionally emits `EventBus.tool_auto_selected(tool_type, target_kind, reason)` with `reason` in `&"zone_enter" | &"aim_change" | &"lock_released"`.
+Emitted by ToolBelt: `tool_equipped(tool_type, item_id, &"auto" | &"manual")`, `tool_unequipped(&"auto" | &"manual")`. `ToolAutoSelector` also emits `EventBus.tool_auto_selected(tool_type, target_kind, reason)`, with `target_kind` in `&"voxel_soft" | &"voxel_hard" | &"timber" | &"fruit_tree" | &"loose_piece"` and `reason` in `&"zone_enter" | &"aim_change" | &"lock_released"`.
 
 ### 2.7 Magnetic grid and snap assist
 **Ghost placement**
@@ -400,10 +451,16 @@ Invalid reasons with pictograms: `occupied`, `no_support`, `outside_plot`, `over
 - `fasten_mode = HOLD` turns hammering into hold-to-progress too.
 - No miss state exists. Pressing with no socket in range does nothing.
 
+**Block placement (D17)**
+- The ghost is a 1 m cube on the face of the aimed voxel or piece. Face stickiness: the ghost keeps the same face until aim leaves it by 0.3 m.
+- `can_place` reasons (pictograms): `protected`, `occupied`, `inside_player`, `inside_pet`, `outside_reach`, `missing_item`.
+- Placing a block that leaves fewer than 3 free voxels above where the player stands is allowed but shows a "low ceiling" pictogram.
+- Build pieces can snap to the top face of solid voxels (`provides_tags = [&"ground"]`).
+
 ### 2.8 Color-coded controller prompts
 `PromptOverlay` draws prompts in screen space over the focused target, positioned with `Camera3D.unproject_position()` and hidden when `Camera3D.is_position_behind()` is true or the target is occluded (AimRay line-of-sight check).
 
-- Max 3 prompts per target: tool prompt (RT/R2/LMB) when a tool target, `interact` (A), `interact_alt` (X).
+- Max 3 prompts per target: tool prompt (RT/R2/LMB) when a tool target, `interact` (X), `interact_alt` (Y). `jump` (A) is never shown as a world prompt.
 - Each prompt = glyph + pictogram (e.g. speech bubble, gift, paw, chair, magnifier). Text label optional (`Settings.prompt_labels`, default on).
 - Glyph colors by glyph set:
 
@@ -416,20 +473,22 @@ Invalid reasons with pictograms: `occupied`, `no_support`, `outside_plot`, `over
 | Triggers | RT/LT white | R2/L2 white | ZR/ZL white | mouse icon |
 
 - Glow pulse when actionable; dimmed with lock badge when not (missing tool, tier, full inventory, already fed today). `reduce_motion` replaces pulse with a static outline. High-contrast mode uses white glyph on black disc.
-- Replaces text-heavy menus for common actions:
+- Replaces text-heavy menus for common actions (X = primary, Y = secondary):
 
-| Target | A | X | Tool |
+| Target | X | Y | Tool |
 |---|---|---|---|
-| NPC | Talk | Gift (opens item picker filtered to giftable) | none |
+| NPC | Talk | Gift (item picker filtered to giftable) | none |
 | Curator NPC | Talk | Donate (donation menu) | none |
 | Pet | Pat | Feed if pet food owned and not fed today, else Dress Up | none |
 | Apple tree | Pick | none | FRUIT_PICKER |
-| Ore node | none | none | PICKAXE |
+| Diggable voxel | none | none | SHOVEL or PICKAXE (material icon) |
+| Non-diggable voxel | none | none | lock pictogram with reason (no glyph) |
 | Treasure chest | Open | none | none |
 | Chair/sofa | Sit | none | none |
 | Bed | Sleep | Set as Home (if owned plot bed) | none |
 | Lamp/radio/toggle | Toggle | none | none |
 | Mailbox | Open mail (badge with unread count) | none | none |
+| Mine entrance | Enter Deep Mine | none | none |
 | Shop / Job board / Bench | Open | none | none |
 
 - Read-aloud: if `Settings.tts_enabled`, focusing a new target speaks the primary prompt verb once.
@@ -438,14 +497,14 @@ Invalid reasons with pictograms: `occupied`, `no_support`, `outside_plot`, `over
 
 ## 3. Data Structures
 
-Conventions: `StringName` ids, lowercase snake_case, never renamed after ship. Prefixes: `item_`, `recipe_`, `piece_`, `outfit_`, `npc_`, `job_`, `contract_`, `plot_`, `mail_tpl_`, `shop_`, `dye_`, `sticker_`, `emote_`, `pet_`, `petacc_`, `case_`, `trophy_`, `loot_`. Display text is a translation key. Definitions are `Resource` subclasses under `res://resources/<type>/`, read-only. Runtime state is plain data serialized to JSON.
+Conventions: `StringName` ids, lowercase snake_case, never renamed after ship. Prefixes: `item_`, `recipe_`, `piece_`, `outfit_`, `npc_`, `job_`, `contract_`, `plot_`, `mail_tpl_`, `shop_`, `dye_`, `sticker_`, `emote_`, `pet_`, `petacc_`, `case_`, `trophy_`, `loot_`, `mat_` (voxel materials), `zone_`, `prot_`. Display text is a translation key. Definitions are `Resource` subclasses under `res://resources/<type>/`, read-only. Runtime state is plain data serialized to JSON.
 
 ### 3.1 Item definition (`ItemDef`)
 | Field | Type | Rule |
 |---|---|---|
 | `id` | StringName | `item_` prefix |
 | `name_key`, `desc_key` | String | translation keys |
-| `category` | enum | `RESOURCE, MINERAL, FABRIC, PRODUCE, FOOD, PET_FOOD, TOOL, BUILD_PIECE, FURNITURE, OUTFIT, PET_ACCESSORY, GEODE, KEY_ITEM` |
+| `category` | enum | `RESOURCE, BLOCK, MINERAL, FABRIC, PRODUCE, FOOD, PET_FOOD, TOOL, BUILD_PIECE, FURNITURE, OUTFIT, PET_ACCESSORY, GEODE, KEY_ITEM` |
 | `icon` | Texture2D | 128x128, must read clearly at 48 px |
 | `max_stack` | int | 1..999; 1 if `has_instance_data` |
 | `base_value` | int | coins >= 0 |
@@ -453,6 +512,7 @@ Conventions: `StringName` ids, lowercase snake_case, never renamed after ship. P
 | `tags` | Array[StringName] | e.g. `&"snack"`, `&"ore"` |
 | `has_instance_data` | bool | dyed outfits/accessories |
 | `tool` | ToolData | if TOOL |
+| `block` | BlockData | if BLOCK: `material_id: StringName` (the `VoxelMaterialDef` it places) |
 | `food` | FoodData | if FOOD or PET_FOOD: `stamina_restore: int`, `pet_happiness: int` |
 | `build_piece` | BuildPieceDef | if BUILD_PIECE/FURNITURE |
 | `outfit` | OutfitDef | if OUTFIT |
@@ -461,7 +521,7 @@ Conventions: `StringName` ids, lowercase snake_case, never renamed after ship. P
 | `collection` | CollectionEntryDef | if donatable (3.7) |
 | `world_scene`, `display_scene` | PackedScene | pickup visual; museum display visual |
 
-`ToolData`: `tool_type: ToolType`, `tier: int (1..4)`, `power: int`, `strike_interval_sec: float`, `stamina_cost: int`. No durability (K1).
+`ToolData`: `tool_type: ToolType` (2.6), `tier: int (1..4)`, `power: int`, `strike_interval_sec: float`, `stamina_cost: int`. No durability (K1).
 
 Item stack: `{ "item_id": "item_iron_ore", "qty": 12 }`, `{ "item_id": "item_shirt_linen", "qty": 1, "data": { "dye": "dye_moss" } }`. Stacks with non-empty `data` never merge. Dye is stored as a `dye_id`, never a raw color.
 
@@ -518,7 +578,10 @@ Rules:
 | `SnapSocket` | `position: Vector3`, `normal: Vector3`, `provides_tags`, `accepts_tags` |
 | `PaintRegionDef` | `region_id {PRIMARY, SECONDARY, TRIM}`, `shader_param: StringName` (instance uniform name), `default_dye_id` |
 | `FurnitureInteractionDef` | `kind {SIT, SLEEP, TOGGLE, PET_BED, FEED_BOWL, STORAGE, INSTRUMENT}`, `seat_markers: Array[NodePath]`, `toggle_states: int` (2 = on/off), `toggle_target: NodePath`, `stamina_regen_per_sec: float` (SIT), `instrument_id` (INSTRUMENT) |
-| `MineNodeDef` | `id`, `scene`, `hardness_tier`, `max_hp`, `loot: LootTableDef`, `discovery: DiscoveryTableDef`, `respawn_days`, `tool_zone_radius` |
+| `VoxelMaterialDef` | `id` (`mat_dirt`, `mat_stone`, `mat_copper_ore`, `mat_geode_rock`, `mat_chest_block`, `mat_bedrock`, ...), `voxel_id: int` (model index in the `VoxelBlockyLibrary`), `hardness_tier: int`, `hits: int` (with the preferred tool), `wrong_tool_hits_multiplier: int` (default 2), `preferred_tool {SHOVEL, PICKAXE}`, `drop: LootTableDef` (natural blocks drop their own `BLOCK` item), `discovery: DiscoveryTableDef` (optional), `special {NONE, GEODE, CHEST, BEDROCK}`, `placeable: bool`, `stamina_cost: int` |
+| `ProtectionVolume` (authored node, data in `ProtectionVolumeDef`) | `id` (`prot_*`), `aabb_cells: AABB` (grid aligned), `reason {TOWN, BUILDING, MUSEUM, ROAD, JOB_SITE, SPAWN}`, `allows_place: bool` |
+| `TerrainZoneDef` | `id` (`zone_*`), `kind {OVERWORLD, DEEP_MINE, STATIC}`, `generator_script`, `seed_mode {FIXED, PER_DAY}`, `bounds_cells: AABB` (bedrock at `min.y`), `persist_edits: bool`, `stream_db_key` |
+| `JumpConfig` | gravity, jump and double-jump velocities, coyote, buffer, air control, max fall speed (1.4) |
 | `LootTableDef` | `entries: Array[{item_id or "coins", min, max, weight}]`, `rolls`, `guaranteed` |
 | `DiscoveryTableDef` | `geode_chance_pct`, `geode_item_ids` (weighted), `chest_chance_pct`, `chest_table: TreasureTableDef`, `geode_pity: int`, `chest_pity: int` |
 | `TreasureTableDef` | `entries: Array[{kind {BLUEPRINT, DYE, STICKER, COINS, ITEM}, id_pool: Array[StringName], weight, coins_min, coins_max}]` |
@@ -544,6 +607,8 @@ Rules:
   "saved_at_unix": 1763164800,
   "slot": 1,
   "rng": { "seed": 918273, "counters": { "loot": 412, "discovery": 77, "mail_pool": 9 } },
+  "voxel": { "db_file": "slot_1.voxels.sqlite", "epoch": 37, "zones_with_edits": ["zone_wilderness", "zone_plot_03"] },
+  "terrain": { "damaged": { "zone_wilderness": { "12,4,-7": 1 } }, "deep_mine": { "generated_day": 14 } },
   "meta": { "player_name": "Robin", "day": 14, "coins": 1340, "playtime_sec": 18342 },
   "clock": { "day": 14, "minute": 545 },
   "player": {
@@ -560,7 +625,7 @@ Rules:
     "hotbar_index": 2
   },
   "exhaustion": { "last_snack_day": 13, "count_total": 3 },
-  "toolbelt": { "PICKAXE": "item_pickaxe_copper", "FRUIT_PICKER": "item_picker_basic", "HAMMER": "item_hammer_basic" },
+  "toolbelt": { "PICKAXE": "item_pickaxe_copper", "SHOVEL": "item_shovel_basic", "FRUIT_PICKER": "item_picker_basic", "HAMMER": "item_hammer_basic" },
   "inventory": {
     "backpack": [ { "item_id": "item_apple", "qty": 6 }, null ],
     "hotbar_refs": [0, 3, null, null, null, null, null, null],
@@ -584,9 +649,9 @@ Rules:
     ]
   },
   "world": {
-    "mine_nodes": { "zone_mine_1/node_017": { "hp": 0, "respawn_day": 16 } },
     "trees": { "zone_orchard/tree_004": { "fruit": 0, "regrow_day": 17 } },
-    "chests": { "zone_mine_1/chest_0003": { "pos": [4.0, 0.0, 9.0], "table": "loot_chest_mine_1", "opened": false } }
+    "timber": { "zone_wilderness/timber_012": { "chopped": true, "respawn_day": 18 } },
+    "chests": { "zone_wilderness/chest_0003": { "cell": [4, 2, 9], "table": "loot_chest_overworld", "opened": false } }
   },
   "discovery": { "pity": { "geode": 3, "chest": 11 } },
   "museum": {
@@ -618,6 +683,10 @@ Rules:
 - Structural failures (wrong JSON type for a section) fail the load and trigger `.bak` fallback.
 - Settings, including accessibility options, live in `user://settings.cfg`, shared across slots.
 - Save is refused while `PauseManager.has_reason(&"transition")`, except the autosave step inside SleepDirector which runs at a defined point (6.2).
+- Voxel content lives in `slot_<n>.voxels.sqlite`, not in JSON. `voxel.epoch` must match the DB epoch file (9.6).
+- `terrain.damaged` holds partially hit voxels (`"x,y,z": hits_taken`) and is cleared at day rollover.
+- Chests store their cell. Deep Mine voxels and chests are not saved (D16); items obtained there persist in inventory as usual.
+- Placed natural blocks are voxels in the DB, not entries in `build`.
 
 ### 3.6 Pet runtime state
 See `pets[]` in 3.5. Rules: `happiness` int 0..100 with floor 40 (K1/K7: never sad beyond "sleepy"); `fed_day` and `pat_day` gate once-per-day bonuses; `accessories` per slot hold an item stack (instance data allowed for dye).
@@ -642,7 +711,7 @@ Collection key is the `item_id`. Instance data (e.g. dye on a fabric) is ignored
 Display cases exist from the start as locked silhouettes; unlocking reveals the case; donated entries appear inside unlocked cases. Entries donated before their case unlocks are shown as soon as it unlocks.
 
 ### 3.8 Settings schema (`user://settings.cfg`, ConfigFile)
-Sections: `[input]` (rebinds as plain dicts, `run_mode`, `duck_mode`, `fasten_mode`, `sensitivity`, `invert_y`, `glyph_override`), `[assist]` (`auto_tool`, `auto_tool_revert`, `snap_strength`), `[accessibility]` (`color_palette {DEFAULT, BLUE_ORANGE, HIGH_CONTRAST}`, `prompt_labels`, `text_scale {1.0, 1.25, 1.5}`, `reduce_motion`, `tts_enabled`, `tts_rate`), `[audio]`, `[video]`.
+Sections: `[input]` (rebinds as plain dicts, `run_mode`, `duck_mode`, `fasten_mode`, `jump_auto`, `sensitivity`, `invert_y`, `glyph_override`), `[assist]` (`auto_tool`, `auto_tool_revert`, `snap_strength`, `go_home_confirm`), `[accessibility]` (`color_palette {DEFAULT, BLUE_ORANGE, HIGH_CONTRAST}`, `prompt_labels`, `text_scale {1.0, 1.25, 1.5}`, `reduce_motion`, `tts_enabled`, `tts_rate`), `[audio]`, `[video]`.
 
 ### 3.9 Static data validation (`Database` boot check and unit test)
 - Unique ids and prefixes; all references resolve.
@@ -654,6 +723,12 @@ Sections: `[input]` (rebinds as plain dicts, `run_mode`, `duck_mode`, `fasten_mo
 - Every `PetAccessoryDef` has a mesh for every species, or the item is flagged species-specific.
 - Every `DyeDef` has a `name_key`.
 - At least one `mail_tpl_care_*` template exists with a `CARE_PACKAGE` kind and one without a snack for repeat exhaustion.
+- Every `VoxelMaterialDef.voxel_id` exists in the `VoxelBlockyLibrary` and is unique; every library model used by generation has a `VoxelMaterialDef`.
+- Every placeable material has a `BLOCK` item and vice versa.
+- `special = CHEST` materials have a `discovery.chest_table`; `special = GEODE` materials drop a GEODE item; exactly one `special = BEDROCK` material exists and is not diggable.
+- Every `TerrainZoneDef` with `persist_edits = true` has a `stream_db_key`; `DEEP_MINE` zones have `persist_edits = false`.
+- Every authored interactable, fruit tree, timber tree and spawn marker in a voxel zone lies inside a protection volume or gets runtime support protection (9.3 P3).
+- `JumpConfig`: computed apex clears 1 voxel (jump) and 2 voxels (double jump) for the player capsule.
 
 ---
 
@@ -662,10 +737,10 @@ Sections: `[input]` (rebinds as plain dicts, `run_mode`, `duck_mode`, `fasten_mo
 ### 4.1 Framework
 - `StateMachine` + `State` nodes (`enter(msg)`, `exit()`, `handle_input(frame) -> StringName`, `physics_update(delta) -> StringName`).
 - Transition rules live in a pure `PlayerTransitionTable` mapping `(state, InputFrame, PlayerContext) -> next_state`, unit-tested without a scene.
-- `PlayerContext`: `move_len`, `is_ducking`, `head_clear`, `in_build_zone`, `focused_target_kind`, `equipped_tool_type`, `tool_target_kind`, `tool_tier_ok`, `stamina`, `exhaustion_pending`, `seat_available`.
+- `PlayerContext`: `move_len`, `is_ducking`, `head_clear`, `in_build_zone`, `focused_target_kind`, `equipped_tool_type`, `tool_target_kind`, `tool_tier_ok`, `stamina`, `exhaustion_pending`, `seat_available`, `on_floor`, `vertical_velocity`, `coyote_left`, `jump_buffer_left`, `air_jumps_left`, `headroom_ok`, `ledge_ahead`, `aimed_voxel_material`, `aimed_voxel_dig_result`.
 - Every transition emits `EventBus.player_state_changed(from, to)`.
 - Paused tree: FSM does not tick; there is no Paused state.
-- **Global rule**: `exhaustion_pending` is checked after the current state's step resolves; if true, the next state is `Exhausted` from any state.
+- **Global rule**: `exhaustion_pending` is checked after the current state's step resolves; if true, the next state is `Sleep` with reason `&"exhausted"` from any grounded state. While airborne it waits for landing.
 
 ### 4.2 Player FSM (top level)
 ```mermaid
@@ -681,76 +756,125 @@ stateDiagram-v2
     Run --> Duck: duck
     Duck --> Idle: duck off AND head_clear
 
-    Idle --> Mine: use_tool AND tool in PICKAXE/AXE AND target
-    Walk --> Mine: use_tool AND tool in PICKAXE/AXE AND target
-    Duck --> Mine: use_tool AND tool in PICKAXE/AXE AND target
+    Idle --> Jump: jump (or buffered) AND headroom_ok
+    Walk --> Jump: jump OR auto-jump ledge
+    Run --> Jump: jump OR auto-jump ledge
+    Duck --> Jump: jump AND head_clear (stands first)
+    Idle --> Fall: left floor AND coyote expired
+    Walk --> Fall: left floor AND coyote expired
+    Run --> Fall: left floor AND coyote expired
+    Jump --> Jump: jump AND air_jumps_left > 0 (double)
+    Jump --> Fall: vertical velocity <= 0
+    Fall --> Jump: jump AND (coyote_left > 0 OR air_jumps_left > 0)
+    Fall --> Idle: on_floor AND move_len <= 0.2
+    Fall --> Walk: on_floor AND move_len > 0.2
+
+    Idle --> Mine: use_tool AND dig/chop target
+    Walk --> Mine: use_tool AND dig/chop target
+    Duck --> Mine: use_tool AND dig/chop target
     Mine --> Idle: cycle done, released
 
     Idle --> Interact: interact/interact_alt on target, or use_tool with FRUIT_PICKER
     Walk --> Interact: same
     Duck --> Interact: same
-    Interact --> Idle: finished
+    Interact --> Idle: resolved
+    Interact --> Talk: NPC talk handoff
+    Interact --> Sit: SIT handoff
+    Interact --> Sleep: bed confirmed
     Interact --> Craft: recipe confirmed (D4)
-    Interact --> Sit: SIT furniture chosen
+    Talk --> Idle: dialogue closed
+    Sit --> Idle: duck, move, or jump
     Craft --> Idle: done or cancelled
 
     Idle --> Build: build_mode AND in_build_zone
     Walk --> Build: build_mode AND in_build_zone
     Build --> Idle: build_mode or duck
 
-    Idle --> Emote: wheel emote chosen
-    Walk --> Emote: wheel emote chosen
+    Idle --> Emote: wheel emote
+    Walk --> Emote: wheel emote
     Emote --> Idle: anim done or move
-    Idle --> PlayInstrument: wheel instrument chosen
+    Idle --> PlayInstrument: wheel instrument
     PlayInstrument --> Idle: move or wheel
 
-    Sit --> Idle: duck or move
-    Idle --> Exhausted: exhaustion_pending
-    Walk --> Exhausted: exhaustion_pending
-    Mine --> Exhausted: strike resolved AND exhaustion_pending
-    Build --> Exhausted: step resolved AND exhaustion_pending
-    Interact --> Exhausted: resolved AND exhaustion_pending
-    Exhausted --> [*]: SleepDirector takes over, FSM reset to Idle at wake
+    Idle --> Sleep: exhaustion_pending
+    Walk --> Sleep: exhaustion_pending
+    Mine --> Sleep: strike resolved AND exhaustion_pending
+    Build --> Sleep: step resolved AND exhaustion_pending
+    Interact --> Sleep: resolved AND exhaustion_pending
+    Sleep --> Idle: player_woke (FSM reset at home bed)
 ```
 
 Transition table (first match wins):
 | From | Condition | To | Side effects |
 |---|---|---|---|
-| any | `exhaustion_pending` after current step | Exhausted | input ignored, yawn-and-sit anim 1.5 s |
-| locomotion | `interact_pressed`/`interact_alt_pressed` on target | Interact | face target |
-| Idle/Walk/Duck | `use_pressed`, tool FRUIT_PICKER, tree with fruit | Interact (FORAGE) | same as A on tree |
-| Idle/Walk/Duck | `use_pressed`, tool PICKAXE/AXE, target in range, tier ok | Mine | lock yaw |
+| any grounded | `exhaustion_pending` after current step | Sleep(exhausted) | input ignored, yawn 1.5 s, then SleepDirector |
+| Jump/Fall | `exhaustion_pending` | stay until landing | then Sleep(exhausted) |
+| locomotion | `interact_pressed`/`interact_alt_pressed` on target | Interact | face target (4.5) |
+| Idle/Walk/Duck | `use_pressed`, tool FRUIT_PICKER, tree with fruit | Interact (FORAGE) | same as X on tree |
+| Idle/Walk/Duck | `use_pressed`, aimed voxel diggable, tier ok | Mine | lock yaw to voxel |
+| Idle/Walk/Duck | `use_pressed`, AXE, timber target in range | Mine | lock yaw |
 | Idle/Walk/Duck | `use_pressed`, tier too low | stay | friendly toast, no stamina spent |
+| Idle/Walk/Duck | `use_pressed`, aimed voxel not diggable | stay | reason pictogram toast, no stamina |
 | Run | `use_pressed` or `interact_pressed` | Walk, then re-evaluate next frame | |
-| Idle/Walk | `build_toggle_pressed`, in build zone | Build | |
+| Idle/Walk/Run | `jump_pressed` or buffered, `headroom_ok` | Jump | `vy = 7.9`; `air_jumps_left = 1` |
+| Idle/Walk/Run | `jump_pressed`, not `headroom_ok` | stay | bump pictogram over head |
+| Walk/Run | `ledge_ahead`, `Settings.jump_auto`, moving toward ledge for 0.3 s | Jump | auto-jump, same as manual |
+| Duck | `jump_pressed`, `head_clear` | Jump | collider to standing first |
+| Duck | `jump_pressed`, not `head_clear` | Duck | low ceiling pictogram |
+| Jump | `jump_pressed`, `air_jumps_left > 0` | Jump | `vy = 7.6` (set, not added); `air_jumps_left = 0`; sparkle VFX |
+| Jump | `vy <= 0` | Fall | |
+| Jump/Fall | ceiling hit | Fall | `vy = 0` |
+| grounded | left floor without jumping | stay for `coyote_time`, then Fall | `air_jumps_left = 1` (walking off a ledge keeps the double jump) |
+| Fall | `jump_pressed`, `coyote_left > 0` | Jump | counts as a ground jump |
+| Fall | `jump_pressed`, `air_jumps_left > 0` | Jump | double jump |
+| Fall | `jump_pressed`, none left | Fall | buffered 0.15 s for landing |
+| Fall | landed, buffered jump | Jump | |
+| Fall | landed, fall height > 4 m | Idle/Walk | 0.2 s soft-land anim, no damage |
+| Jump/Fall | entered KillPlane/DeepWater | SafeGround return (6.3) | |
+| Idle/Walk | `build_toggle_pressed`, in build zone | Build | show grid |
 | Idle/Walk | `build_toggle_pressed`, not in build zone | stay | pictogram toast (house + X) |
-| Idle/Walk/Run | duck on | Duck | collider swap |
-| Duck | duck off, head clear | Idle/Walk | |
-| Duck | duck off, not head clear | Duck | "low ceiling" pictogram |
+| Idle/Walk/Run | duck on | Duck | collider swap, lower camera |
+| Duck | duck off, `head_clear` | Idle/Walk | |
+| Duck | duck off, not `head_clear` | Duck | "low ceiling" pictogram |
+| Walk | run active, `move_len > 0.2` | Run | |
+| Run | `move_len <= 0.2` | Idle | run toggle resets |
+| Build | `build_toggle_pressed` or `duck_pressed` | Idle | hide grid, free ghost |
 | Idle/Walk | wheel closed with emote | Emote | pet/NPC reaction (7.4) |
 | Idle | wheel closed with instrument | PlayInstrument | instrument in hand |
-| Interact | SIT chosen, `seat_available` | Sit | snap to seat marker |
-| Sit | `duck_pressed` or `move_len > 0.5` | Idle | stand anim |
+| Interact | handoff Talk / Sit / Sleep / Craft | that state | 4.5 |
+| Sit | `duck_pressed`, `move_len > 0.5`, or `jump_pressed` | Idle | stand; the jump press does not also jump (resume guard) |
 | Craft | timer elapsed | Idle | `try_craft` commit |
 | Craft | move or duck | Idle | cancelled, nothing consumed |
 
-Invariants (unit-tested): Run never active while ducking; leaving Duck requires head clear; exactly one state active; Exhausted only entered once per depletion; no stamina is spent in Sit, Emote, PlayInstrument, Build Paint/Stamp, Craft.
+Invariants (unit-tested): Run never active while ducking; leaving Duck requires head clear; at most one air jump per airtime, reset only on landing; no jump without headroom; Mine, Interact, Build, Talk, Sit, Craft, Emote, PlayInstrument are never entered while airborne; exactly one state active; Sleep entered once per depletion; no stamina spent in Jump, Fall, Sit, Talk, Emote, PlayInstrument, Build Paint/Stamp, Craft.
 
-### 4.3 Mine sub-FSM (pickaxe and axe)
+Duck mechanics: on enter, disable `CollisionStanding`, enable `CollisionDucking`, tween SpringArm length and camera height. `head_clear = not HeadClearance.is_colliding()` using the standing capsule offset upward.
+
+#### 4.2.1 Airborne details
+- Jump height is fixed (releasing A does not cut the jump), for predictability (K5).
+- Auto-jump (`StepProbe`): the cell in front at foot level is solid, the cell above it is free, and 3 cells above the step top are free. Disabled while ducking, in Build Fasten, or within 0.5 s after a manual jump.
+- Air actions: `use_tool` while airborne performs one dig strike or one block placement without entering Mine or Build (single-shot, no hold-repeat). This supports pillar building: jump, place a block below. Placing into the player's own cell is allowed only when the capsule bottom is above that cell's top.
+- Landing never damages, stuns beyond 0.2 s, or costs stamina.
+
+### 4.3 Mine sub-FSM (dig voxels, chop timber)
 ```mermaid
 stateDiagram-v2
     [*] --> Ready
     Ready --> Windup: use_tool
     Windup --> Strike: anim event hit
-    Strike --> Recover: damage applied, stamina spent
-    Recover --> Windup: use_tool held AND hp > 0 AND NOT exhaustion_pending
-    Recover --> Yield: hp == 0
+    Strike --> Recover: TerrainService.hit_voxel or WorldState.chop_tree, stamina spent
+    Recover --> Windup: use_tool held AND target remains AND NOT exhaustion_pending
+    Recover --> Retarget: target destroyed AND use_tool held
+    Retarget --> Windup: new aimed target valid for the same tool
+    Retarget --> [*]: no valid target
     Recover --> [*]: released OR exhaustion_pending
-    Yield --> [*]: loot + discovery rolled
-    Windup --> [*]: target lost
+    Windup --> [*]: target lost (out of reach)
 ```
-- Each strike spends `tool.stamina_cost`. The strike that reaches 0 stamina still lands (K1).
-- Yield: loot rolled with seeded RNG; `DiscoveryService.roll_on_depletion(node_key)` runs (6.4). Overflow drops as pickups.
+- Hits per voxel = `material.hits`, times `wrong_tool_hits_multiplier` with the non-preferred tool (auto-tool normally prevents this).
+- Final hit: `TerrainService` re-checks `can_dig`, sets the voxel to air via `IVoxelWorld.set_voxel`, adds drops (overflow drops as pickups at the voxel center), calls `DiscoveryService.roll_on_voxel_dug`, emits `voxel_dug`.
+- Holding `use_tool` keeps digging the next aimed voxel (Minecraft-like), re-checking protection each time.
+- The strike that reaches 0 stamina still lands (K1).
+- Timber: `chop_tree` reduces tree HP; at 0, loot drops and the tree respawns after `respawn_days`. Apple trees are never chop targets (D8).
 
 ### 4.4 Build sub-FSM
 ```mermaid
@@ -766,9 +890,9 @@ stateDiagram-v2
         Preview --> Removing: use_alt held on own piece
         Removing --> Preview: 0.6 s complete or released
     }
-    Place --> Paint: hotbar_next
-    Paint --> Stamp: hotbar_next
-    Stamp --> Place: hotbar_next
+    Place --> Paint: build_tool_next (D-pad right)
+    Paint --> Stamp: build_tool_next
+    Stamp --> Place: build_tool_next
     state Paint {
         [*] --> PaintAim
         PaintAim --> PaintAim: rotate cycles region (outline highlight)
@@ -780,37 +904,84 @@ stateDiagram-v2
         StampAim --> StampAim: use_alt held removes stamp under aim
     }
 ```
-- Catalog (X) opens a menu and pauses; returns to the same sub-state.
+- Catalog (Y) opens a menu and pauses; returns to the same sub-state.
 - Paint and Stamp only target pieces on plots the player owns (never job-site blueprint pieces before contract completion).
 - Removing a painted/stamped piece returns the piece item; decor data is discarded (stickers and dyes are unlocks, nothing is lost).
 
-### 4.5 Interact sub-FSM
-`InteractionSpec`: `kind {FORAGE, TALK, GIFT, DONATE, MAILBOX, SHOP, JOB_BOARD, WORKBENCH, TAILOR_BENCH, WARDROBE, PET_PAT, PET_FEED, PET_DRESS, PLOT_SIGN, BED, SET_HOME, SIT, TOGGLE, CHEST, PICKUP}`, `anim`, `duration_sec`, `opens_menu`, `stamina_cost`.
+Rev 3 changes to Build:
+- Build tool cycling is on D-pad right/left; rotation is on RB/LB (2.3).
+- The Place catalog has a **Blocks** tab (D17). `BuildService.try_place_block(cell, material_id)` checks `TerrainService.can_place(cell)` and the shared occupancy, consumes 1 BLOCK item, then calls `IVoxelWorld.set_voxel`.
+- Removing a placed block with `use_alt` in Build returns the item instantly, only inside owned plots; elsewhere blocks are dug normally.
+- Jump and airborne placement are allowed in Build.
+
+### 4.5 Interaction model (D3)
+**Criteria for a dedicated state.** An interaction gets its own FSM state if any of these hold:
+| ID | Criterion |
+|---|---|
+| C1 | Open-ended: lasts until the player chooses to leave |
+| C2 | Remaps input (own context) |
+| C3 | Changes the camera rig, collider, or ownership of the player transform (snaps to a marker) |
+| C4 | Guards a multi-step transaction that must not be interrupted (time skip, save, zone load) |
+| C5 | Has its own sub-FSM with 3+ states or a cancellable timer |
+
+**Classification**
+| Interaction | C1 | C2 | C3 | C4 | C5 | Result |
+|---|---|---|---|---|---|---|
+| Dig voxels / chop timber | | | | | x | `Mine` |
+| Build: place, fasten, paint, stamp, blocks | x | x | | | x | `Build` |
+| Timed crafting (D4) | | | | | x | `Craft` |
+| Talk to NPC | x | | x | | x | **`Talk`** |
+| Sit on furniture | x | | x | | | **`Sit`** |
+| Sleep (bed, late night, exhaustion) | | | x | x | | **`Sleep`** |
+| Play instrument | x | x | | | | `PlayInstrument` |
+| Emote | | | | | | thin `Emote` state (deliberate exception: locks the 1.5 to 3 s animation so pet and NPC reactions play out) |
+| Forage apple tree, pickup, toggle lamp/radio, open chest, pet pat/feed | | | | | | context `Interact` |
+| Mailbox, shop, job board, benches, wardrobe, pet wardrobe, plot sign, donation desk, gift, set home | | | | | | context `Interact` (each opens a menu that owns its flow) |
+| Enter Deep Mine | | | | x | | context `Interact`, handing off to `SceneRouter` (its transition pause covers C4) |
+
+**Context-aware `Interact`** (parameterized by `InteractionSpec`):
+- `InteractionSpec`: `kind`, `anim`, `duration_sec`, `opens_menu`, `stamina_cost`, `handoff_state` (empty, `&"talk"`, `&"sit"`, `&"sleep"`, `&"craft"`).
+- Target resolution: candidates from `InteractionProbe`; an `AimRay` hit wins outright; otherwise highest `score = facing_dot * 2 - distance / 2.0 + kind_priority` (`PICKUP` 3; `NPC`, `PET`, `CHEST` 2; others 1). Ties by stable key.
+- The focused target exposes `primary_spec` (X) and `secondary_spec` (Y), shown by PromptOverlay (2.8).
+- Flow: `Approach (turn <= 0.3 s) -> Perform (anim) -> OpenMenu (optional) -> Resolve`, or `Handoff` to a dedicated state.
 
 ```mermaid
 stateDiagram-v2
     [*] --> Approach
-    Approach --> Perform: aligned (<= 0.3 s turn)
-    Perform --> OpenMenu: opens_menu != ""
+    Approach --> Perform: aligned
+    Perform --> Handoff: spec.handoff_state != ""
+    Perform --> OpenMenu: spec.opens_menu != ""
     Perform --> Resolve: no menu AND anim done
-    OpenMenu --> Resolve: menu closed
+    OpenMenu --> Resolve: menu closed (game resumes)
+    OpenMenu --> Handoff: menu result requests handoff (e.g. bench -> Craft)
+    Handoff --> [*]
     Resolve --> [*]
 ```
-| Kind | Perform | Menu | Resolve |
+
+| Kind | Perform | Menu | Resolve / Handoff |
 |---|---|---|---|
-| FORAGE | pick anim 1.2 s | none | add fruit (overflow drops), `stamina -1`, regrow timer |
-| TALK | greet | dialogue | friendship, met |
-| GIFT | none | gift picker | NpcService gift rules |
-| DONATE | none | donation | 6.5 |
-| CHEST | open anim 1.0 s | reveal card (pauses) | treasure granted (6.4) |
-| PET_PAT | pat anim | none | happiness + (once/day bonus) |
+| FORAGE | pick anim 1.2 s | none | fruit added (overflow drops), stamina -1, regrow timer |
+| PICKUP | bend 0.4 s | none | item added |
+| TOGGLE | press 0.3 s | none | `BuildService.toggle_furniture` |
+| CHEST | open 1.0 s | `chest_reveal` | treasure granted (6.4) |
+| PET_PAT | pat anim | none | happiness + (once-per-day bonus) |
 | PET_FEED | feed anim | none | `PetService.try_feed` |
-| PET_DRESS | none | pet wardrobe | accessories applied on confirm |
-| SIT | sit anim | none | to `Sit` state |
-| TOGGLE | press anim 0.3 s | none | `BuildService.toggle_furniture` |
-| BED | sleep fade | confirm (pictogram moon) | `SleepDirector.begin_sleep(&"bed")` |
-| SET_HOME | none | confirm | `HousingService.set_home_bed` |
-| others | as rev 1 | shop, job board, crafting, wardrobe, plot purchase, mail | as rev 1 |
+| PET_DRESS | none | `pet_wardrobe` | accessories applied on confirm |
+| GIFT | none | `gift_picker` | NpcService gift rules |
+| DONATE | none | `donation` | 6.5 |
+| MAILBOX, SHOP, JOB_BOARD, WARDROBE, PLOT_SIGN | none | respective menu | menu commands |
+| WORKBENCH, TAILOR_BENCH | none | `crafting` | Handoff to `Craft` if a timed recipe was confirmed |
+| SET_HOME | none | `confirm` | `HousingService.set_home_bed` |
+| TALK | none | none | Handoff to `Talk` |
+| SIT | none | none | Handoff to `Sit` |
+| BED | none | `confirm` (moon pictogram) | Handoff to `Sleep(bed)` |
+| MINE_ENTRANCE | none | `mine_entrance_confirm` | `SceneRouter` to Deep Mine |
+
+**`Talk` state**: the NPC pauses its schedule and turns to the player; the camera blends to a two-shot (0.3 s); then the `dialogue` menu is pushed (pauses). On close the camera blends back, the NPC resumes, and the FSM returns to Idle.
+
+**`Sit` state**: snap to the nearest free seat marker; body collider disabled while seated; stamina regen per `stamina_regen_per_sec`; pet may Nap. Exit on duck, move > 0.5 or jump; stand at the marker's exit point, validated free of voxels and pieces (try the opposite side, then the nearest free floor cell).
+
+**`Sleep` state** (`reason in {&"exhausted", &"bed", &"late_night"}`): plays yawn (exhausted) or lie-down (bed); calls `SleepDirector.begin_sleep(reason)`; input ignored; on `player_woke` the FSM resets to Idle at the home bed.
 
 ### 4.6 Pet AI FSM
 ```mermaid
@@ -831,15 +1002,19 @@ stateDiagram-v2
     Eat --> Follow: done
     Idle --> Nap: pet bed within 10 m AND player sitting or sleeping
     Nap --> Follow: player moves
+    Follow --> Call: pet_call
+    Idle --> Call: pet_call
+    Call --> Follow: reached player, or teleported (no path in 1 s or distance > 10 m)
 ```
+Pathing per 9.4.
 
 ### 4.7 Dialogue, mail, donation menus
-- Dialogue: `Greeting -> Choices -> {Chat, JobTalk, Shop} -> Choices -> End`. Gift moved to the X world prompt (fewer menu layers).
+- Dialogue: `Greeting -> Choices -> {Chat, JobTalk, Shop} -> Choices -> End`. Gift is the Y world prompt (fewer menu layers). Advance shows the A glyph.
 - Mail: `InboxList -> Reading -> Claim -> InboxList`. Letters show illustration first, text second; TTS reads body if enabled.
 - Donation: `List (only not-yet-donated collectibles in inventory, plus a "Donate all new" button) -> Confirm (icon grid) -> Result (case/trophy celebration if any) -> List`. A second tab "Geodes" opens geodes one at a time with a crack animation.
 
 ### 4.8 Emote/instrument wheel FSM (menu, paused)
-`Open -> Hover(slot by stick direction) -> Commit (release D-pad up, or A) -> Close`. `ui_cancel` or neutral stick on release closes with no action. Pages via `ui_tab_next/prev`: Emotes, Instruments, Tools (manual override, 2.6).
+Opened with D-pad left. `Open -> Hover(slot by stick direction) -> Commit (release D-pad left, or A) -> Close`. `ui_cancel` or neutral stick on release closes with no action. Pages via `ui_tab_next/prev`: Emotes, Instruments, Tools (manual override, 2.6).
 
 ---
 
@@ -898,7 +1073,7 @@ sequenceDiagram
 ```
 
 ### 5.5 Resume input guard
-`InputReader` drops `*_pressed` flags for physics frames `<= resume_frame` and requires a release for any action held at resume. Axes pass through. Also applies after `player_woke`.
+`InputReader` drops `*_pressed` flags for physics frames `<= resume_frame` and requires a release for any action held at resume. Axes pass through. This also suppresses a jump on the A press that closed a menu, and runs after `player_woke` and `player_sent_home`. Also applies after `player_woke`.
 
 ### 5.6 Automatic pause triggers
 | Trigger | Behavior |
@@ -918,6 +1093,8 @@ sequenceDiagram
 | OutfitCustomizer / PetWardrobe preview SubViewports | WHEN_PAUSED (inherited) | turntable animation without physics |
 | Donation and Chest reveal celebration animations | WHEN_PAUSED (inherited) | |
 | Toasts, DeviceBanner, Fader | ALWAYS | |
+| `VoxelTerrain`, `VoxelViewer` | PAUSABLE (inherited) | no streaming or edits while paused; in-flight meshing finishes |
+| SaveService voxel save wait | ALWAYS | polls `VoxelSaveCompletionTracker.is_complete()` each frame |
 | SleepDirector | ALWAYS (exception under GameSession) | its sequence runs while the `&"transition"` pause is held; awaits only `Fader` and `SceneRouter` signals |
 
 Timer rules: gameplay timers `create_timer(t, false)` or `Timer` nodes; tweens via `Node.create_tween()`.
@@ -925,20 +1102,22 @@ Timer rules: gameplay timers `create_timer(t, false)` or `Timer` nodes; tweens v
 ### 5.8 Menu inventory
 | menu_id | Opened by | initial_focus | Notes |
 |---|---|---|---|
-| `pause_menu` | Start, focus loss, device loss | Resume | Resume, Save, Load, Settings, Quit |
+| `pause_menu` | Start, focus loss, device loss | Resume | Resume, Go Home (D19), Save, Load, Settings, Quit |
+| `go_home_confirm` | Go Home | Yes (non-destructive) | skippable via `go_home_confirm` setting |
+| `mine_entrance_confirm` | Mine entrance X | Enter | sun + pickaxe pictogram: "resets every morning" |
 | `settings` | pause | first control | tabs: Controls, Assist, Accessibility, Audio, Video |
 | `rebind_capture` | settings | n/a | hold `ui_cancel` 1 s to abort |
 | `inventory` | View/Touchpad | first slot | tabs: Backpack, Outfit, Pet, Collection Book, Jobs, Map |
 | `collection_book` | inventory tab, curator dialogue | first entry of first page | pages per category; silhouette / icon / icon + ribbon; hint on focus |
 | `outfit_customizer` | Wardrobe | HEAD | preview, dye palette by name + swatch |
-| `pet_wardrobe` | pet X, PetWardrobe furniture | HEAD slot | preview pet, accessories, dye |
+| `pet_wardrobe` | pet Y, PetWardrobe furniture | HEAD slot | preview pet, accessories, dye |
 | `crafting` | benches | first craftable | D4 |
 | `shop`, `job_board`, `mail`, `dialogue`, `house_purchase`, `save_load`, `confirm` | as rev 1 | as rev 1 | |
-| `gift_picker` | NPC X | first giftable | heart icons show known preferences |
-| `donation` | curator X, DonationDesk | first donatable | 4.7 |
+| `gift_picker` | NPC Y | first giftable | heart icons show known preferences |
+| `donation` | curator Y, DonationDesk | first donatable | 4.7 |
 | `chest_reveal` | chest open | Continue | shows unlock card with pictogram |
-| `build_catalog` | X in Build | last used | pieces / dyes / stickers by Build tool |
-| `wheel` | D-pad up | center | 4.8; radial focus by stick angle |
+| `build_catalog` | Y in Build | last used | pieces / dyes / stickers by Build tool |
+| `wheel` | D-pad left | center | 4.8; radial focus by stick angle |
 | `sleep_card` | SleepDirector | none (auto-advance) | "Good morning" card with day number and letter pictogram |
 
 ### 5.9 Focus rules
@@ -956,6 +1135,8 @@ As rev 1: `FOCUS_ALL` on interactive controls, explicit neighbors in grids, mous
 | `text_scale` | 1.25 | 1.0 / 1.25 / 1.5 |
 | `reduce_motion` | off | on / off |
 | `tts_enabled` | off | on / off (D14) |
+| `jump_auto` | on | on / off (D18) |
+| `go_home_confirm` | on | on / off |
 | Hold durations (remove, abort) | 0.6 s / 1.0 s | 0.4 to 1.5 s |
 
 ---
@@ -968,7 +1149,7 @@ As rev 1: `FOCUS_ALL` on interactive controls, explicit neighbors in grids, mous
 |---|---|
 | `base_max` | 100 |
 | `max_bonus_cap` | 50 (from trophies) |
-| Costs | mine/chop strike 2, hammer hit 1, screw complete 1, forage 1; walking, running, ducking, placing, painting, stamping, crafting, talking: 0 |
+| Costs | dig soft voxel 1 per hit, dig hard voxel 2 per hit, chop 2 per hit, hammer hit 1, screw complete 1, forage 1; walking, running, jumping, double jumping, ducking, placing, painting, stamping, crafting, talking: 0 |
 | Regen while sitting | 1 per 2 s |
 | Food | `FoodData.stamina_restore` |
 | Low thresholds | 25% (yawn anim, HUD pulse), 10% (stronger hint, `quick_eat` prompt if food owned) |
@@ -987,7 +1168,8 @@ No movement penalty at low stamina. No fall damage exists.
 `SleepDirector.begin_sleep(reason)`, `reason in {&"exhausted", &"bed", &"late_night"}`. Single code path for all three.
 
 Exhaustion trigger rules:
-- `stamina_depleted` -> wait for the player FSM to enter `Exhausted` (current strike/step resolves first) -> `begin_sleep(&"exhausted")`.
+- `stamina_depleted` -> the FSM enters `Sleep(exhausted)` once the current strike/step resolves (after landing if airborne) -> `begin_sleep(&"exhausted")`.
+- Depletion in the Deep Mine wakes the player at home as usual; the Deep Mine regenerates at rollover (D16).
 - If a zone transition is in progress, exhaustion is deferred until it completes. Only one sleep runs at a time; duplicate calls are ignored and logged.
 - Menus cannot be open (stamina is only spent during unpaused gameplay).
 
@@ -1004,7 +1186,7 @@ sequenceDiagram
     participant SV as SaveService
     participant EB as EventBus
     SS->>EB: stamina_depleted
-    FSM->>FSM: finish step -> Exhausted (1.5 s yawn)
+    FSM->>FSM: finish step -> Sleep(exhausted), 1.5 s yawn
     FSM->>SD: begin_sleep(&"exhausted")
     SD->>EB: sleep_transition_started(&"exhausted")
     SD->>PM: request_pause(&"transition")
@@ -1034,10 +1216,11 @@ Care letter rules:
 `DayRollover` is an explicit ordered list called by `GameClock` and `SleepDirector`. It never relies on signal connection order:
 1. Set clock (day, 06:00).
 2. `WorldStateService.respawn_due(day)`.
-3. `EconomyService.restock(day)`.
-4. `PetService.daily_reset(day)` (fed/pat flags evaluated, happiness drift toward 60, floor 40).
-5. `MailService.deliver_due(day)`.
-6. Emit `EventBus.day_started(day)`.
+3. `TerrainService.daily_reset(day)` (clear `terrain.damaged`; set the Deep Mine seed for `day`).
+4. `EconomyService.restock(day)`.
+5. `PetService.daily_reset(day)` (fed/pat flags evaluated, happiness drift toward 60, floor 40).
+6. `MailService.deliver_due(day)`.
+7. Emit `EventBus.day_started(day)`.
 
 No loss guarantees (K1): inventory, wallet, tools, placed pieces (loose ones stay loose), pet, and contracts are unchanged by exhaustion, except the added snack. Contracts with deadlines are not failed by exhaustion; deadlines extend by one day if the deadline was today.
 
@@ -1046,13 +1229,17 @@ No loss guarantees (K1): inventory, wallet, tools, placed pieces (loose ones sta
 - `KillPlane` (below each zone) and `DeepWater` areas: on player entry, quick fade (0.4 s, `&"transition"` pause), place at last safe position, no cost, no message beyond a soft pictogram.
 - Shallow water is walkable decoration. No drowning, no fall damage, no hostile creatures, no hot surfaces.
 - The pet uses the same rule (teleports to the player).
+- Safe positions are recorded only where 3 free voxels sit above the floor, so a return never lands the player in a tunnel they cannot stand in.
+- Every voxel zone has an undiggable bedrock layer at `bounds_cells.min.y`; nobody can dig out of the world.
+- **Go Home** (D19): pause-menu button. `SleepDirector.go_home()`: transition pause, fade, load home zone, place at home bed, fade in. No time skip, no stamina change, no cost. Emits `player_sent_home`.
+- Stuck hint: if the player gives move input for 20 s without moving more than 0.5 m and is enclosed (all 4 horizontal neighbors and the cell above blocked), a gentle prompt suggests Go Home.
 
 ### 6.4 Non-violent discovery (geodes and treasure chests)
-Triggered by `DiscoveryService.roll_on_depletion(node_key)` when a mine node yields. Seeded RNG stream `discovery`.
+Triggered by `DiscoveryService.roll_on_voxel_dug(material_id, cell)` whenever `TerrainService` removes a voxel. Seeded RNG stream `discovery`.
 
-Roll order:
-1. **Geode**: chance `geode_chance_pct`; forced if `pity.geode >= geode_pity`. On success: add geode item (or drop), reset `pity.geode`, else increment.
-2. **Treasure chest**: chance `chest_chance_pct`; forced if `pity.chest >= chest_pity`. On success: spawn `TreasureChest` at the nearest free floor point next to the node, persisted in `world.chests` until opened. Reset/increment pity as above.
+Sources:
+1. **Geode rock** (`special = GEODE`): generated in hard stone layers; digging it drops a GEODE item. **Pity**: after `geode_pity` hard voxels dug without a geode, the next hard voxel also drops one. `pity.geode` resets on any geode.
+2. **Buried treasure** (`special = CHEST`): generated in pockets (overworld: rare, persists until opened; Deep Mine: per day). Digging the chest block, or any voxel face-adjacent to it, converts that block into a `TreasureChest` entity in its cell, so a child sees a chest appear instead of breaking it. The chest persists in `world.chests` until opened. **Pity**: after `chest_pity` voxels dug in voxel zones without revealing a chest, a `TreasureChest` spawns in the nearest free cell next to the next dug voxel. `pity.chest` resets on any reveal.
 
 Chest open (Interact CHEST):
 - Draw one entry from `TreasureTableDef` by weight. For unlock kinds (`BLUEPRINT`, `DYE`, `STICKER`), pick only from ids **not yet unlocked**. If the pool is exhausted, re-draw among unlock kinds with remaining ids; if all are exhausted, grant coins (K6: no duplicates, never empty).
@@ -1091,7 +1278,7 @@ State updates are synchronous within the call, so a second call in the same fram
 - Newly satisfied (e.g. content added in an update): unlock and reward exactly once, following the rules above.
 - Already recorded: no events, no rewards. Loading never re-emits `item_donated`.
 
-**Museum zone**: display cases instantiate `display_scene` for donated entries at `slot_markers`; trophy statues appear on pedestals. Rebuilt from state on zone load.
+**Museum zone**: display cases instantiate `display_scene` for donated entries at `slot_markers`; trophy statues appear on pedestals. Rebuilt from state on zone load. The Museum is a STATIC zone (no voxels).
 
 ---
 
@@ -1115,7 +1302,7 @@ Pet (CharacterBody3D, layer pet, mask world|build_pieces)
 - Follow target is recomputed at 5 Hz; speed scales between walk and run with distance.
 - Teleport on: distance > `teleport_distance` (20 m), no path for 2 s, or zone change (spawn next to player after load).
 - Build overlap: if a placed piece's footprint covers the pet, the pet is moved to the nearest free navmesh point (`NavigationServer3D` closest point query).
-- Navmesh baked for the pet's agent radius so it follows into ducking tunnels.
+- Navigation per 9.4: `VoxelAStarGrid3D` on voxel ground (the pet fits its 1x2 agent assumption and hops 1 voxel), navmesh in STATIC zones, teleport fallback. `pet_call` (D-pad right) makes the pet come to the player.
 
 **Feeding** (`PetService.try_feed(item_id)`):
 - Item must be `PET_FOOD` (or `FOOD` tagged favorite) and in inventory, else error, nothing removed.
@@ -1132,7 +1319,7 @@ Pet (CharacterBody3D, layer pet, mask world|build_pieces)
 
 ### 7.2 Painting and stamping
 **Paint** (Build mode, Paint tool):
-- Target: owned, placed piece with `paint_regions`. `rotate_cw/ccw` cycles the active region; the region gets an outline highlight.
+- Target: owned, placed piece with `paint_regions`. RB/LB cycle the active region; the region gets an outline highlight. Voxels are not paintable in v1.
 - `use_tool` applies the selected dye: `BuildService.try_paint(piece_key, region_id, dye_id)` stores `paint[region] = dye_id` and calls `set_instance_shader_parameter(region.shader_param, dye.color)` on the piece's GeometryInstance3D nodes.
 - Dyes are unlocks, never consumed (D12). Eyedropper (`interact`) copies a region's dye.
 - High-contrast palette: dye swatches in the palette show `pattern_tex` and name.
@@ -1159,10 +1346,10 @@ Pet (CharacterBody3D, layer pet, mask world|build_pieces)
 Furniture (`fastener = NONE`) is usable as soon as placed. Structural pieces only count as support and for blueprints once FASTENED.
 
 ### 7.4 Emote and instrument wheel
-- D-pad up opens `wheel` (menu, pauses). 8 slots per page; pages Emotes, Instruments, Tools.
+- D-pad left opens `wheel` (menu, pauses). 8 slots per page; pages Emotes, Instruments, Tools.
 - v1 emotes: wave, dance, cheer, clap, heart, sleepy, laugh, point. Unlocked defaults: wave, dance, cheer; others via friendship letters and chests.
 - Emote state: plays `EmoteDef.anim` (1.5 to 3 s); pet within 8 m runs `React`; NPCs within 6 m play `npc_reaction`; first wave to each NPC per day gives +1 friendship.
-- Instruments (flute, drum, ukulele): `PlayInstrument` state; 8 note actions (`note_1..8`) mapped per 2.3; each press plays a note `AudioStreamPlayer3D` (polyphony 4); no score, no fail.
+- Instruments (flute, drum, ukulele): `PlayInstrument` state; 8 note actions (`note_1..8`) on A, B, X, Y, LB, RB, LT, RT (KB 1..8) per 2.3; each press plays a note `AudioStreamPlayer3D` (polyphony 4); no score, no fail.
 - Wheel Tools page lists owned tools for manual override (2.6 rule 6).
 
 ---
@@ -1174,17 +1361,23 @@ Furniture (`fastener = NONE`) is usable as soon as placed. Structural pieces onl
 |---|---|
 | `InventoryModel` | add/remove/merge/split, overflow, instance-data stacks |
 | `WalletModel`, `TransactionCoordinator` | all-or-nothing with failure injection |
-| `PlayerTransitionTable` | 4.2 table and invariants |
+| `PlayerTransitionTable` | 4.2 table and invariants, including airborne rules: headroom, coyote, buffer, one air jump, reset on landing, auto-jump conditions, no action states while airborne, Sleep waits for landing |
+| `JumpModel` | apex heights clear 1 and 2 voxels for configured gravity and velocities |
+| `InteractionResolver` | target scoring, aim override, X/Y spec mapping, handoff to Talk/Sit/Sleep/Craft |
+| `TerrainRules` | protection P1 to P7 (9.3), bedrock, shared occupancy with build pieces |
+| `VoxelDigModel` | hits per material and tool, wrong-tool multiplier, drops, partial damage reset at rollover |
+| `BlockPlacementModel` | occupancy against voxels, pieces, player, pet; owned-plot instant removal |
+| `FakeVoxelWorld` | DDA raycast correctness (the fake itself is tested) |
 | Mine/Build/Interact/Pet sub-FSM tables | pure transitions |
 | `ToolSelectionModel` | priority, aim preference, debounce, hysteresis, locks, override, missing tool, revert |
 | `SnapAssistModel` | socket choice by radius per strength, sticky snap, auto-rotation, validity reasons |
 | `StaminaModel` | clamp, edge-triggered depletion, last action lands, thresholds once per day |
 | `DayRollover` | step order with spies |
-| `DiscoveryModel` | pity forcing, unique unlock pools, exhausted-pool fallback to coins, seeded determinism |
+| `DiscoveryModel` | geode pity on hard voxels, chest reveal on adjacency, chest pity, unique unlock pools, exhausted-pool fallback to coins, seeded determinism |
 | `MuseumModel` | guards, batch dedupe, case and trophy evaluation, reward guard |
 | `PetBrainModel`, feeding rules | follow/teleport thresholds, happiness floor, daily flags |
 | `MailboxModel` | delivery idempotence, claim all-or-nothing, never-expire kinds |
-| Save round-trip and sanitization | int casting, `.bak` fallback, migrations, unknown ids |
+| Save round-trip and sanitization | int casting, `.bak` fallback, migrations, unknown ids, voxel epoch match and mismatch fallback, save ordering (9.6) with a fake stream |
 | `Database` integrity | 3.9 |
 | `InputReader` resume guard | synthetic frames |
 | Pause-safety lint | grep for `create_timer(` without `false`, `get_tree().create_tween(` |
@@ -1199,39 +1392,46 @@ Mandatory conventions for every integration suite:
 6. Physics-dependent steps (Area3D overlaps) await physics frames via helper `await_physics_frames(n)` (loops `await get_tree().physics_frame`). `simulate_frames` alone is not sufficient. Physics tick fixed at 60 Hz; 0.15 s = 9 frames, 1.0 s = 60 frames.
 7. No InputEvents. Player input is injected with `InputReader.inject(frame)`; movement into zones is done by setting `global_position` and awaiting physics frames.
 8. Every await has a timeout: `await assert_signal(EventBus).wait_until(2000).is_emitted(...)`.
-9. Headless run with the command in 0.5 item 1 must exit 0.
+9. Headless run with the command in 0.6 item 1 must exit 0.
+10. Terrain in integration suites is a `FakeVoxelWorld` (a `Dictionary[Vector3i, int]` with a data-based DDA raycast) injected into `TerrainService` and `ToolAutoSelector`. Standard suites contain no `VoxelTerrain` node.
+11. Real-terrain smoke suite `test/integration/test_voxel_smoke.gd`, tagged `@voxel_real`: a 32x32x32 `VoxelTerrain` with `VoxelStreamSQLite` under `user://test_tmp/`; dig, place, save (await tracker), reload, compare. Must pass headless in the plan1 spike; if it cannot run headless it moves to a windowed CI job and this spec is updated.
 
 ### 8.3 Suite A: auto-tool selection (`test/integration/test_auto_tool_selection.gd`)
-Fixture `auto_tool_fixture.tscn`: flat floor; Player at origin; ToolBelt granted PICKAXE (tier 1), AXE, FRUIT_PICKER, HAMMER, SCREWDRIVER; MineNode tier 1 at (6,0,0); AppleTree with fruit at (-6,0,0); MineNode tier 3 at (0,0,-6); owned plot with a LOOSE nailed wall at (0,0,6) and a LOOSE screwed shelf at (3,0,6). Zones far enough apart not to overlap except where a case needs it.
+Fixture `auto_tool_fixture.tscn` with `FakeVoxelWorld`: flat `mat_dirt` floor at y = 0; a 3x3 `mat_stone` patch at x 5..7, z -1..1; one tier-3 `mat_stone_hard` voxel at (0,1,-6); a protection volume over x -2..2, z 8..10 containing a `mat_dirt` voxel at (0,1,9); AppleTree with fruit at (-6,1,0); TimberTree at (-6,1,6); owned plot with a LOOSE nailed wall at (3,1,6) and a LOOSE screwed shelf at (5,1,6). ToolBelt: SHOVEL, PICKAXE tier 1, AXE, FRUIT_PICKER, HAMMER, SCREWDRIVER. Aim is set with `ToolAutoSelector.set_aim_for_tests(origin, direction)`; movement by setting `global_position` and awaiting physics frames.
 
 | # | Case | Steps | Assertions |
 |---|---|---|---|
-| A1 | Enter ore zone | move player to (4.5,0,0); await 12 physics frames | `tool_auto_selected(PICKAXE, &"mine_node", &"zone_enter")` emitted once; `ToolBelt.equipped_type == PICKAXE` |
-| A2 | Enter fruit tree zone | move to (-4,0,0) | FRUIT_PICKER equipped; prompt for tree shows tool prompt |
-| A3 | Tree without fruit inactive | set fruit 0, re-enter | no emission; hands empty |
-| A4 | Hammer in Build mode | enter Build (inject `build_toggle_pressed`), move near nailed wall | HAMMER equipped |
-| A5 | Screwdriver by fastener | move near screwed shelf | SCREWDRIVER equipped |
-| A6 | Loose-piece zones ignored outside Build | exit Build, stay near wall | no HAMMER emission; equipped not HAMMER |
-| A7 | Exit all zones reverts | leave all zones; await 59 frames then 2 more | no `tool_unequipped` at frame 59; emitted by frame 61 with `&"auto"` |
-| A8 | Debounce | oscillate between two overlapping zones every 4 frames for 24 frames | at most one `tool_auto_selected` |
-| A9 | Hysteresis | move just outside enter radius (+0.3 m) | still equipped, no unequip |
-| A10 | Aim preference | stand in overlap of ore and tree zones, point AimRay at tree | FRUIT_PICKER wins despite lower priority |
-| A11 | Priority then distance | same overlap, no aim target | PICKAXE (priority 30 > 20) |
-| A12 | Action lock | start Mine on ore (inject `use_pressed`), teleport into tree overlap mid-Windup | no switch until Mine exits; then switch with reason `&"lock_released"` |
-| A13 | Manual override | choose AXE via wheel command, enter ore zone | no auto switch for 10 s (600 frames) or until all zones left |
-| A14 | Missing tool | remove PICKAXE from belt, enter ore zone | no equip; `prompt_changed(target, &"missing_tool", PICKAXE)` emitted |
-| A15 | Tier too low | approach tier-3 node with tier-1 pickaxe | PICKAXE equipped; prompt tier-lock badge; `use_pressed` spends 0 stamina |
-| A16 | Setting off | `Settings.auto_tool = false`, enter ore zone | no emission |
-| A17 | Paused | `PauseManager.request_pause(&"menu")`, move into zone, await 30 frames | no emission while paused; emission after release |
+| A1 | Aim at stone | aim at (5,0,0) from 3 m | `tool_auto_selected(PICKAXE, &"voxel_hard", &"aim_change")` once; equipped PICKAXE |
+| A2 | Aim at dirt | aim at (0,0,2) | SHOVEL with `&"voxel_soft"` |
+| A3 | Out of reach | aim at stone from 6 m | no emission |
+| A4 | Protected voxel | aim at (0,1,9) | no equip; `prompt_changed(target, &"protected", ...)` |
+| A5 | Fruit tree zone | move to (-4,1,0), no aim target | FRUIT_PICKER with `&"zone_enter"` |
+| A6 | Tree without fruit | set fruit 0, re-enter | no emission |
+| A7 | Timber zone | move near timber | AXE |
+| A8 | Hammer in Build | inject `build_toggle_pressed`, move near nailed wall | HAMMER |
+| A9 | Screwdriver by fastener | move near screwed shelf | SCREWDRIVER |
+| A10 | Loose-piece zones ignored outside Build | exit Build, stay near wall | no HAMMER emission |
+| A11 | Aim beats zone | stand in fruit-tree zone, aim at dirt | SHOVEL |
+| A12 | Zone priority, then distance | stand in AXE and FRUIT_PICKER overlap with no aim; then test equal-priority zones | priority decides first; nearer zone decides on equal priority |
+| A13 | No candidates, revert | remove aim and leave zones; await 59 physics frames, then 2 more | no `tool_unequipped` at frame 59; `tool_unequipped(&"auto")` by frame 61 |
+| A14 | Debounce | alternate aim between stone and dirt every 4 frames for 24 frames | at most one `tool_auto_selected` |
+| A15 | Voxel aim hysteresis | aim leaves stone for 10 frames, then returns | no switch, no unequip |
+| A16 | Action lock | start Mine on stone, change aim to dirt during Windup | no switch until Mine exits; then SHOVEL with `&"lock_released"` |
+| A17 | Airborne does not lock | inject `jump_pressed`, change aim from stone to dirt in the air | switch happens while airborne |
+| A18 | Manual override | select AXE via the wheel command, aim at stone | no auto switch for 600 frames or until no candidates |
+| A19 | Missing tool | remove PICKAXE, aim at stone | no equip; `missing_tool` prompt |
+| A20 | Tier too low | aim at the tier-3 voxel | PICKAXE equipped; tier-lock badge; a strike spends 0 stamina and leaves the voxel |
+| A21 | Setting off | `Settings.auto_tool = false` | no emission |
+| A22 | Paused | `request_pause(&"menu")`, change aim and position, await 30 frames | nothing while paused; emission after release |
 
 ### 8.4 Suite B: stamina zero-state recovery (`test/integration/test_stamina_exhaustion.gd`)
-Fixture `exhaustion_fixture.tscn`: Mine zone with one ore node; starter cabin zone registered with `SceneRouter` (bed marker `bed_01`, mailbox); player with PICKAXE; inventory with 3 known items; wallet 500; day 5, 14:00; NPC `npc_hilde` friendship 100.
+Fixture `exhaustion_fixture.tscn`: Wilderness zone with a `FakeVoxelWorld` `mat_stone` floor (`hits = 2`); starter cabin zone registered with `SceneRouter` (bed marker `bed_01`, mailbox); player with PICKAXE; inventory with 3 known items; wallet 500; day 5, 14:00; NPC `npc_hilde` friendship 100.
 
 | # | Case | Steps | Assertions |
 |---|---|---|---|
 | B1 | Edge-triggered depletion | stamina = 1; `spend(2, &"mine")` | stamina == 0 (not negative); `stamina_depleted` emitted exactly once; second `spend` emits nothing |
-| B2 | Last action lands | stamina = 1, inject mine strike | node hp reduced by tool power; then FSM enters `Exhausted` |
-| B3 | Signal order | B2 then await `player_woke` (timeout 5000) | recorder order: `stamina_depleted`, `sleep_transition_started(&"exhausted")`, `game_paused`, `mail_delivered`, `day_started(6)`, `player_woke(&"exhausted", 6)`, `game_resumed` |
+| B2 | Last action lands | stamina = 2, two strikes on one stone voxel (cost 2 each) | second strike lands with stamina 0 clamped: voxel removed, `voxel_dug` emitted, drop added; then FSM enters `Sleep` with reason `&"exhausted"` |
+| B3 | Signal order | B2 then await `player_woke` (timeout 5000) | recorder order: `stamina_depleted`, `player_state_changed(_, &"sleep")`, `sleep_transition_started(&"exhausted")`, `game_paused`, `mail_delivered`, `day_started(6)`, `player_woke(&"exhausted", 6)`, `game_resumed` |
 | B4 | Wake state | after B3 | clock day 6, minute 360; current zone == starter cabin; player within 0.1 m of `bed_01` marker; stamina == max; FSM state Idle; `PauseManager.is_paused() == false` and no reasons held |
 | B5 | Care letter with snack | after B3 | inbox has exactly 1 new message: kind `CARE_PACKAGE`, `deliver_day == 6`, sender `npc_hilde`, `expires_day == 0`, one `item` attachment with `&"snack"` tag, qty 1, `claimed == false`; `exhaustion.last_snack_day == 6` |
 | B6 | Claim | `claim_attachments(id)` | inventory +1 snack; second claim returns error, inventory unchanged |
@@ -1242,6 +1442,10 @@ Fixture `exhaustion_fixture.tscn`: Mine zone with one ore node; starter cabin zo
 | B11 | Owned home bed | grant plot, `set_home_bed(plot bed)`, deplete | wakes at plot bed marker |
 | B12 | Autosave content | read autosave JSON after wake | `player.stamina == max`, care message present in `mail.inbox`, `exhaustion.last_snack_day == 6`, all ints are `TYPE_INT` after load |
 | B13 | Contract deadline extension | active contract with deadline day 5 at depletion | deadline becomes day 6; contract not failed |
+| B14 | Depletion while airborne | stamina 1, jump, air-dig a stone voxel (cost 2) | `stamina_depleted` emitted; FSM stays Jump/Fall until landing; `sleep_transition_started` after `on_floor` |
+| B15 | Partial damage reset | one hit on a `hits = 3` voxel, then exhaust | after wake `terrain.damaged` is empty; voxel still present |
+| B16 | Deep Mine wake | exhaust inside a Deep Mine fixture zone | wake at home bed; Deep Mine seed day == 6 |
+| B17 | Go Home is not exhaustion | call `go_home()` | `player_sent_home` emitted; no day change; no care letter; stamina unchanged |
 
 ### 8.5 Suite C: museum collection (`test/integration/test_museum_collection.gd`)
 Fixture `museum_fixture.tscn`: Museum zone with one case `case_test_minerals` (COUNT 2, MINERAL), one trophy `trophy_test_first` (TOTAL_COUNT 1, reward `max_stamina_bonus 10`, coins 50), donation desk; test resources with collectibles `item_quartz` (MINERAL), `item_amethyst` (MINERAL), `item_cotton_cloth` (FABRIC, dyeable), `item_apple` (PRODUCE), non-collectible `item_plank_pine`.
@@ -1263,6 +1467,72 @@ Fixture `museum_fixture.tscn`: Museum zone with one case `case_test_minerals` (C
 | C13 | Structural failure | `museum.donated` as an array in primary save, valid `.bak` | load falls back to `.bak`; notice flagged |
 | C14 | Reconcile new content | load a save whose donations satisfy a trophy not present when saved | trophy unlocked once, reward letter scheduled once; save and reload again yields no second reward |
 | C15 | Discovery tracking | `InventoryService.add(&"item_apple", 1)` on fresh session | `entry_discovered(&"item_apple")` once; adding again emits nothing |
+| C16 | Mineral from voxel ore | dig a `mat_quartz_ore` voxel in `FakeVoxelWorld` | `item_quartz` added; `entry_discovered(&"item_quartz")` once; donatable |
+| C17 | Geode-sourced mineral | open a geode on a fixed seed with undiscovered bias | result is an undiscovered mineral; discovered once |
 
 ### 8.6 Definition of done
-For any task: unit and integration suites pass in a headless run (command in 0.5 item 1) with exit code 0, and `_docs/PROGRESS.md` is updated per CLAUDE.md.
+For any task: unit and integration suites pass in a headless run (command in 0.6 item 1) with exit code 0, and `_docs/PROGRESS.md` is updated per CLAUDE.md. `@voxel_real` is required only after the plan1 spike passes.
+
+---
+
+## 9. Voxel Terrain
+
+### 9.1 Technology
+- Zylann Voxel Tools **GDExtension** 1.7 in `res://addons/zylann.voxel/`, official Godot 4.7.x, regular export templates.
+- `VoxelTerrain` with `VoxelMesherBlocky` and a `VoxelBlockyLibrary` (one model per `VoxelMaterialDef`). Data block size and view distance (start at 96 m) are tuned in the spike.
+- Generation: `VoxelGeneratorScript` using Godot's built-in noise (FastNoise2 is not in the GDExtension). Layers: grass/dirt surface, stone, hard stone, ore veins, geode rock pockets, chest pockets, bedrock floor.
+- `VoxelViewer` on the Player drives loading.
+- `IVoxelWorld` interface, the only way gameplay touches terrain:
+  `get_voxel(cell) -> int`, `set_voxel(cell, voxel_id)`, `raycast(origin, dir, max_dist) -> {hit, cell, prev_cell, voxel_id}`, `is_loaded(cell) -> bool`, `flush() -> Signal` (emitted when saved).
+  - Real: `VoxelWorldAdapter` wraps `VoxelTerrain.get_voxel_tool()` (`get_voxel`, `set_voxel`, `raycast`, `is_area_editable` for `is_loaded`) and `save_modified_blocks()`.
+  - Fake: `FakeVoxelWorld` for tests (9.7).
+
+### 9.2 Zones
+| Kind | Terrain | Edits persist | Notes |
+|---|---|---|---|
+| OVERWORLD (Wilderness, Orchard, Plots, town outskirts) | VoxelTerrain, fixed seed | yes (slot DB) | ore sparse and finite; buildings and roads covered by protection volumes |
+| DEEP_MINE | VoxelTerrain, seed = hash(save_seed, day) | no (memory only, discarded at rollover) | renewable ore, geodes, chests; 3-voxel main tunnels, 2-voxel crawlspaces (Duck) to treasure pockets |
+| STATIC (Town core, Museum, Starter Cabin interior) | hand-built meshes, no VoxelTerrain | n/a | baked navmesh for NPCs |
+
+### 9.3 Protection rules
+`TerrainService.can_dig(cell)` and `can_place(cell)` evaluate in order; the first failure returns its reason.
+| ID | Rule | Reason |
+|---|---|---|
+| P1 | Cell inside a `ProtectionVolume` (dig always refused; place refused unless `allows_place`) | `&"protected"` |
+| P2 | Cell is bedrock or below `bounds_cells.min.y` | `&"bedrock"` |
+| P3 | Cell supports a fruit tree, timber tree, interactable, NPC spawn, or pet bed: the cell directly below the object's base and its 8 horizontal neighbors | `&"supports_object"` |
+| P4 | Cell is directly below any build-piece footprint cell | `&"supports_building"` |
+| P5 | Cell is inside an active job-site blueprint area | `&"job_site"` |
+| P6 | Dig: the cell directly under the player's feet. Place: a cell inside the player or pet capsule | `&"under_player"`, `&"inside_player"`, `&"inside_pet"` |
+| P7 | Cell not loaded | `&"not_loaded"` (silent) |
+
+Protection volumes are authored in zone scenes; P3 to P5 are computed at runtime from current objects. There is no gravity or collapse simulation; these rules guarantee nothing authored floats.
+
+### 9.4 Navigation
+- NPCs: only in STATIC zones and protected volumes, on baked `NavigationRegion3D`. NPC schedules never target unprotected voxel cells.
+- Pet on voxel ground: `VoxelAStarGrid3D` (`set_terrain`, `set_region`, `find_path_async`) over a 32x16x32 region centered on the player, re-centered after the player moves 8 m.
+- Pet in STATIC zones: navmesh.
+- Fallback: no path within 1 s, distance > 20 m, or zone change -> teleport to a free standing cell next to the player.
+
+### 9.5 Collision
+- Default: `VoxelTerrain` mesh-based collision on layer `world`; the player is a Jolt `CharacterBody3D`.
+- Budget (verified in the spike): edit-to-collision <= 100 ms; no frame > 20 ms during continuous digging on min-spec hardware.
+- Edge safety: when a dug voxel supports the player's capsule edge (straight down is blocked by P6), the player gets a temporary support until the rebuild finishes or 0.2 s pass.
+- Fallback if the budget fails: player terrain collision via `VoxelBoxMover` (`get_motion`, step climbing for auto-jump), Jolt for everything else. This is a plan-level switch; the airborne FSM then reads floor state from the mover.
+
+### 9.6 Persistence
+- Overworld terrains use `VoxelStreamSQLite` with `database_path` pointing to a **working copy**: `user://saves/work/slot_<n>.voxels.sqlite`.
+- Load slot: copy `slot_<n>.voxels.sqlite` to the working copy (empty for a new game), then attach the stream.
+- Save:
+  1. Call `save_modified_blocks()` on each overworld terrain and wait for `VoxelSaveCompletionTracker.is_complete()` (10 s timeout; on `is_aborted()` or timeout the save fails with a friendly toast and nothing is written).
+  2. Increment `voxel.epoch`; copy the working DB to `slot_<n>.voxels.sqlite.tmp`; write the epoch to `slot_<n>.voxels.epoch.tmp`.
+  3. Write JSON (`.tmp`, rotate `.bak`, rename). Then rotate the DB and epoch `.bak` files and rename their `.tmp` files.
+  - With this order, a crash between the JSON and DB renames leaves new JSON with the old DB: dug voxels reappear while their drops are already in the inventory (harmless duplication). The reverse order would lose items (K1), so it is not used.
+- Load: if JSON `voxel.epoch` differs from the DB epoch file, use the newest consistent pair (the `.bak` pair) and show a gentle notice.
+- **Unverified**: whether the SQLite file can be safely copied while the stream holds it open after the tracker completes. The spike must confirm it; fallback is pointing `database_path` at a fresh file per save, or detaching the stream during the copy.
+- Deep Mine: no stream; regenerated from the day seed on entry.
+
+### 9.7 Test seams
+- `IVoxelWorld` with `FakeVoxelWorld` (dictionary + DDA raycast) for unit and integration tests.
+- `TerrainService.new(world: IVoxelWorld, inventory, discovery, occupancy, rules)` constructor injection.
+- `@voxel_real` smoke suite (8.2 item 11).

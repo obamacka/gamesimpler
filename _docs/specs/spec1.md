@@ -3,7 +3,7 @@
 | Field | Value |
 |---|---|
 | Status | DRAFT rev 3, pending review of Section 0.5 (Open Decisions) |
-| Revision | rev 1: core systems. rev 2: kid-friendly, accessibility, forgiving logic, expression systems, integration tests. rev 3: D1 to D4 resolved (dig-anywhere blocky voxels, jump and double jump, context-aware interaction with dedicated critical states, crafting flow confirmed) |
+| Revision | rev 1: core systems. rev 2: kid-friendly, accessibility, forgiving logic, expression systems, integration tests. rev 3: D1 to D4 resolved (dig-anywhere blocky voxels, jump and double jump, context-aware interaction with dedicated critical states, crafting flow confirmed). rev 3.1: D16 to D19 confirmed |
 | Engine | Godot 4.7 stable (4.7.2 latest patch found, 2026-08-18), GDScript |
 | Physics | Jolt Physics (built-in module) |
 | Voxels | Zylann Voxel Tools 1.7, GDExtension edition (MIT), released 2026-08-20, targets Godot 4.5+ |
@@ -83,6 +83,10 @@ Godot facts verified against `godotengine/godot` tag `4.7-stable` class referenc
 | D2 | **Jump and double jump**, both available from the start. **A = jump, X = interact, Y = secondary interact**; build mode moves to D-pad up | 1.4, 2.2, 2.3, 2.8, 4.2 |
 | D3 | **Context-aware `Interact`** for most interactions; **dedicated states** for critical ones, chosen by explicit criteria C1 to C5 | 4.5 |
 | D4 | Recipe chosen in a paused menu; timed `Craft` state runs in the world and is cancellable | 4.2, 4.5 |
+| D16 | **Overworld digging is permanent; the Deep Mine regenerates every day** from a per-day seed, keeping ore renewable | 3.5, 6.2, 9.2 |
+| D17 | **Dug blocks can be placed back**: natural blocks drop as `BLOCK` items and are placed on the 1 m grid with the Build Place tool | 2.7, 4.4, 9.3 |
+| D18 | **Auto-jump onto 1-voxel ledges is on by default**; setting to disable | 4.2, 4.2.1, 5.10 |
+| D19 | **Go Home button in the pause menu**: fade home at no cost and no time skip, so a child can never be stuck | 5.8, 6.3 |
 
 ### 0.5 Open decisions (owner confirmation needed before plan1)
 | ID | Question | Proposed default | Alternative |
@@ -98,10 +102,6 @@ Godot facts verified against `godotengine/godot` tag `4.7-stable` class referenc
 | D13 | Renderer | **Forward+** (Decals for stamps) | Compatibility renderer with mesh-projected stamp quads |
 | D14 | Read-aloud (TTS) | Setting, default off; uses OS voices | Recorded VO; none |
 | D15 | Auto-tool after no targets | Revert to empty hands after 1.0 s | Keep last tool |
-| D16 | Renewable ore, now that overworld digs are permanent | **Overworld edits persist; the Deep Mine regenerates daily** from a per-day seed and its edits are discarded at rollover | All ore finite; or ore slowly regrows in the overworld |
-| D17 | Can dug blocks be placed back? | **Yes.** Natural blocks drop as `BLOCK` items and can be placed on the 1 m grid with the Build Place tool | Digging only |
-| D18 | Auto-jump onto 1-voxel ledges | **On by default**, setting to disable | Off by default |
-| D19 | Go Home (unstuck) button in the pause menu | **Yes**: fade home at no cost and no time skip | None |
 
 ### 0.6 Known issues and risks raised
 1. **CLAUDE.md test command is wrong for gdUnit4 v6.2.3.** The entry script is `res://addons/gdUnit4/bin/GdUnitCmdTool.gd`; headless runs exit with `RETURN_ERROR_HEADLESS_NOT_SUPPORTED` unless `--ignoreHeadlessMode` is passed; tests are selected with `-a`. Proposed (verify in plan1 task 1):

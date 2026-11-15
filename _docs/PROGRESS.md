@@ -2,7 +2,7 @@
 
 | Field | Value |
 |---|---|
-| Spec | `_docs/specs/spec1.md` rev 3 |
+| Spec | `_docs/specs/spec1.md` rev 3.1 |
 | Plan | `_docs/plans/plan1.md` |
 | Active phase | Phase 0 (not started) |
 | Last updated | 2026-11-15 |
@@ -117,7 +117,8 @@ Status values: `Not started`, `In progress`, `Blocked`, `Done`.
 | ID | Status | Value |
 |---|---|---|
 | D1 to D4 | Resolved (spec rev 3) | blocky 1 m voxels, protected zones, Voxel Tools GDExtension; jump + double jump, A jump, X/Y interact; criteria-based dedicated states; timed Craft in world |
-| D5 to D19 | Open, spec defaults assumed | see `plan1.md` 0.5 for the phase each one blocks |
+| D16 to D19 | Resolved (spec rev 3.1, 2026-11-15) | overworld digs permanent and Deep Mine regenerates daily; dug blocks placeable; auto-jump on by default; Go Home in pause menu |
+| D5 to D15 | Open, spec defaults assumed | see `plan1.md` 0.5 for the phase each one blocks |
 
 ## Blockers and open issues
 | Date | Item | Owner | Status |

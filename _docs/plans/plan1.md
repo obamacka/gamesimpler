@@ -65,9 +65,10 @@ Spec defaults are used unless the owner overrides before the listed phase starts
 | Decision | Default assumed | Needed by |
 |---|---|---|
 | D13 renderer | Forward+ | Phase 0 (project settings) |
-| D18 auto-jump default | On | Phase 1 |
-| D6 day length, D7 save model, D8 apple trees not choppable, D10 starter cabin, D15 auto-tool revert, D16 Deep Mine regenerates, D19 Go Home | spec defaults | Phase 2 |
-| D17 place blocks back | Yes | Phase 3 |
+| D18 auto-jump default | **Confirmed**: on | Phase 1 |
+| D6 day length, D7 save model, D8 apple trees not choppable, D10 starter cabin, D15 auto-tool revert | spec defaults | Phase 2 |
+| D16 Deep Mine regenerates daily, D19 Go Home | **Confirmed** | Phase 2 |
+| D17 place blocks back | **Confirmed**: yes | Phase 3 |
 | D5 house purchase upfront, D14 TTS setting | spec defaults | Phase 4 |
 | D9 crops = foraged produce, D11 one pet | spec defaults | Phase 5 (D9 also affects Phase 6 museum content) |
 | D12 dyes are unlocks | Yes | Phase 6 (outfit dye in Phase 4 uses dye ids either way) |

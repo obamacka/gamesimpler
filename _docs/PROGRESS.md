@@ -106,10 +106,10 @@ Status values: `Not started`, `In progress`, `Blocked`, `Done`.
 ### Phase 5
 | Task | Status | Date | Commit | Notes |
 |---|---|---|---|---|
-| P5.1 Resources | Done | 2026-11-16 | see Phase 5 commit | `npcs.json` (5 NPCs, friendship rules and letters), `pets.json` (dog, cat, 3 accessories, names, care config), `emotes.json` (8 emotes, 3 instruments), pet food, pet bed and feed bowl pieces, adoption / job offer / catalog / friendship mail |
-| P5.2 to P5.13 Scripts | Done | 2026-11-16 | see Phase 5 commit | NPC service and bodies with schedules, Talk with a 0.3 s camera two-shot, DialogueModel and dialogue / gift menus; mail complete (all attachment types, expiry to Lost and Found, cap and prune, catalog orders) and mail menu; PetBrainModel, PetService, Pet body with Skeleton3D and BoneAttachment3D slots, path providers (VoxelAStarGrid3D, navmesh, straight), adoption on day 2, pet_call, bowl self-feed, wheel with Emote and PlayInstrument; `claim_all` removed |
-| P5.14 to P5.17 Unit suites | Done | 2026-11-16 | see Phase 5 commit | pet brain 10, feeding 6, accessories 3, mailbox full 7, npc 3, dialogue 2, resolver npc/pet 3, wheel 2, phase 5 round trip 1 |
-| P5.18 to P5.22 Integration suites | Done | 2026-11-16 | see Phase 5 commit | pet follow 6, pet care 5, mail arrival 5, npc talk 2, emote and instrument 4 |
+| P5.1 Resources | Done | 2026-11-16 | 56d4cef | `npcs.json` (5 NPCs, friendship rules and letters), `pets.json` (dog, cat, 3 accessories, names, care config), `emotes.json` (8 emotes, 3 instruments), pet food, pet bed and feed bowl pieces, adoption / job offer / catalog / friendship mail |
+| P5.2 to P5.13 Scripts | Done | 2026-11-16 | 56d4cef | NPC service and bodies with schedules, Talk with a 0.3 s camera two-shot, DialogueModel and dialogue / gift menus; mail complete (all attachment types, expiry to Lost and Found, cap and prune, catalog orders) and mail menu; PetBrainModel, PetService, Pet body with Skeleton3D and BoneAttachment3D slots, path providers (VoxelAStarGrid3D, navmesh, straight), adoption on day 2, pet_call, bowl self-feed, wheel with Emote and PlayInstrument; `claim_all` removed |
+| P5.14 to P5.17 Unit suites | Done | 2026-11-16 | 56d4cef | pet brain 10, feeding 6, accessories 3, mailbox full 7, npc 3, dialogue 2, resolver npc/pet 3, wheel 2, phase 5 round trip 1 |
+| P5.18 to P5.22 Integration suites | Done | 2026-11-16 | 56d4cef | pet follow 6, pet care 5, mail arrival 5, npc talk 2, emote and instrument 4 |
 | Manual checklist | Not started | | | pet through tunnels, dug terrain and town; TTS letter; claim package; adopt, name and dress the pet by pad |
 
 ### Phase 6
@@ -140,7 +140,7 @@ Status values: `Not started`, `In progress`, `Blocked`, `Done`.
 | 2026-11-16 | 93b088c | 2B | `ci/run_tests.sh` | 0 | 0 | 311 cases (Phases 0 to 2B) |
 | 2026-11-16 | 405aae6 | 3 | `ci/run_tests.sh` | 0 | 0 | 369 cases (Phases 0 to 3) |
 | 2026-11-16 | 8566596 | 4 | `ci/run_tests.sh` | 0 | 0 | 430 cases (Phases 0 to 4) |
-| 2026-11-16 | Phase 5 commit | 5 | `ci/run_tests.sh` | 0 | 0 | 489 cases (Phases 0 to 5) |
+| 2026-11-16 | 56d4cef | 5 | `ci/run_tests.sh` | 0 | 0 | 489 cases (Phases 0 to 5) |
 
 ## Decisions
 | ID | Status | Value |

@@ -2,7 +2,7 @@
 
 | Field | Value |
 |---|---|
-| Implements | `_docs/specs/spec1.md` rev 3.3 |
+| Implements | `_docs/specs/spec1.md` rev 3.4 |
 | Status | DRAFT, not started |
 | Tracking | `_docs/PROGRESS.md` (update after every completed task, per CLAUDE.md) |
 | Engine / libs | Godot 4.7.x, Jolt, gdUnit4 v6.2.3, Voxel Tools 1.7 GDExtension |
@@ -43,7 +43,7 @@ res://spikes/                Phase 0 spikes, excluded from export
 - [ ] Pause-safety lint suite passes (P1.24).
 - [ ] `Database` integrity suite passes for every resource type introduced so far.
 - [ ] Manual gamepad pass on the phase's checklist with an Xbox-layout pad and a DualShock 4 or DualSense, plus keyboard/mouse.
-- [ ] Phases 2, 2B, 3, 5, 6: performance check on both min-spec machines (spec 0.7: i7-3770 / 16 GB DDR3-1333 / GTX 1070, and base M1 / 16 GB) against D25 (30 fps at 1080p medium) and the voxel budget; numbers logged in `_docs/PROGRESS.md`. The 60 fps recommended-spec check is added once D26 is defined.
+- [ ] Phases 2, 2B, 3, 5, 6: performance check on both min-spec machines (spec 0.7: i7-3770 / 16 GB DDR3-1333 / GTX 1070, and base M1 / 16 GB) against D25 (30 fps at 1080p medium) and the voxel budget; and on both recommended-spec machines (spec 0.7.1: Ryzen 5 3600 / 16 GB / RTX 2070, and M2 / 16 GB) against 60 fps at 1080p medium; numbers logged in `_docs/PROGRESS.md`.
 - [ ] `_docs/PROGRESS.md` updated: tasks ticked, test run logged with commit SHA, open issues recorded.
 - [ ] Commit with a meaningful message.
 
@@ -62,11 +62,7 @@ res://spikes/                Phase 0 spikes, excluded from export
 8. **Added Phase 2B (Farming)** for D9, between Phases 2 and 3, so your phase numbers stay unchanged. It needs Phase 2 terrain, tools, stamina and day rollover; seeds in shops come in Phase 4 and crop donations in Phase 6.
 
 ### 0.5 Decision gates
-D1 to D25 are resolved (spec 0.4). One item remains:
-
-| Decision | Default assumed | Needed by |
-|---|---|---|
-| D26 recommended spec for the 60 fps target | not gated until defined | any phase gate after it is defined |
+All decisions D1 to D26 are resolved (spec 0.4). No phase is blocked on a decision.
 
 ---
 
@@ -94,7 +90,7 @@ D1 to D25 are resolved (spec 0.4). One item remains:
   - [ ] h. Jolt `CharacterBody3D` physics works in a headless run (needed by Phase 1 integration suites).
   - [ ] i. `@voxel_real` smoke suite `res://test/integration/test_voxel_smoke.gd` passes headless (or the report states why it needs a windowed job).
   - [ ] j. No illegal-instruction crash on the i7-3770 (no AVX2), in the editor or the exported build.
-  - [ ] k. Frame rate at 1920x1080 medium with the target view distance while walking and digging: >= 30 fps on both min-spec machines (D25); on the M1 confirm the Metal driver is active; voxel worker thread count chosen so at least 2 hardware threads stay free for main and physics.
+  - [ ] k. Frame rate at 1920x1080 medium with the target view distance while walking and digging: >= 30 fps on both min-spec machines and >= 60 fps on both recommended-spec machines (D25, D26); on the M1 confirm the Metal driver is active; voxel worker thread count chosen so at least 2 hardware threads stay free for main and physics.
 - [ ] **P0.9 Export smoke.** Export the spike for Windows x86_64, Linux x86_64, macOS (universal) with stock templates; each launches and digs. The macOS build is run on the base M1.
 - [ ] **P0.10 Go / no-go record.** In `_docs/reports/voxel_spike.md`: GDExtension go, or fallback to module edition (custom editor, templates, CI change), and/or `VoxelBoxMover` for player collision (spec 9.5), and/or per-save `database_path` (spec 9.6). Update spec 0.6 and 9 if anything changed.
 

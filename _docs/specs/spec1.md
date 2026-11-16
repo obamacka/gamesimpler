@@ -2,8 +2,8 @@
 
 | Field | Value |
 |---|---|
-| Status | DRAFT rev 3.3, all product decisions resolved except D26 (recommended spec) |
-| Revision | rev 1: core systems. rev 2: kid-friendly, accessibility, forgiving logic, expression systems, integration tests. rev 3: D1 to D4 resolved (dig-anywhere blocky voxels, jump and double jump, context-aware interaction with dedicated critical states, crafting flow confirmed). rev 3.1: D16 to D19 confirmed. rev 3.2: D5 to D15 resolved (farming system added, pets on day 2, keep last tool), min-spec hardware, test command note. rev 3.3: D20 to D25 resolved (macOS min spec M1 16 GB; 30 fps on min spec, 60 fps on recommended spec) |
+| Status | DRAFT rev 3.4, all decisions resolved |
+| Revision | rev 1: core systems. rev 2: kid-friendly, accessibility, forgiving logic, expression systems, integration tests. rev 3: D1 to D4 resolved (dig-anywhere blocky voxels, jump and double jump, context-aware interaction with dedicated critical states, crafting flow confirmed). rev 3.1: D16 to D19 confirmed. rev 3.2: D5 to D15 resolved (farming system added, pets on day 2, keep last tool), min-spec hardware, test command note. rev 3.3: D20 to D25 resolved (macOS min spec M1 16 GB; 30 fps on min spec, 60 fps on recommended spec). rev 3.4: D26 recommended spec |
 | Engine | Godot 4.7 stable (4.7.2 latest patch found, 2026-08-18), GDScript |
 | Physics | Jolt Physics (built-in module) |
 | Voxels | Zylann Voxel Tools 1.7, GDExtension edition (MIT), released 2026-08-20, targets Godot 4.5+ |
@@ -105,11 +105,10 @@ Godot facts verified against `godotengine/godot` tag `4.7-stable` class referenc
 | D23 | **Neglected crops suffer nothing**: unwatered crops do not grow that day; crops never wilt, die or rot | 10.5 |
 | D24 | **macOS minimum spec: base Apple M1 with 16 GB RAM** (Apple Silicon only; Intel Macs unsupported) | 0.7 |
 | D25 | **30 fps at 1920x1080, medium preset, on min spec** (Windows/Linux and macOS); **60 fps on the recommended spec** (D26) | 0.7, 9.5 |
+| D26 | **Recommended spec (60 fps at 1920x1080 medium):** Windows/Linux AMD Ryzen 5 3600, 16 GB RAM, Nvidia GeForce RTX 2070; macOS Apple M2, 16 GB | 0.7 |
 
-### 0.5 Open decisions (owner confirmation needed)
-| ID | Question | Proposed default | Alternative |
-|---|---|---|---|
-| D26 | "Newer hardware" for the 60 fps target (D25) is not a testable spec | **Owner to define a recommended spec** (CPU, GPU, RAM; Windows/Linux and macOS). Until then the 60 fps target is not gated | Gate 60 fps on the team's current dev machines |
+### 0.5 Open decisions
+None. All decisions D1 to D26 are resolved (0.4).
 
 ### 0.6 Known issues and risks raised
 1. **Test command.** The owner updated CLAUDE.md (2026-11-16) to `godot --headless --path . -s -d res://addons/gdUnit4/bin/GdUnitCmdTool.gd --ignoreHeadlessMode -a res://test`. Remaining risk: with `-d` and no remote debugger, a GDScript parse error drops Godot into its interactive `debug>` prompt and the run never exits (a hung CI job instead of a failure). gdUnit4 v6.2.3's own `runtest.sh` passes `--remote-debug tcp://127.0.0.1:0` for exactly this reason (comment in that script). Recommended command, to verify in plan1 P0.3 and then propose for CLAUDE.md:
@@ -152,11 +151,17 @@ Godot facts verified against `godotengine/godot` tag `4.7-stable` class referenc
 | GPU | Nvidia GeForce GTX 1070 (8 GB, Vulkan capable) |
 | macOS (D24) | Apple M1 (base chip), 16 GB RAM; Apple Silicon only |
 
+### 0.7.1 Recommended spec (D26, 60 fps target)
+| Platform | CPU | RAM | GPU |
+|---|---|---|---|
+| Windows / Linux | AMD Ryzen 5 3600 | 16 GB | Nvidia GeForce RTX 2070 |
+| macOS | Apple M2 (base chip) | 16 GB | integrated |
+
 | Fact or target | Consequence |
 |---|---|
 | Godot 4.5 and 4.6 system requirements list an x86_64 CPU with SSE4.2 for the 64-bit editor and exports. The i7-3770 has SSE4.2. | Official x86_64 builds run on min spec. Re-check the 4.7 page when godotengine.org is reachable. |
 | Forward+ uses Vulkan on Windows and Linux; the GTX 1070 supports Vulkan. | D13 Forward+ is viable on min spec. |
-| Performance targets (D25): 30 fps at 1920x1080, medium preset, on both min-spec machines; 60 fps on the recommended spec (D26, to be defined). | Measured in the Phase 0 spike and at every phase gate that adds heavy systems (2, 2B, 3, 5, 6). |
+| Performance targets (D25): 30 fps at 1920x1080, medium preset, on both min-spec machines; 60 fps at 1920x1080 medium on both recommended-spec machines (0.7.1). | Measured in the Phase 0 spike and at every phase gate that adds heavy systems (2, 2B, 3, 5, 6). |
 | Forward+ on macOS uses the Metal driver by default on Apple Silicon (4.7 `rendering/rendering_device/driver.macos`). | D13 Forward+ is viable on the M1; decals (stamps) are measured there too. |
 | Voxel budget (9.5): edit-to-collision <= 100 ms, no frame > 33.3 ms while digging. | Measured on the i7-3770 and the M1. |
 | Worker threads: leave at least 2 hardware threads for the main and physics threads. | Voxel Tools thread count is capped accordingly (spike confirms the setting). |

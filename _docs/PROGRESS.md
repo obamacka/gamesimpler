@@ -2,7 +2,7 @@
 
 | Field | Value |
 |---|---|
-| Spec | `_docs/specs/spec1.md` rev 3.3 |
+| Spec | `_docs/specs/spec1.md` rev 3.4 |
 | Plan | `_docs/plans/plan1.md` |
 | Active phase | Phase 0 (not started) |
 | Last updated | 2026-11-16 |
@@ -25,7 +25,8 @@ Status values: `Not started`, `In progress`, `Blocked`, `Done`.
 | CI | Not configured (P0.6) |
 | Min-spec hardware (Windows/Linux) | Intel Core i7-3770, 16 GB DDR3-1333, Nvidia GTX 1070 (spec 0.7) |
 | Min-spec hardware (macOS) | Base Apple M1, 16 GB RAM (D24) |
-| Performance target | 30 fps at 1920x1080 medium on min spec; 60 fps on recommended spec (D25); recommended spec not yet defined (D26) |
+| Performance target | 30 fps at 1920x1080 medium on min spec; 60 fps on recommended spec (D25) |
+| Recommended spec (D26) | Windows/Linux: Ryzen 5 3600, 16 GB, RTX 2070. macOS: M2, 16 GB |
 
 ## Phase overview
 | Phase | Title | Status | Gate commit |
@@ -132,7 +133,7 @@ Status values: `Not started`, `In progress`, `Blocked`, `Done`.
 | D16 to D19 | Resolved (spec rev 3.1, 2026-11-15) | overworld digs permanent and Deep Mine regenerates daily; dug blocks placeable; auto-jump on by default; Go Home in pause menu |
 | D5 to D15 | Resolved (spec rev 3.2, 2026-11-16) | upfront coins; 20-minute days; 3 slots + autosave on sleep; apple trees not choppable; **farming system added**; free starter cabin; **pet on day 2**; dyes are unlocks; Forward+; TTS default off; **keep last tool** |
 | D20 to D25 | Resolved (spec rev 3.3, 2026-11-16) | no seasons; no weather; farm on owned plots and starter garden; crops never die; macOS min spec base M1 16 GB; 30 fps at 1080p medium on min spec, 60 fps on recommended spec |
-| D26 | Open | recommended spec for the 60 fps target |
+| D26 | Resolved (spec rev 3.4, 2026-11-16) | recommended spec: Ryzen 5 3600 / 16 GB / RTX 2070 (Windows/Linux), M2 / 16 GB (macOS) |
 
 ## Blockers and open issues
 | Date | Item | Owner | Status |
@@ -141,5 +142,5 @@ Status values: `Not started`, `In progress`, `Blocked`, `Done`.
 | 2026-11-16 | `-d` without `--remote-debug tcp://127.0.0.1:0` may hang on GDScript parse errors | P0.3 | Open |
 | 2026-11-15 | Voxel GDExtension maturity, collision latency, headless behavior, SQLite copy safety unverified (spec 0.6 items 18, 19, 21, 22) | P0.8 | Open |
 | 2026-11-15 | Min-spec hardware undefined | owner, P0.7 | Closed 2026-11-16 (Windows/Linux and macOS) |
-| 2026-11-16 | Recommended spec for the 60 fps target undefined (D26) | owner | Open |
+| 2026-11-16 | Recommended spec for the 60 fps target undefined (D26) | owner | Closed 2026-11-16 |
 | 2026-11-16 | i7-3770 has no AVX2; Voxel Tools GDExtension instruction-set requirement unverified | P0.8 j | Open |

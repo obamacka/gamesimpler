@@ -1268,7 +1268,7 @@ sequenceDiagram
 
 Care letter rules:
 - Template from pool `pool_care_exhausted`, sender = a befriended NPC (highest friendship; fallback `npc_neighbor`), chosen by seeded RNG.
-- Snack attachment (`item` tagged `&"snack"`, qty 1) only if `exhaustion.last_snack_day != new_day`; then set `last_snack_day = new_day`. Otherwise use a no-snack template from `pool_care_exhausted_repeat`.
+- Snack attachment (`item` tagged `&"snack"`, qty 1) unless a snack already arrived on the day the player collapsed (`exhaustion.last_snack_day == current_day`); when given, set `last_snack_day = new_day`. Otherwise use a no-snack template from `pool_care_exhausted_repeat`. (The earlier wording compared against `new_day`, which is always different because every exhaustion advances the day; corrected in Phase 2.)
 - `CARE_PACKAGE` never expires.
 - `reason == &"bed"`: no care letter. `reason == &"late_night"` (02:00): care letter without snack, gentle "time for bed" text.
 - Mailbox badge on the HUD shows unread count on wake; prompt over mailbox glows.

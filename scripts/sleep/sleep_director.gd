@@ -37,7 +37,7 @@ func begin_sleep(reason: StringName) -> void:
 
 
 func _schedule_care_letter(reason: StringName, new_day: int) -> void:
-	var pool := CareLetterModel.pool_for(reason, new_day, int(session.exhaustion["last_snack_day"]))
+	var pool := CareLetterModel.pool_for(reason, new_day - 1, int(session.exhaustion["last_snack_day"]))
 	if pool == &"":
 		return
 	var tpl := CareLetterModel.pick(Database.templates_in_pool(pool), session.rng)

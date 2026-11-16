@@ -135,3 +135,56 @@ func test_exhaustion_preempts_grounded_and_waits_for_landing() -> void:
 	assert_str(_next(T.WALK, _f(), _c({"exhaustion_pending": true})).to).is_equal(T.SLEEP)
 	assert_str(_next(T.FALL, _f(), _c({"exhaustion_pending": true, "on_floor": false})).to).is_equal(&"")
 	assert_str(_next(T.FALL, _f(), _c({"exhaustion_pending": true, "on_floor": true})).to).is_equal(T.SLEEP)
+
+
+# ---- Phase 2 action rows (spec 4.2, 4.3, 4.5)
+
+func _press_use() -> InputFrame:
+	var f := InputFrame.new()
+	f.use_pressed = true
+	return f
+
+
+func test_mine_requires_target_tool_and_no_block() -> void:
+	assert_str(_next(T.IDLE, _press_use(), _c({"tool_target_kind": T.TARGET_VOXEL, "tool_ok": true})).to).is_equal(T.MINE)
+	var low := _next(T.IDLE, _press_use(), _c({"tool_target_kind": T.TARGET_VOXEL, "tool_ok": false}))
+	assert_str(low.to).is_equal(&"")
+	assert_str(low.effect).is_equal(T.FX_TIER_LOW)
+	var blocked := _next(T.WALK, _press_use(), _c({"tool_target_kind": T.TARGET_VOXEL, "tool_blocked": &"protected", "move_len": 1.0}))
+	assert_str(blocked.effect).is_equal(T.FX_BLOCKED)
+	assert_str(_next(T.DUCK, _press_use(), _c({"tool_target_kind": T.TARGET_TIMBER, "tool_ok": true, "wants_duck": true})).to).is_equal(T.MINE)
+
+
+func test_run_slows_to_walk_before_actions() -> void:
+	assert_str(_next(T.RUN, _press_use(), _c({"tool_target_kind": T.TARGET_VOXEL, "tool_ok": true, "move_len": 1.0, "wants_run": true})).to).is_equal(T.WALK)
+
+
+func test_picker_on_fruit_tree_forages() -> void:
+	var t := _next(T.IDLE, _press_use(), _c({"tool_target_kind": T.TARGET_FRUIT_TREE, "tool_ok": true}))
+	assert_str(t.to).is_equal(T.INTERACT)
+	assert_str(t.effect).is_equal(T.FX_FORAGE)
+
+
+func test_interact_needs_target() -> void:
+	var f := InputFrame.new()
+	f.interact_pressed = true
+	assert_str(_next(T.IDLE, f, _c({"has_interact_target": true})).to).is_equal(T.INTERACT)
+	assert_str(_next(T.IDLE, f, _c({"has_interact_target": false})).to).is_equal(&"")
+
+
+func test_mine_and_interact_exits() -> void:
+	assert_str(_next(T.MINE, InputFrame.new(), _c({"mine_done": false})).to).is_equal(&"")
+	assert_str(_next(T.MINE, InputFrame.new(), _c({"mine_done": true})).to).is_equal(T.IDLE)
+	assert_str(_next(T.MINE, InputFrame.new(), _c({"mine_done": true, "is_ducking": true})).to).is_equal(T.DUCK)
+	assert_str(_next(T.MINE, InputFrame.new(), _c({"mine_done": true, "exhaustion_pending": true})).to).is_equal(T.SLEEP)
+	assert_str(_next(T.INTERACT, InputFrame.new(), _c({"interact_done": true, "interact_handoff": &"sleep"})).to).is_equal(T.SLEEP)
+	assert_str(_next(T.INTERACT, InputFrame.new(), _c({"interact_done": true})).to).is_equal(T.IDLE)
+
+
+func test_air_strike_is_single_shot_without_state_change() -> void:
+	var c := _c({"on_floor": false, "vertical_velocity": 2.0, "tool_target_kind": T.TARGET_VOXEL, "tool_ok": true})
+	var t := _next(T.JUMP, _press_use(), c)
+	assert_str(t.to).is_equal(&"")
+	assert_str(t.effect).is_equal(T.FX_AIR_STRIKE)
+	c.vertical_velocity = -2.0
+	assert_str(_next(T.FALL, _press_use(), c).effect).is_equal(T.FX_AIR_STRIKE)

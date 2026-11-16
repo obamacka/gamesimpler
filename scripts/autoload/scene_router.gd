@@ -39,6 +39,8 @@ func _fade(alpha: float, duration: float) -> void:
 	if d <= 0.0:
 		_fader.color.a = alpha
 		return
+	if not is_inside_tree():
+		return
 	var tw := _fader.create_tween()
 	tw.tween_property(_fader, "color:a", alpha, d)
 	await tw.finished
@@ -52,17 +54,34 @@ func scene_path(zone_id: StringName) -> String:
 
 
 func change_zone(zone_id: StringName, spawn_key: StringName) -> void:
+	if not is_instance_valid(zone_root):
+		push_warning("SceneRouter: no zone root, cannot load %s" % zone_id)
+		return
 	busy = true
 	EventBus.zone_unloading.emit(current_zone_id)
 	if is_instance_valid(current_zone):
 		current_zone.queue_free()
 		await get_tree().process_frame
-	var packed: PackedScene = load(scene_path(zone_id))
+	var path := scene_path(zone_id)
+	var packed: PackedScene = load(path) if path != "" and ResourceLoader.exists(path) else null
+	if packed == null:
+		push_warning("SceneRouter: no scene for zone %s" % zone_id)
+		busy = false
+		return
 	current_zone = packed.instantiate()
 	current_zone_id = zone_id
+	# Hold the player still at the spawn (its VoxelViewer drives terrain loading there) until
+	# the zone says the ground around it has collision; generated terrain meshes asynchronously.
+	var frozen := is_instance_valid(player)
+	if frozen:
+		player.process_mode = Node.PROCESS_MODE_DISABLED
 	zone_root.add_child(current_zone)
 	await get_tree().process_frame
 	place_player(spawn_key)
+	if current_zone.has_method("await_ground_ready") and is_instance_valid(player):
+		await current_zone.await_ground_ready(player.global_position)
+	if frozen and is_instance_valid(player):
+		player.process_mode = Node.PROCESS_MODE_INHERIT
 	busy = false
 	EventBus.zone_loaded.emit(zone_id)
 

@@ -1,0 +1,32 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/world/zone.gd" id="1_zone"]
+[ext_resource type="Script" path="res://scripts/world/bed.gd" id="2_bed"]
+[ext_resource type="Script" path="res://scripts/world/mailbox.gd" id="3_mail"]
+
+[sub_resource type="BoxShape3D" id="floor_shape"]
+size = Vector3(80, 1, 80)
+
+[node name="fixture_cabin" type="Node3D"]
+script = ExtResource("1_zone")
+zone_id = &"zone_starter_cabin"
+
+[node name="Floor" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
+
+[node name="Shape" type="CollisionShape3D" parent="Floor"]
+shape = SubResource("floor_shape")
+
+[node name="SpawnPoints" type="Node3D" parent="."]
+
+[node name="spawn_start" type="Marker3D" parent="SpawnPoints"]
+
+[node name="spawn_entry" type="Marker3D" parent="SpawnPoints"]
+
+[node name="bed_01" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 0, 5)
+script = ExtResource("2_bed")
+
+[node name="Mailbox" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3, 0, 0)
+script = ExtResource("3_mail")

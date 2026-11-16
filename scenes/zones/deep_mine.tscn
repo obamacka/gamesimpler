@@ -1,0 +1,30 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/world/zone.gd" id="1_zone"]
+[ext_resource type="Script" path="res://scripts/world/mine_entrance.gd" id="2_door"]
+[ext_resource type="Script" path="res://scripts/world/protection_volume.gd" id="3_prot"]
+
+[node name="DeepMine" type="Node3D"]
+script = ExtResource("1_zone")
+zone_id = &"zone_deep_mine"
+terrain_kind = &"deep_mine"
+view_distance = 64
+
+[node name="spawn_entry" type="Marker3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.5, -36, 1.5)
+
+[node name="Light" type="OmniLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.5, -34, 1.5)
+omni_range = 20.0
+
+[node name="Exit" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.5, -36, 0.2)
+script = ExtResource("2_door")
+target_zone = &"zone_wilderness"
+target_spawn = &"spawn_from_mine"
+
+[node name="ProtectExit" type="Node3D" parent="."]
+script = ExtResource("3_prot")
+min_cell = Vector3i(0, -37, -1)
+max_cell = Vector3i(2, -33, 2)
+reason = &"BUILDING"

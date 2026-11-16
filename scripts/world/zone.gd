@@ -7,8 +7,12 @@ const CHEST_SCENE := preload("res://scenes/props/treasure_chest.tscn")
 
 @export var zone_id: StringName
 @export var spawn_chests := true
+## &"overworld" or &"deep_mine" generates a VoxelTerrain at load; empty = static or test zone.
+@export var terrain_kind: StringName = &""
+@export var view_distance := 96
 
 var terrain_node: Node
+var generator: VoxelGeneratorScript
 
 
 func _enter_tree() -> void:
@@ -16,6 +20,9 @@ func _enter_tree() -> void:
 	if s == null:
 		return
 	terrain_node = find_child("VoxelTerrain", false, false)
+	if terrain_node == null and terrain_kind != &"":
+		terrain_node = _make_terrain(s)
+		_snap_surface_children()
 	if terrain_node:
 		s.terrain.set_world(VoxelWorldAdapter.new(terrain_node))
 	else:
@@ -67,3 +74,59 @@ func _on_pickup(item_id: StringName, qty: int, at: Vector3) -> void:
 	p.qty = qty
 	add_child(p)
 	p.global_position = at
+
+
+func _material_ids() -> Dictionary:
+	var ids := {}
+	for m in Database.materials.values():
+		ids[String(m.id)] = m.voxel_id
+	return ids
+
+
+func _make_terrain(s: GameSession) -> Node:
+	var z: TerrainZoneDef = Database.zones.get(zone_id)
+	var bmin := z.bounds_min if z else Vector3i(-64, -32, -64)
+	var bmax := z.bounds_max if z else Vector3i(64, 64, 64)
+	if terrain_kind == &"deep_mine":
+		generator = DeepMineGenerator.new(_material_ids(), bmin.y, bmax.y, DeepMineGenerator.day_seed(s.rng.seed_value, s.day()))
+	else:
+		generator = OverworldGenerator.new(_material_ids(), bmin.y, hash([s.rng.seed_value, String(zone_id)]))
+	var t := VoxelTerrain.new()
+	t.name = "VoxelTerrain"
+	var mesher := VoxelMesherBlocky.new()
+	mesher.library = VoxelLibraryBuilder.build()
+	t.mesher = mesher
+	t.generator = generator
+	t.max_view_distance = view_distance
+	t.bounds = AABB(Vector3(bmin), Vector3(bmax - bmin))
+	t.generate_collisions = true
+	add_child(t)
+	return t
+
+
+## Children of a "Surface" node are moved onto the generated ground (overworld zones).
+func _snap_surface_children() -> void:
+	var surface := find_child("Surface", false, false)
+	if surface == null or not (generator is OverworldGenerator):
+		return
+	for n in surface.get_children():
+		if n is Node3D:
+			var p: Vector3 = n.position
+			n.position.y = (generator as OverworldGenerator).height_at(floori(p.x), floori(p.z)) + 1
+
+
+## Resolves once the terrain around `pos` is meshed (so collision exists), or after a timeout.
+## Static zones resolve immediately.
+func await_ground_ready(pos: Vector3, timeout_ms: int = 10000) -> void:
+	if not (terrain_node is VoxelTerrain):
+		return
+	var t: VoxelTerrain = terrain_node
+	var area := AABB(pos - Vector3(4, 6, 4), Vector3(8, 10, 8))
+	var start := Time.get_ticks_msec()
+	while not t.is_area_meshed(area):
+		if Time.get_ticks_msec() - start > timeout_ms:
+			push_warning("Zone %s: terrain around %s not meshed after %d ms" % [zone_id, pos, timeout_ms])
+			return
+		await get_tree().process_frame
+	await get_tree().physics_frame
+	await get_tree().physics_frame

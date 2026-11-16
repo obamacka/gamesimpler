@@ -80,7 +80,13 @@ func load_all(dir: String) -> void:
 		var m := MailTemplateDef.new()
 		m.id = StringName(d["id"]); m.sender_id = StringName(d.get("sender_id", "system")); m.kind = StringName(d.get("kind", "LETTER"))
 		m.subject_key = d.get("subject_key", ""); m.body_key = d.get("body_key", ""); m.pool_id = StringName(d.get("pool_id", ""))
-		m.expires_after_days = int(d.get("expires_after_days", 0)); m.attachments = d.get("attachments", []); m.has_snack = bool(d.get("has_snack", false))
+		m.expires_after_days = int(d.get("expires_after_days", 0)); m.has_snack = bool(d.get("has_snack", false))
+		m.attachments = (d.get("attachments", []) as Array).map(func(a):
+			var c: Dictionary = a.duplicate()
+			for k in ["qty", "amount"]:
+				if c.has(k):
+					c[k] = int(c[k])
+			return c)
 		mail_templates[m.id] = m
 	var cfg := _read(dir.path_join("config.json"))
 	var s: Dictionary = cfg.get("stamina", {})

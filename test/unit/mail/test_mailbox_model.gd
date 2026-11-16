@@ -56,8 +56,10 @@ func test_claim_all_or_nothing() -> void:
 
 
 func test_snack_once_per_day_pool_choice() -> void:
-	assert_str(CareLetterModel.pool_for(&"exhausted", 6, 5)).is_equal(&"pool_care_exhausted")
+	# Collapsing on day 5 with no snack yet: snack. Collapsing on day 6 after a snack arrived on day 6: none.
+	assert_str(CareLetterModel.pool_for(&"exhausted", 5, 0)).is_equal(&"pool_care_exhausted")
 	assert_str(CareLetterModel.pool_for(&"exhausted", 6, 6)).is_equal(&"pool_care_exhausted_repeat")
+	assert_str(CareLetterModel.pool_for(&"exhausted", 7, 6)).is_equal(&"pool_care_exhausted")
 	assert_str(CareLetterModel.pool_for(&"late_night", 6, 5)).is_equal(&"pool_care_late_night")
 	assert_str(CareLetterModel.pool_for(&"bed", 6, 5)).is_equal(&"")
 

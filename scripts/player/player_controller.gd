@@ -37,6 +37,7 @@ var _last_alt := false
 var _focused: Interactable
 var _target: Dictionary = {}     # current tool target: {"kind": &"voxel", "cell"} or {"kind": &"zone", "node"}
 var _safe_timer := 0.0
+var _target_destroyed := false
 
 @onready var machine: StateMachine = $StateMachine
 @onready var input_reader: InputReader = $InputReader
@@ -274,6 +275,12 @@ func _build_phase2_context(f: InputFrame, delta: float) -> void:
 	tool_selector.tick(delta, current_state().locks_tool())
 	var aim := tool_selector.last_aim
 	var best := tool_selector.best()
+	# Spec 4.3: while mining, the target is pinned until destroyed; only then may it retarget.
+	if machine.current_id == PlayerTransitionTable.MINE and not _target.is_empty() and not _target_destroyed and mine_target_valid():
+		c.tool_target_kind = PlayerTransitionTable.TARGET_VOXEL if _target["kind"] == &"voxel" else PlayerTransitionTable.TARGET_TIMBER
+		c.tool_ok = true
+		return
+	_target_destroyed = false
 	_target = {}
 	if not aim.is_empty() and aim.get("blocked", &"") != &"":
 		c.tool_target_kind = PlayerTransitionTable.TARGET_VOXEL
@@ -373,14 +380,16 @@ func perform_strike() -> bool:
 		var r := s.terrain.hit_voxel(cell, data)
 		if r["result"] == VoxelDigModel.DAMAGED or r["result"] == VoxelDigModel.DUG:
 			s.stamina.spend(mat.stamina_cost, &"dig")
-		return r["result"] == VoxelDigModel.DUG
+		_target_destroyed = r["result"] == VoxelDigModel.DUG
+		return _target_destroyed
 	var zone = _target.get("node")
 	if not is_instance_valid(zone) or zone.target_kind != &"timber" or data == null or data.tool_type != ToolTypes.AXE:
 		return false
 	var cr := s.world_state.chop(zone.key, data.power, zone.global_position)
 	if cr["result"] != &"gone":
 		s.stamina.spend(data.stamina_cost, &"chop")
-	return cr["result"] == &"felled"
+	_target_destroyed = cr["result"] == &"felled"
+	return _target_destroyed
 
 
 ## Late night (spec 6.2): sleep once grounded.
@@ -427,3 +436,26 @@ func _enclosed() -> bool:
 		if space.intersect_ray(q).is_empty():
 			return false
 	return _probe_collides(jump_clearance)
+
+
+## What the prompt overlay should show this frame (spec 2.8).
+func prompt_target() -> Dictionary:
+	var s := session()
+	if s == null:
+		return {}
+	var best := tool_selector.best()
+	var aim := tool_selector.last_aim
+	var focus := _resolve_focus(false)
+	var blocked: StringName = aim.get("blocked", &"") if not aim.is_empty() else &""
+	var pos := Vector3.ZERO
+	if focus:
+		pos = focus.global_position
+	elif not aim.is_empty() and aim.has("cell"):
+		pos = Vector3(aim["cell"]) + Vector3(0.5, 1.0, 0.5)
+	elif not best.is_empty() and _zone_node(best["key"], aim):
+		pos = _zone_node(best["key"], aim).global_position + Vector3(0, 1, 0)
+	else:
+		return {}
+	return {"position": pos, "tool": best if blocked == &"" else {}, "blocked": blocked,
+		"primary": focus.spec_for(self, false, false) if focus else null,
+		"secondary": focus.spec_for(self, false, true) if focus else null}

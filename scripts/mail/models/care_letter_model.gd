@@ -1,14 +1,16 @@
 ## Picks the care letter for a sleep transition (spec 6.2).
-## exhausted: snack pool if no snack was given on `new_day` yet, else the repeat pool.
+## exhausted: snack pool unless a snack already arrived on the day the player collapsed
+## (`current_day == last_snack_day`), else the repeat pool. Exhausting every day therefore
+## gives a snack at most every other time (known issue 12).
 ## late_night: no-snack pool. bed: no letter.
 class_name CareLetterModel
 extends RefCounted
 
 
-static func pool_for(reason: StringName, new_day: int, last_snack_day: int) -> StringName:
+static func pool_for(reason: StringName, current_day: int, last_snack_day: int) -> StringName:
 	match reason:
 		&"exhausted":
-			return &"pool_care_exhausted" if last_snack_day != new_day else &"pool_care_exhausted_repeat"
+			return &"pool_care_exhausted" if last_snack_day != current_day else &"pool_care_exhausted_repeat"
 		&"late_night":
 			return &"pool_care_late_night"
 	return &""

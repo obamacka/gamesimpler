@@ -31,6 +31,8 @@ func current_glyphs() -> int:
 
 
 func vendor_id(joy_device: int) -> int:
+	if not (joy_device in Input.get_connected_joypads()):
+		return 0
 	var info := Input.get_joy_info(joy_device)
 	return int(info.get("vendor_id", 0))
 

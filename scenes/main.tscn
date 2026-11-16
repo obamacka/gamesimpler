@@ -1,9 +1,9 @@
 [gd_scene format=3]
 
-[ext_resource type="PackedScene" path="res://scenes/dev/locomotion_room.tscn" id="1_room"]
-[ext_resource type="PackedScene" path="res://scenes/player/player.tscn" id="2_player"]
-[ext_resource type="PackedScene" path="res://ui/debug/debug_overlay.tscn" id="3_debug"]
-[ext_resource type="PackedScene" path="res://ui/prompts/glyph_icon.tscn" id="4_glyph"]
+[ext_resource type="Script" path="res://scripts/session/main.gd" id="1_main"]
+[ext_resource type="PackedScene" path="res://ui/debug/debug_overlay.tscn" id="2_debug"]
+[ext_resource type="Script" path="res://ui/hud/hud.gd" id="3_hud"]
+[ext_resource type="Script" path="res://ui/prompts/prompt_overlay.gd" id="4_prompts"]
 
 [sub_resource type="ProceduralSkyMaterial" id="sky_mat"]
 
@@ -15,6 +15,7 @@ background_mode = 2
 sky = SubResource("sky")
 
 [node name="Main" type="Node3D"]
+script = ExtResource("1_main")
 
 [node name="World" type="Node3D" parent="."]
 
@@ -25,17 +26,12 @@ environment = SubResource("env")
 transform = Transform3D(0.866, -0.354, 0.354, 0, 0.707, 0.707, -0.5, -0.612, 0.612, 0, 10, 0)
 shadow_enabled = true
 
-[node name="LocomotionRoom" parent="World" instance=ExtResource("1_room")]
+[node name="UI" type="Node" parent="."]
 
-[node name="Player" parent="World" instance=ExtResource("2_player")]
+[node name="HUD" type="CanvasLayer" parent="UI"]
+script = ExtResource("3_hud")
 
-[node name="UI" type="CanvasLayer" parent="."]
+[node name="PromptOverlay" type="CanvasLayer" parent="UI"]
+script = ExtResource("4_prompts")
 
-[node name="GlyphIcon" parent="UI" instance=ExtResource("4_glyph")]
-offset_left = 16.0
-offset_top = 980.0
-offset_right = 80.0
-offset_bottom = 1044.0
-button = &"face_left"
-
-[node name="DebugOverlay" parent="." instance=ExtResource("3_debug")]
+[node name="DebugOverlay" parent="." instance=ExtResource("2_debug")]

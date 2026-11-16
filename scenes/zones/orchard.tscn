@@ -1,0 +1,55 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/world/zone.gd" id="1_zone"]
+[ext_resource type="Script" path="res://scripts/world/apple_tree.gd" id="2_apple"]
+[ext_resource type="Script" path="res://scripts/world/mine_entrance.gd" id="3_door"]
+[ext_resource type="Script" path="res://scripts/world/protection_volume.gd" id="4_prot"]
+[ext_resource type="Script" path="res://scripts/safety/safety_volume.gd" id="5_safety"]
+
+[sub_resource type="BoxShape3D" id="kill_shape"]
+size = Vector3(200, 4, 200)
+
+[node name="Orchard" type="Node3D"]
+script = ExtResource("1_zone")
+zone_id = &"zone_orchard"
+terrain_kind = &"overworld"
+
+[node name="Surface" type="Node3D" parent="."]
+
+[node name="spawn_from_wilderness" type="Marker3D" parent="Surface"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5, 0, 0.5)
+
+[node name="Apple1" type="Node3D" parent="Surface"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.5, 0, 4.5)
+script = ExtResource("2_apple")
+
+[node name="Apple2" type="Node3D" parent="Surface"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10.5, 0, 4.5)
+script = ExtResource("2_apple")
+
+[node name="Apple3" type="Node3D" parent="Surface"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.5, 0, 9.5)
+script = ExtResource("2_apple")
+
+[node name="Apple4" type="Node3D" parent="Surface"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10.5, 0, 9.5)
+script = ExtResource("2_apple")
+
+[node name="WildernessPath" type="Node3D" parent="Surface"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.5, 0, 0.5)
+script = ExtResource("3_door")
+target_zone = &"zone_wilderness"
+target_spawn = &"spawn_from_orchard"
+
+[node name="ProtectPath" type="Node3D" parent="."]
+script = ExtResource("4_prot")
+min_cell = Vector3i(-4, -16, -2)
+max_cell = Vector3i(2, 48, 3)
+reason = &"ROAD"
+
+[node name="KillPlane" type="Area3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -30, 0)
+script = ExtResource("5_safety")
+
+[node name="Shape" type="CollisionShape3D" parent="KillPlane"]
+shape = SubResource("kill_shape")

@@ -18,6 +18,7 @@ func schedule(tpl: MailTemplateDef, sent_day: int, deliver_day: int, params: Dic
 		"expires_day": 0 if tpl.expires_after_days == 0 else deliver_day + tpl.expires_after_days,
 		"attachments": tpl.attachments.duplicate(true), "read": false, "claimed": false, "archived": false,
 	})
+	scheduled[-1] = _ints([scheduled[-1]])[0]
 	return id
 
 

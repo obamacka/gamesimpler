@@ -1,0 +1,81 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/world/zone.gd" id="1_zone"]
+[ext_resource type="Script" path="res://scripts/world/timber_tree.gd" id="2_timber"]
+[ext_resource type="Script" path="res://scripts/world/mine_entrance.gd" id="3_door"]
+[ext_resource type="Script" path="res://scripts/world/protection_volume.gd" id="4_prot"]
+[ext_resource type="Script" path="res://scripts/safety/safety_volume.gd" id="5_safety"]
+
+[sub_resource type="BoxShape3D" id="kill_shape"]
+size = Vector3(400, 4, 400)
+
+[node name="Wilderness" type="Node3D"]
+script = ExtResource("1_zone")
+zone_id = &"zone_wilderness"
+terrain_kind = &"overworld"
+
+[node name="Surface" type="Node3D" parent="."]
+
+[node name="spawn_start" type="Marker3D" parent="Surface"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5, 0, 0.5)
+
+[node name="spawn_from_cabin" type="Marker3D" parent="Surface"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.5, 0, 2.5)
+
+[node name="spawn_from_mine" type="Marker3D" parent="Surface"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.5, 0, -10.5)
+
+[node name="spawn_from_orchard" type="Marker3D" parent="Surface"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10.5, 0, 6.5)
+
+[node name="Oak1" type="Node3D" parent="Surface"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 0, 6)
+script = ExtResource("2_timber")
+
+[node name="Oak2" type="Node3D" parent="Surface"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 0, -8)
+script = ExtResource("2_timber")
+
+[node name="Oak3" type="Node3D" parent="Surface"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14, 0, 12)
+script = ExtResource("2_timber")
+
+[node name="Log1" type="Node3D" parent="Surface"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3, 0, 9)
+script = ExtResource("2_timber")
+def_id = &"log_fallen"
+
+[node name="MineEntrance" type="Node3D" parent="Surface"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.5, 0, -13)
+script = ExtResource("3_door")
+
+[node name="CabinDoor" type="Node3D" parent="Surface"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5, 0, 4)
+script = ExtResource("3_door")
+target_zone = &"zone_starter_cabin"
+target_spawn = &"spawn_from_wilderness"
+
+[node name="OrchardPath" type="Node3D" parent="Surface"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13, 0, 6.5)
+script = ExtResource("3_door")
+target_zone = &"zone_orchard"
+target_spawn = &"spawn_from_wilderness"
+
+[node name="ProtectSpawn" type="Node3D" parent="."]
+script = ExtResource("4_prot")
+min_cell = Vector3i(-2, -40, -2)
+max_cell = Vector3i(3, 64, 5)
+reason = &"SPAWN"
+
+[node name="ProtectMineEntrance" type="Node3D" parent="."]
+script = ExtResource("4_prot")
+min_cell = Vector3i(10, -40, -15)
+max_cell = Vector3i(15, 64, -9)
+reason = &"BUILDING"
+
+[node name="KillPlane" type="Area3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -40, 0)
+script = ExtResource("5_safety")
+
+[node name="Shape" type="CollisionShape3D" parent="KillPlane"]
+shape = SubResource("kill_shape")

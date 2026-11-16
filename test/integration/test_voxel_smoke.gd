@@ -257,3 +257,89 @@ func test_character_on_voxel_collision_and_dig_latency() -> void:
 	var ms := (Time.get_ticks_usec() - t0) / 1000.0
 	print("[voxel_spike] edit-to-collision: %d physics frames, %.1f ms (this machine; budget 100 ms on min spec)" % [frames, ms])
 	assert_int(frames).is_less(120)
+
+
+# ---- P2.33: generators and TerrainService on real Voxel Tools terrain
+
+func _ids() -> Dictionary:
+	var ids := {}
+	for m in Database.materials.values():
+		ids[String(m.id)] = m.voxel_id
+	return ids
+
+
+func test_overworld_generator_bedrock_and_surface() -> void:
+	var gen := OverworldGenerator.new(_ids(), -24, 77)
+	var terrain := VoxelTerrain.new()
+	var mesher := VoxelMesherBlocky.new()
+	mesher.library = VoxelLibraryBuilder.build()
+	terrain.mesher = mesher
+	terrain.generator = gen
+	terrain.max_view_distance = 32
+	terrain.bounds = AABB(Vector3(-16, -24, -16), Vector3(32, 48, 32))
+	_root.add_child(terrain)
+	var viewer := VoxelViewer.new()
+	terrain.add_child(viewer)
+	assert_bool(await _await_loaded(terrain, AABB(Vector3(-4, -24, -4), Vector3(8, 40, 8)))).is_true()
+	var w := VoxelWorldAdapter.new(terrain)
+	var h := gen.height_at(0, 0)
+	assert_int(w.get_voxel(Vector3i(0, h, 0))).is_equal(Database.voxel_id_of(&"mat_grass"))
+	assert_int(w.get_voxel(Vector3i(0, h + 1, 0))).is_equal(0)
+	assert_int(w.get_voxel(Vector3i(0, -24, 0))).is_equal(Database.voxel_id_of(&"mat_bedrock"))
+
+
+func test_terrain_service_with_real_adapter_respects_protection() -> void:
+	var gen := OverworldGenerator.new(_ids(), -24, 77)
+	var terrain := VoxelTerrain.new()
+	var mesher := VoxelMesherBlocky.new()
+	mesher.library = VoxelLibraryBuilder.build()
+	terrain.mesher = mesher
+	terrain.generator = gen
+	terrain.max_view_distance = 32
+	_root.add_child(terrain)
+	terrain.add_child(VoxelViewer.new())
+	assert_bool(await _await_loaded(terrain, AABB(Vector3(-4, -24, -4), Vector3(8, 40, 8)))).is_true()
+	var session := GameSession.create(5, VoxelWorldAdapter.new(terrain))
+	_root.add_child(session)
+	session.new_game()
+	var h := gen.height_at(1, 1)
+	session.terrain.rules.add_volume(Vector3i(0, -30, 0), Vector3i(0, 40, 0), &"TOWN")
+	var shovel := session.toolbelt.model.tool_data(ToolTypes.SHOVEL)
+	assert_str(session.terrain.hit_voxel(Vector3i(0, gen.height_at(0, 0), 0), shovel)["result"]).is_equal(TerrainRules.PROTECTED)
+	session.terrain.hit_voxel(Vector3i(1, h, 1), shovel)
+	assert_str(session.terrain.hit_voxel(Vector3i(1, h, 1), shovel)["result"]).is_equal(VoxelDigModel.DUG)
+	assert_int(session.terrain.world.get_voxel(Vector3i(1, h, 1))).is_equal(0)
+	assert_int(session.inventory.count(&"item_dirt")).is_equal(1)
+
+
+func test_real_zones_load_and_player_stands() -> void:
+	var session := GameSession.create(11)
+	_root.add_child(session)
+	session.new_game()
+	var zone_root := Node3D.new()
+	_root.add_child(zone_root)
+	SceneRouter.reset_for_tests()
+	SceneRouter.fade_duration = 0.0
+	SceneRouter.zone_root = zone_root
+	var player: PlayerController = preload("res://scenes/player/player.tscn").instantiate()
+	_root.add_child(player)
+	player.tool_selector.set_aim_for_tests(Vector3(0, 1000, 0), Vector3.UP)
+	SceneRouter.player = player
+	await SceneRouter.change_zone(&"zone_wilderness", &"spawn_start")
+	var zone: Zone = SceneRouter.current_zone
+	assert_object(zone.terrain_node).is_not_null()
+	var start := Time.get_ticks_msec()
+	while not (zone.terrain_node as VoxelTerrain).is_area_meshed(AABB(Vector3(-4, -10, -4), Vector3(8, 24, 8))) and Time.get_ticks_msec() - start < LOAD_TIMEOUT_MS:
+		await get_tree().process_frame
+	await PhysicsWait.frames(get_tree(), 90)
+	assert_bool(player.is_on_floor()).override_failure_message("player not standing on generated terrain").is_true()
+	var surface := (zone.generator as OverworldGenerator).height_at(0, 0) + 1
+	assert_float(player.global_position.y).is_equal_approx(float(surface), 0.1)
+	await SceneRouter.change_zone(&"zone_deep_mine", &"spawn_entry")
+	assert_str(SceneRouter.current_zone_id).is_equal(&"zone_deep_mine")
+	var mine: Zone = SceneRouter.current_zone
+	assert_int((mine.generator as DeepMineGenerator).voxel_at(1, -36, 1)).override_failure_message("spawn must be inside a tunnel").is_equal(0)
+	assert_int((mine.generator as DeepMineGenerator).voxel_at(1, -37, 1)).is_not_equal(0)
+	SceneRouter.reset_for_tests()
+	SceneRouter.player = null
+	SceneRouter.zone_root = null

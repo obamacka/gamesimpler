@@ -343,3 +343,45 @@ func test_real_zones_load_and_player_stands() -> void:
 	SceneRouter.reset_for_tests()
 	SceneRouter.player = null
 	SceneRouter.zone_root = null
+
+
+# P2B.2: Home Meadow on real Voxel Tools terrain: the starter garden is level grass and
+# farmable, the cabin exterior is protected, and the player tills a real voxel.
+func test_home_meadow_garden_is_level_and_farmable() -> void:
+	var session := GameSession.create(11)
+	_root.add_child(session)
+	session.new_game()
+	var zone_root := Node3D.new()
+	_root.add_child(zone_root)
+	SceneRouter.reset_for_tests()
+	SceneRouter.fade_duration = 0.0
+	SceneRouter.zone_root = zone_root
+	var player: PlayerController = preload("res://scenes/player/player.tscn").instantiate()
+	_root.add_child(player)
+	player.tool_selector.set_aim_for_tests(Vector3(0, 1000, 0), Vector3.UP)
+	SceneRouter.player = player
+	await SceneRouter.change_zone(&"zone_home_meadow", &"spawn_start")
+	var zone: Zone = SceneRouter.current_zone
+	var gen := zone.generator as OverworldGenerator
+	var plot: PlotDef = Database.plots[&"plot_starter_garden"]
+	var t := zone.terrain_node as VoxelTerrain
+	var area := AABB(Vector3(plot.min_cell.x, -10, plot.min_cell.z), Vector3(8, 30, 8))
+	var start := Time.get_ticks_msec()
+	while not t.is_area_meshed(area) and Time.get_ticks_msec() - start < LOAD_TIMEOUT_MS:
+		await get_tree().process_frame
+	var h := gen.height_at(plot.min_cell.x, plot.min_cell.z)
+	for x in range(plot.min_cell.x, plot.max_cell.x + 1):
+		for z in range(plot.min_cell.z, plot.max_cell.z + 1):
+			assert_int(gen.height_at(x, z)).is_equal(h)
+	var soil := Vector3i(plot.min_cell.x + 2, h, plot.min_cell.z + 2)
+	assert_int(session.terrain.world.get_voxel(soil)).is_equal(Database.voxel_id_of(&"mat_grass"))
+	assert_str(session.farm.farmable_reason(soil)).is_equal(&"")
+	assert_bool(session.farm.try_till(soil, &"").ok).is_true()
+	assert_int(session.terrain.world.get_voxel(soil)).is_equal(Database.voxel_id_of(&"mat_farmland"))
+	assert_object(zone.find_child("Well", true, false)).is_not_null()
+	assert_object(zone.get_node_or_null("FarmView")).is_not_null()
+	var cabin_x := -5
+	assert_str(session.terrain.can_dig(Vector3i(cabin_x, gen.height_at(cabin_x, -3), -3))).is_equal(TerrainRules.PROTECTED)
+	SceneRouter.reset_for_tests()
+	SceneRouter.player = null
+	SceneRouter.zone_root = null

@@ -3,7 +3,7 @@ extends PlayerState
 
 const TURN_TIME := 0.3
 
-var target: Interactable
+var target: Node3D   # Interactable or FarmActionTarget (both offer spec_for / resolve)
 var spec: InteractionSpec
 var _t := 0.0
 
@@ -12,7 +12,7 @@ func enter(msg: Dictionary = {}) -> void:
 	player.context.interact_done = false
 	player.context.interact_handoff = &""
 	_t = 0.0
-	target = player.focused_interactable()
+	target = player.farm_target if msg.get("effect", &"") == PlayerTransitionTable.FX_FARM else player.focused_interactable()
 	if target == null:
 		player.context.interact_done = true
 		return
@@ -21,7 +21,7 @@ func enter(msg: Dictionary = {}) -> void:
 		player.context.interact_done = true
 
 
-func physics_tick(delta: float, _f: InputFrame) -> void:
+func physics_tick(delta: float, f: InputFrame) -> void:
 	if player.context.interact_done:
 		return
 	_t += delta
@@ -31,6 +31,11 @@ func physics_tick(delta: float, _f: InputFrame) -> void:
 	if spec.stamina_cost > 0:
 		player.session().stamina.spend(spec.stamina_cost, spec.kind)
 	target.resolve(spec, player)
+	# Watering repeats while RT stays held and the aim moves to another dry cell (plan P2B.7).
+	if spec.kind == &"WATER" and f.use_held and not player.context.exhaustion_pending \
+			and player.refresh_farm_target().get("action", &"") == &"water":
+		_t = TURN_TIME
+		return
 	player.context.interact_handoff = spec.handoff_state
 	player.context.interact_done = true
 

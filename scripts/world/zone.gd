@@ -38,6 +38,7 @@ func _ready() -> void:
 		return
 	for v in find_children("*", "ProtectionVolume", true, false):
 		s.terrain.rules.add_volume(v.min_cell, v.max_cell, v.reason, v.allows_place)
+	s.farm.bind_zone(zone_id, self)
 	if spawn_chests:
 		for key in s.world_state.chests:
 			if StringName(s.world_state.chests[key]["zone"]) == zone_id:
@@ -90,7 +91,13 @@ func _make_terrain(s: GameSession) -> Node:
 	if terrain_kind == &"deep_mine":
 		generator = DeepMineGenerator.new(_material_ids(), bmin.y, bmax.y, DeepMineGenerator.day_seed(s.rng.seed_value, s.day()))
 	else:
-		generator = OverworldGenerator.new(_material_ids(), bmin.y, hash([s.rng.seed_value, String(zone_id)]))
+		var og := OverworldGenerator.new(_material_ids(), bmin.y, hash([s.rng.seed_value, String(zone_id)]))
+		for p in Database.plots.values():
+			if p.zone_id == zone_id:   # plots are level, with a 1-cell border
+				var a: Vector3i = p.min_cell - Vector3i(1, 0, 1)
+				var b: Vector3i = p.max_cell + Vector3i(2, 0, 2)
+				og.add_flat(Rect2i(a.x, a.z, b.x - a.x, b.z - a.z))
+		generator = og
 	var t := VoxelTerrain.new()
 	t.name = "VoxelTerrain"
 	var mesher := VoxelMesherBlocky.new()

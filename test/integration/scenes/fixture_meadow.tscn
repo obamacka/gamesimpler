@@ -1,0 +1,35 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/world/zone.gd" id="1_zone"]
+[ext_resource type="Script" path="res://scripts/world/protection_volume.gd" id="2_prot"]
+[ext_resource type="Script" path="res://scripts/world/well.gd" id="3_well"]
+
+[sub_resource type="BoxShape3D" id="floor_shape"]
+size = Vector3(80, 1, 80)
+
+[node name="fixture_meadow" type="Node3D"]
+script = ExtResource("1_zone")
+zone_id = &"zone_home_meadow"
+spawn_chests = false
+
+[node name="Floor" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
+
+[node name="Shape" type="CollisionShape3D" parent="Floor"]
+shape = SubResource("floor_shape")
+
+[node name="spawn_start" type="Marker3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5, 0, 0.5)
+
+[node name="spawn_from_wilderness" type="Marker3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5, 0, 0.5)
+
+[node name="ProtectNextToPlot" type="Node3D" parent="."]
+script = ExtResource("2_prot")
+min_cell = Vector3i(13, -40, -4)
+max_cell = Vector3i(15, 64, 3)
+reason = &"BUILDING"
+
+[node name="Well" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.5, 0, 8.5)
+script = ExtResource("3_well")

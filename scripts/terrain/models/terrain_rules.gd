@@ -25,6 +25,7 @@ var bedrock_voxel := -1
 var player_feet_cell := Vector3i(0, -100000, 0)
 var player_cells: Array[Vector3i] = []
 var pet_cells: Array[Vector3i] = []
+var occupied_cells: Dictionary = {}      # Vector3i -> object key (crops, sprinklers: spec 10.6)
 ## Phase 3 hooks (build pieces). Default: nothing built.
 var building_supported: Callable = func(_c: Vector3i) -> bool: return false
 var piece_occupied: Callable = func(_c: Vector3i) -> bool: return false
@@ -91,7 +92,7 @@ func can_place(cell: Vector3i) -> StringName:
 		return PROTECTED                                                # P1
 	if cell.y < bounds_min_y:
 		return BEDROCK                                                  # P2
-	if world.get_voxel(cell) != IVoxelWorld.AIR or piece_occupied.call(cell):
+	if world.get_voxel(cell) != IVoxelWorld.AIR or piece_occupied.call(cell) or occupied_cells.has(cell):
 		return OCCUPIED
 	if not vol.is_empty() and vol["reason"] == &"JOB_SITE":
 		return JOB_SITE                                                 # P5

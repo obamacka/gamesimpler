@@ -22,6 +22,9 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5, 0, 0.5)
 [node name="spawn_from_cabin" type="Marker3D" parent="Surface"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.5, 0, 2.5)
 
+[node name="spawn_from_meadow" type="Marker3D" parent="Surface"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.5, 0, 2.5)
+
 [node name="spawn_from_mine" type="Marker3D" parent="Surface"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.5, 0, -10.5)
 
@@ -49,10 +52,10 @@ def_id = &"log_fallen"
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.5, 0, -13)
 script = ExtResource("3_door")
 
-[node name="CabinDoor" type="Node3D" parent="Surface"]
+[node name="MeadowPath" type="Node3D" parent="Surface"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5, 0, 4)
 script = ExtResource("3_door")
-target_zone = &"zone_starter_cabin"
+target_zone = &"zone_home_meadow"
 target_spawn = &"spawn_from_wilderness"
 
 [node name="OrchardPath" type="Node3D" parent="Surface"]

@@ -18,6 +18,8 @@ var world_state: WorldStateService
 var mail: MailService
 var housing: HousingService
 var sleep: SleepDirector
+var farm: FarmService
+var hotbar := HotbarModel.new()
 var exhaustion := {"last_snack_day": 0, "count_total": 0}
 var zone_root: Node3D
 var player: Node3D
@@ -43,13 +45,16 @@ func _build(world: IVoxelWorld) -> void:
 	mail = _add(MailService.new(), "MailService")
 	housing = _add(HousingService.new(), "HousingService")
 	sleep = _add(SleepDirector.new(), "SleepDirector")
+	farm = _add(FarmService.new(), "FarmService")
 	terrain.setup(self, world)
 	world_state.setup(self)
 	mail.setup(self)
 	sleep.setup(self)
+	farm.setup(self)
 	rollover.register(&"clock", func(day): GameClock.model.set_morning(day))
 	rollover.register(&"world_respawn", func(day): world_state.respawn_due(day))
 	rollover.register(&"terrain_reset", func(day): terrain.daily_reset(day))
+	rollover.register(&"farm_growth", func(day): farm.daily_growth(day))
 	rollover.register(&"mail_deliver", func(day): mail.deliver_due(day))
 	rollover.register(&"day_started", func(day):
 		stamina.model.new_day()
@@ -74,12 +79,18 @@ func _exit_tree() -> void:
 		current = null
 
 
-## New-game defaults: starter tools, full stamina, day 1 morning.
+## New-game defaults: starter tools (incl. HOE and full WATERING_CAN), full stamina, day 1
+## morning, and the welcome letter with starter seeds in the mailbox (spec 10.7).
 func new_game() -> void:
 	for t in Database.starter_tools:
 		toolbelt.model.grant(t)
 	stamina.model.configure(Database.stamina)
+	farm.model.refill()
 	GameClock.model.set_morning(1)
+	var welcome: MailTemplateDef = Database.mail_templates.get(&"mail_tpl_welcome")
+	if welcome:
+		mail.schedule(welcome, 1)
+		mail.deliver_due(1)
 
 
 func day() -> int:
@@ -99,16 +110,17 @@ func to_dict() -> Dictionary:
 		"schema_version": 1,
 		"rng": rng.to_dict(),
 		"clock": GameClock.model.to_dict(),
-		"player": stamina.model.to_dict().merged({"home": housing.to_dict()}),
+		"player": stamina.model.to_dict().merged({"home": housing.to_dict(), "hotbar_index": hotbar.selected}),
 		"exhaustion": exhaustion.duplicate(),
 		"toolbelt": toolbelt.model.to_dict(),
-		"inventory": inventory.model.to_dict(),
+		"inventory": inventory.model.to_dict().merged({"hotbar_refs": hotbar.refs.duplicate()}),
 		"wallet": wallet.model.to_dict(),
 		"unlocks": unlocks.model.to_dict(),
 		"terrain": {"damaged": terrain.dig.to_dict()},
 		"world": world_state.to_dict(),
 		"discovery": discovery.model.to_dict(),
 		"mail": mail.model.to_dict(),
+		"farm": farm.to_dict(),
 	}
 
 
@@ -127,3 +139,6 @@ func from_dict(d: Dictionary) -> void:
 	world_state.from_dict(d.get("world", {}))
 	discovery.model.from_dict(d.get("discovery", {}))
 	mail.model.from_dict(d.get("mail", {}))
+	farm.from_dict(d.get("farm", {}))
+	hotbar.from_dict({"hotbar_refs": d.get("inventory", {}).get("hotbar_refs", hotbar.refs),
+		"hotbar_index": d.get("player", {}).get("hotbar_index", 0)})

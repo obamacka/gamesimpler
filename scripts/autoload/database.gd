@@ -13,6 +13,9 @@ var fruit_trees: Dictionary = {}
 var timber_trees: Dictionary = {}
 var zones: Dictionary = {}          # StringName -> TerrainZoneDef
 var mail_templates: Dictionary = {}
+var crops: Dictionary = {}           # StringName -> CropDef
+var plots: Dictionary = {}           # StringName -> PlotDef
+var farm := FarmConfig.new()
 var stamina := StaminaConfig.new()
 var discovery := DiscoveryConfig.new()
 var starter_tools: Array[StringName] = []
@@ -33,6 +36,7 @@ func load_all(dir: String) -> void:
 	load_errors.clear()
 	items.clear(); materials.clear(); materials_by_voxel.clear(); loot_tables.clear()
 	treasure_tables.clear(); fruit_trees.clear(); timber_trees.clear(); zones.clear(); mail_templates.clear()
+	crops.clear(); plots.clear()
 	var items_json := _read(dir.path_join("items.json"))
 	for d in items_json.get("items", []):
 		var it := _item(d)
@@ -73,6 +77,18 @@ func load_all(dir: String) -> void:
 		z.stream_db_key = d.get("stream_db_key", ""); z.treasure_table = StringName(d.get("treasure_table", ""))
 		z.bounds_min = _v3i(d.get("bounds_min", [-64, -32, -64])); z.bounds_max = _v3i(d.get("bounds_max", [64, 64, 64]))
 		zones[z.id] = z
+	for d in world.get("plots", []):
+		var pl := PlotDef.new()
+		pl.id = StringName(d["id"]); pl.zone_id = StringName(d["zone_id"]); pl.min_cell = _v3i(d["min_cell"]); pl.max_cell = _v3i(d["max_cell"])
+		pl.owned_from_start = bool(d.get("owned_from_start", false)); pl.price_coins = int(d.get("price_coins", 0))
+		plots[pl.id] = pl
+	for d in _read(dir.path_join("crops.json")).get("crops", []):
+		var c := CropDef.new()
+		c.id = StringName(d["id"]); c.seed_item_id = StringName(d["seed_item_id"]); c.harvest_item_id = StringName(d["harvest_item_id"])
+		c.days_per_stage.assign((d["days_per_stage"] as Array).map(func(v): return int(v)))
+		c.regrow_stage = int(d.get("regrow_stage", -1)); c.yield_min = int(d.get("yield_min", 1)); c.yield_max = int(d.get("yield_max", 1))
+		c.seed_return_pct = int(d.get("seed_return_pct", 0)); c.color = Color.html(d.get("color", "#40a040"))
+		crops[c.id] = c
 	var home: Dictionary = world.get("home", {})
 	home_zone = StringName(home.get("zone_id", "zone_starter_cabin"))
 	home_bed_key = StringName(home.get("bed_key", "bed_01"))
@@ -99,6 +115,9 @@ func load_all(dir: String) -> void:
 	discovery.geode_item_id = StringName(dc.get("geode_item_id", "item_geode"))
 	discovery.geode_pity = int(dc.get("geode_pity", 40)); discovery.chest_pity = int(dc.get("chest_pity", 150))
 	starter_tools.assign((cfg.get("starter_kit", {}).get("tools", []) as Array).map(func(v): return StringName(v)))
+	var fc: Dictionary = cfg.get("farm", {})
+	farm = FarmConfig.new()
+	farm.can_capacity = int(fc.get("can_capacity", 20)); farm.sprinkler_radius = int(fc.get("sprinkler_radius", 1)); farm.till_stamina = int(fc.get("till_stamina", 1))
 
 
 func item(id: StringName) -> ItemDef:
@@ -209,6 +228,24 @@ func validate() -> Array[String]:
 	for t in starter_tools:
 		if not items.has(t) or items[t].tool == null:
 			errors.append("starter tool %s invalid" % t)
+	for id in items:
+		if items[id].category == &"SEED" and not crops.has(items[id].seed_crop):
+			errors.append("seed %s plants unknown crop %s" % [id, items[id].seed_crop])
+	for id in crops:
+		var c: CropDef = crops[id]
+		if not items.has(c.seed_item_id) or items[c.seed_item_id].seed_crop != id:
+			errors.append("crop %s seed item %s missing or not linked" % [id, c.seed_item_id])
+		if not items.has(c.harvest_item_id) or items[c.harvest_item_id].category != &"PRODUCE":
+			errors.append("crop %s harvest item %s missing or not PRODUCE" % [id, c.harvest_item_id])
+		if c.regrow_stage >= c.stage_count():
+			errors.append("crop %s regrow_stage must be below the final stage" % id)
+		if c.days_per_stage.is_empty() or c.stage_count() < 3 or c.stage_count() > 5:
+			errors.append("crop %s needs 3 to 5 stages" % id)
+	for id in plots:
+		if not zones.has(plots[id].zone_id):
+			errors.append("plot %s in unknown zone" % id)
+	if not materials.has(&"mat_farmland"):
+		errors.append("mat_farmland material missing")
 	return errors
 
 
@@ -238,6 +275,7 @@ func _item(d: Dictionary) -> ItemDef:
 	it.tags.assign((d.get("tags", []) as Array).map(func(v): return StringName(v)))
 	it.has_instance_data = bool(d.get("has_instance_data", false))
 	it.block_material = StringName(d.get("block_material", ""))
+	it.seed_crop = StringName(d.get("seed_crop", ""))
 	if d.has("tool"):
 		var t := ToolData.new()
 		var td: Dictionary = d["tool"]

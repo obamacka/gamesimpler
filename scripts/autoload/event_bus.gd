@@ -21,6 +21,7 @@ signal settings_changed(section: StringName, key: StringName, value: Variant)
 # Inventory, wallet, unlocks (spec 1.8)
 signal item_added(item_id: StringName, qty: int)
 signal inventory_changed
+signal hotbar_selected(index: int)
 signal coins_changed(old_value: int, new_value: int)
 signal unlock_granted(kind: StringName, id: StringName)
 
@@ -54,6 +55,16 @@ signal clock_late_night
 # Mail (spec 3.3)
 signal mail_delivered(ids: Array)
 signal mail_claimed(id: String)
+
+# Farming (spec 1.8, 10)
+signal soil_tilled(cell: Vector3i)
+signal crop_planted(cell: Vector3i, crop_id: StringName)
+signal crop_watered(cell: Vector3i)
+signal crop_grew(cell: Vector3i, stage: int)
+signal crop_harvested(cell: Vector3i, crop_id: StringName, qty: int)
+signal can_refilled(water: int)
+signal sprinkler_placed(cell: Vector3i)
+signal farm_changed(zone_id: StringName)
 
 # Zones (spec 1.2 SceneRouter)
 signal zone_unloading(zone_id: StringName)

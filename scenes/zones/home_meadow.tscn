@@ -1,0 +1,73 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/world/zone.gd" id="1_zone"]
+[ext_resource type="Script" path="res://scripts/world/mine_entrance.gd" id="2_door"]
+[ext_resource type="Script" path="res://scripts/world/protection_volume.gd" id="3_prot"]
+[ext_resource type="Script" path="res://scripts/safety/safety_volume.gd" id="4_safety"]
+[ext_resource type="Script" path="res://scripts/world/well.gd" id="5_well"]
+[ext_resource type="Script" path="res://scripts/world/building_shell.gd" id="6_shell"]
+
+[sub_resource type="BoxShape3D" id="kill_shape"]
+size = Vector3(400, 4, 400)
+
+[node name="HomeMeadow" type="Node3D"]
+script = ExtResource("1_zone")
+zone_id = &"zone_home_meadow"
+terrain_kind = &"overworld"
+
+[node name="Surface" type="Node3D" parent="."]
+
+[node name="spawn_start" type="Marker3D" parent="Surface"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5, 0, 4.5)
+
+[node name="spawn_from_cabin" type="Marker3D" parent="Surface"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.5, 0, 3.5)
+
+[node name="spawn_from_wilderness" type="Marker3D" parent="Surface"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11.5, 0, 8.5)
+
+[node name="CabinExterior" type="Node3D" parent="Surface"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.5, 0, -2.5)
+script = ExtResource("6_shell")
+size = Vector3(7, 4, 6)
+
+[node name="CabinDoor" type="Node3D" parent="Surface"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.5, 0, 0.7)
+script = ExtResource("2_door")
+target_zone = &"zone_starter_cabin"
+target_spawn = &"spawn_from_meadow"
+
+[node name="Well" type="Node3D" parent="Surface"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14.5, 0, 0.5)
+script = ExtResource("5_well")
+
+[node name="WildernessPath" type="Node3D" parent="Surface"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -14, 0, 8.5)
+script = ExtResource("2_door")
+target_zone = &"zone_wilderness"
+target_spawn = &"spawn_from_meadow"
+
+[node name="ProtectCabin" type="Node3D" parent="."]
+script = ExtResource("3_prot")
+min_cell = Vector3i(-10, -40, -7)
+max_cell = Vector3i(-1, 64, 2)
+reason = &"BUILDING"
+
+[node name="ProtectSpawn" type="Node3D" parent="."]
+script = ExtResource("3_prot")
+min_cell = Vector3i(-1, -40, 3)
+max_cell = Vector3i(2, 64, 6)
+reason = &"SPAWN"
+
+[node name="ProtectWell" type="Node3D" parent="."]
+script = ExtResource("3_prot")
+min_cell = Vector3i(13, -40, -1)
+max_cell = Vector3i(15, 64, 1)
+reason = &"BUILDING"
+
+[node name="KillPlane" type="Area3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -40, 0)
+script = ExtResource("4_safety")
+
+[node name="Shape" type="CollisionShape3D" parent="KillPlane"]
+shape = SubResource("kill_shape")

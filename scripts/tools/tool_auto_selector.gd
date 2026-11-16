@@ -107,7 +107,12 @@ func aim_target(session: GameSession) -> Dictionary:
 		if player.global_position.distance_to(center) <= REACH_FROM_PLAYER + 0.5:
 			var mat := Database.material_by_voxel(hit["voxel_id"])
 			var reason := session.terrain.can_dig(cell)
-			if mat and reason != TerrainRules.NOT_LOADED:
+			var farm_aim: Dictionary = session.farm.aim_for(cell, session.hotbar.selected_item_id(session.inventory.model)) \
+				if mat and reason != TerrainRules.NOT_LOADED and reason != TerrainRules.PROTECTED else {}
+			if not farm_aim.is_empty():
+				best_dist = hit["distance"]
+				best_aim = farm_aim
+			elif mat and reason != TerrainRules.NOT_LOADED:
 				best_dist = hit["distance"]
 				best_aim = {"key": "voxel:%d,%d,%d" % [cell.x, cell.y, cell.z], "kind": &"voxel", "cell": cell,
 					"tool": mat.preferred_tool, "target_kind": &"voxel_hard" if mat.is_hard() else &"voxel_soft",

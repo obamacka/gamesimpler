@@ -34,7 +34,10 @@ var last_safe_position := Vector3.ZERO
 var stuck := StuckDetector.new()
 var _forced_sleep: StringName = &""
 var _last_alt := false
-var _focused: Interactable
+var _focused: Node3D              # Interactable or the FarmActionTarget
+var farm_target: FarmActionTarget
+var _farm_aim: Dictionary = {}    # this tick's farm action (spec 10.4) or {}
+var _farm_pos := Vector3.ZERO
 var _target: Dictionary = {}     # current tool target: {"kind": &"voxel", "cell"} or {"kind": &"zone", "node"}
 var _safe_timer := 0.0
 var _target_destroyed := false
@@ -64,6 +67,10 @@ func _ready() -> void:
 	_was_on_floor = true
 	_fall_peak_y = global_position.y
 	tool_selector.setup(self, tool_detector)
+	farm_target = FarmActionTarget.new()
+	farm_target.name = "FarmTarget"
+	farm_target.top_level = true
+	add_child(farm_target)
 	EventBus.player_woke.connect(_on_woke)
 	last_safe_position = global_position
 	if GameSession.current:
@@ -96,7 +103,7 @@ func _physics_process(delta: float) -> void:
 	if t.stays():
 		_apply_stay_effect(t.effect)
 	elif machine.has_state(t.to):
-		if t.to == PlayerTransitionTable.MINE:
+		if t.to == PlayerTransitionTable.MINE or (t.effect == PlayerTransitionTable.FX_FARM and tool_selector.best().get("tool", &"") != &""):
 			tool_selector.commit_now()
 		machine.transition_to(t.to, {"effect": t.effect, "from": machine.current_id, "auto": context.auto_jump_ready and not f.jump_pressed, "reason": pending_sleep_reason})
 		if t.effect == PlayerTransitionTable.FX_SOFT_LAND:
@@ -272,9 +279,11 @@ func _build_phase2_context(f: InputFrame, delta: float) -> void:
 	s.terrain.rules.player_feet_cell = feet
 	s.terrain.rules.player_cells = [feet + Vector3i.UP, feet + Vector3i(0, 2, 0), feet + Vector3i(0, 3, 0)]
 
+	_handle_hotbar(f, s)
 	tool_selector.tick(delta, current_state().locks_tool())
 	var aim := tool_selector.last_aim
 	var best := tool_selector.best()
+	_update_farm_aim(aim, best)
 	# Spec 4.3: while mining, the target is pinned until destroyed; only then may it retarget.
 	if machine.current_id == PlayerTransitionTable.MINE and not _target.is_empty() and not _target_destroyed and mine_target_valid():
 		c.tool_target_kind = PlayerTransitionTable.TARGET_VOXEL if _target["kind"] == &"voxel" else PlayerTransitionTable.TARGET_TIMBER
@@ -285,6 +294,9 @@ func _build_phase2_context(f: InputFrame, delta: float) -> void:
 	if not aim.is_empty() and aim.get("blocked", &"") != &"":
 		c.tool_target_kind = PlayerTransitionTable.TARGET_VOXEL
 		c.tool_blocked = aim["blocked"]
+	elif not _farm_aim.is_empty() and _farm_aim["action"] != &"harvest":
+		c.tool_target_kind = PlayerTransitionTable.TARGET_FARM
+		c.tool_ok = true
 	elif not best.is_empty():
 		var belt := s.toolbelt.model
 		match best["target_kind"]:
@@ -303,12 +315,56 @@ func _build_phase2_context(f: InputFrame, delta: float) -> void:
 				_target = {"kind": &"zone", "node": _zone_node(best["key"], aim)}
 				c.tool_target_kind = PlayerTransitionTable.TARGET_FRUIT_TREE
 				c.tool_ok = true
-	if f.interact_pressed or f.interact_alt_pressed or f.use_pressed:
+	if f.interact_pressed and _farm_aim.get("action", &"") in [&"harvest", &"refill"]:
+		_focused = farm_target
+		c.has_interact_target = true
+	elif f.use_pressed and c.tool_target_kind == PlayerTransitionTable.TARGET_FARM:
+		_focused = farm_target
+	elif f.interact_pressed or f.interact_alt_pressed or f.use_pressed:
 		_focused = _resolve_focus(f.use_pressed and c.tool_target_kind == PlayerTransitionTable.TARGET_FRUIT_TREE)
 		c.has_interact_target = _focused != null and _focused.spec_for(self, false, f.interact_alt_pressed) != null
 	var enclosed := _enclosed()
 	if stuck.update(delta, f.move.length() > 0.2, global_position, enclosed):
 		EventBus.stuck_hint.emit()
+
+
+## Hotbar selection (spec 2.2): shoulders cycle, number keys pick. Phase 4 adds the hotbar UI.
+func _handle_hotbar(f: InputFrame, s: GameSession) -> void:
+	var before := s.hotbar.selected
+	if f.hotbar_select >= 0:
+		s.hotbar.select(f.hotbar_select)
+	elif f.hotbar_next_pressed:
+		s.hotbar.next()
+	elif f.hotbar_prev_pressed:
+		s.hotbar.prev()
+	if s.hotbar.selected != before:
+		EventBus.hotbar_selected.emit(s.hotbar.selected)
+
+
+## Farm action for this tick from the aimed farm cell or the well's tool zone (spec 10.4).
+## The FarmActionTarget is frozen while an Interact runs so the action cannot retarget mid-way.
+func _update_farm_aim(aim: Dictionary, best: Dictionary) -> void:
+	_farm_aim = {}
+	if not aim.is_empty() and aim.get("blocked", &"") == &"" and aim.has("farm"):
+		_farm_aim = aim["farm"]
+		_farm_pos = Vector3(_farm_aim["crop_cell"]) + Vector3(0.5, 0.3, 0.5)
+	elif not best.is_empty() and best["target_kind"] == &"refill":
+		var n := _zone_node(best["key"], aim)
+		if n:
+			_farm_aim = {"action": &"refill"}
+			_farm_pos = (n as Node3D).global_position
+	if machine.current_id != PlayerTransitionTable.INTERACT:
+		farm_target.configure(_farm_aim, _farm_pos)
+
+
+## Interact calls this to repeat watering while RT stays held (plan P2B.7).
+func refresh_farm_target() -> Dictionary:
+	var s := session()
+	if s:
+		tool_selector.last_aim = tool_selector.aim_target(s)
+		_update_farm_aim(tool_selector.last_aim, tool_selector.best())
+	farm_target.configure(_farm_aim, _farm_pos)
+	return _farm_aim
 
 
 func _zone_node(key: String, aim: Dictionary) -> Node:
@@ -338,7 +394,7 @@ func _resolve_focus(prefer_tree: bool) -> Interactable:
 	return lookup.get(best.get("key", ""))
 
 
-func focused_interactable() -> Interactable:
+func focused_interactable() -> Node3D:
 	return _focused
 
 
@@ -445,8 +501,10 @@ func prompt_target() -> Dictionary:
 		return {}
 	var best := tool_selector.best()
 	var aim := tool_selector.last_aim
-	var focus := _resolve_focus(false)
+	var focus: Node3D = _resolve_focus(false)
 	var blocked: StringName = aim.get("blocked", &"") if not aim.is_empty() else &""
+	if farm_target.has_action() and farm_target.action["action"] in [&"harvest", &"refill"]:
+		focus = farm_target
 	var pos := Vector3.ZERO
 	if focus:
 		pos = focus.global_position
@@ -457,7 +515,12 @@ func prompt_target() -> Dictionary:
 	else:
 		return {}
 	var target_cell = null if focus else aim.get("cell")
-	return {"position": pos, "tool": best if blocked == &"" else {}, "blocked": blocked, "cell": target_cell,
+	var tool_row: Dictionary = best
+	if blocked == &"" and not _farm_aim.is_empty() and aim.has("farm"):
+		tool_row = aim
+	elif blocked != &"":
+		tool_row = {}
+	return {"position": pos, "tool": tool_row, "blocked": blocked, "cell": target_cell,
 		"primary": focus.spec_for(self, false, false) if focus else null,
 		"secondary": focus.spec_for(self, false, true) if focus else null}
 

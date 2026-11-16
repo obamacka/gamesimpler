@@ -1,0 +1,100 @@
+{
+  "crops": [
+    {
+      "id": "crop_carrot",
+      "seed_item_id": "item_seed_carrot",
+      "harvest_item_id": "item_carrot",
+      "days_per_stage": [
+        1,
+        1,
+        1
+      ],
+      "regrow_stage": -1,
+      "yield_min": 1,
+      "yield_max": 2,
+      "seed_return_pct": 25,
+      "color": "#f08a24"
+    },
+    {
+      "id": "crop_sunflower",
+      "seed_item_id": "item_seed_sunflower",
+      "harvest_item_id": "item_sunflower",
+      "days_per_stage": [
+        1,
+        1,
+        1,
+        1
+      ],
+      "regrow_stage": -1,
+      "yield_min": 1,
+      "yield_max": 1,
+      "seed_return_pct": 40,
+      "color": "#f2cf1d"
+    },
+    {
+      "id": "crop_pumpkin",
+      "seed_item_id": "item_seed_pumpkin",
+      "harvest_item_id": "item_pumpkin",
+      "days_per_stage": [
+        1,
+        1,
+        1,
+        1,
+        2
+      ],
+      "regrow_stage": -1,
+      "yield_min": 1,
+      "yield_max": 1,
+      "seed_return_pct": 20,
+      "color": "#e07018"
+    },
+    {
+      "id": "crop_cotton",
+      "seed_item_id": "item_seed_cotton",
+      "harvest_item_id": "item_cotton",
+      "days_per_stage": [
+        1,
+        1,
+        1,
+        2
+      ],
+      "regrow_stage": -1,
+      "yield_min": 1,
+      "yield_max": 3,
+      "seed_return_pct": 25,
+      "color": "#f4f2ee"
+    },
+    {
+      "id": "crop_strawberry",
+      "seed_item_id": "item_seed_strawberry",
+      "harvest_item_id": "item_strawberry",
+      "days_per_stage": [
+        1,
+        1,
+        1,
+        1
+      ],
+      "regrow_stage": 2,
+      "yield_min": 2,
+      "yield_max": 4,
+      "seed_return_pct": 0,
+      "color": "#d8283a"
+    },
+    {
+      "id": "crop_tomato",
+      "seed_item_id": "item_seed_tomato",
+      "harvest_item_id": "item_tomato",
+      "days_per_stage": [
+        1,
+        1,
+        2,
+        1
+      ],
+      "regrow_stage": 2,
+      "yield_min": 2,
+      "yield_max": 3,
+      "seed_return_pct": 0,
+      "color": "#d8402a"
+    }
+  ]
+}

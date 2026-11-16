@@ -89,9 +89,11 @@ func update(delta: float, aim: Dictionary, zones: Array, locked: bool) -> Array:
 		_prompt(events, best["key"], &"missing_tool", tool)
 		_pending_tool = &""
 		return events
-	# Rule 8: tier too low still equips, with a badge.
+	# Rule 8: tier too low still equips, with a badge. Spec 10.4: an empty can shows a badge too.
 	var data := belt.tool_data(tool)
-	if int(best.get("tier_required", 0)) > (data.tier if data else 0):
+	if best.get("badge", &"") != &"":
+		_prompt(events, best["key"], best["badge"], tool)
+	elif int(best.get("tier_required", 0)) > (data.tier if data else 0):
 		_prompt(events, best["key"], &"tier_lock", tool)
 	elif _last_prompt.begins_with(best["key"] + ":"):
 		_last_prompt = ""
@@ -145,7 +147,7 @@ func _best(aim: Dictionary, zones: Array, events: Array) -> Dictionary:
 			_prompt(events, current_aim["key"], blocked, &"")
 		elif current_aim.get("tool", &"") != &"":
 			return {"key": current_aim["key"], "tool": current_aim["tool"], "target_kind": current_aim["target_kind"],
-				"tier_required": current_aim.get("tier_required", 0), "reason": &"aim_change"}
+				"tier_required": current_aim.get("tier_required", 0), "badge": current_aim.get("badge", &""), "reason": &"aim_change"}
 
 	var cands: Array = []
 	var keep: Dictionary = {}

@@ -2,8 +2,8 @@
 
 | Field | Value |
 |---|---|
-| Status | DRAFT rev 3.4, all decisions resolved |
-| Revision | rev 1: core systems. rev 2: kid-friendly, accessibility, forgiving logic, expression systems, integration tests. rev 3: D1 to D4 resolved (dig-anywhere blocky voxels, jump and double jump, context-aware interaction with dedicated critical states, crafting flow confirmed). rev 3.1: D16 to D19 confirmed. rev 3.2: D5 to D15 resolved (farming system added, pets on day 2, keep last tool), min-spec hardware, test command note. rev 3.3: D20 to D25 resolved (macOS min spec M1 16 GB; 30 fps on min spec, 60 fps on recommended spec). rev 3.4: D26 recommended spec |
+| Status | DRAFT rev 3.5, all decisions resolved |
+| Revision | rev 1: core systems. rev 2: kid-friendly, accessibility, forgiving logic, expression systems, integration tests. rev 3: D1 to D4 resolved (dig-anywhere blocky voxels, jump and double jump, context-aware interaction with dedicated critical states, crafting flow confirmed). rev 3.1: D16 to D19 confirmed. rev 3.2: D5 to D15 resolved (farming system added, pets on day 2, keep last tool), min-spec hardware, test command note. rev 3.3: D20 to D25 resolved (macOS min spec M1 16 GB; 30 fps on min spec, 60 fps on recommended spec). rev 3.4: D26 recommended spec. rev 3.5: Phase 2B farming details (farm events, save shape, extra 10.4 rows, Home Meadow) |
 | Engine | Godot 4.7 stable (4.7.2 latest patch found, 2026-08-18), GDScript |
 | Physics | Jolt Physics (built-in module) |
 | Voxels | Zylann Voxel Tools 1.7, GDExtension edition (MIT), released 2026-08-20, targets Godot 4.5+ |
@@ -333,7 +333,7 @@ Services do not reference each other, except `TransactionCoordinator` (Economy),
 | Jobs | `accept_contract`, `submit_contract` | `contract_completed`, `job_rank_up` |
 | Mail | `schedule`, `deliver_due(day)`, `claim_attachments` | `mail_delivered`, `mail_claimed` |
 | Build | `try_place`, `fasten_step`, `try_remove`, `try_place_block`, `try_paint`, `try_stamp`, `undo_decor`, `toggle_furniture` | `piece_placed`, `piece_fastened`, `block_placed`, `piece_painted`, `piece_stamped`, `furniture_toggled` |
-| Farm | `try_till(cell)`, `try_plant(cell, seed_item_id)`, `try_water(cell)`, `try_harvest(cell)`, `refill_can()`, `daily_growth(day)` | `soil_tilled`, `crop_planted`, `crop_watered`, `crop_grew(cell, stage)`, `crop_harvested(cell, crop_id, qty)` |
+| Farm | `try_till(cell, seed_item_id = "")`, `try_plant(cell, seed_item_id)`, `try_water(cell)`, `try_harvest(cell)`, `refill_can()`, `try_place_sprinkler(cell)`, `daily_growth(day)` | `soil_tilled(soil_cell)`, `crop_planted`, `crop_watered`, `crop_grew(cell, stage)`, `crop_harvested(cell, crop_id, qty)`, `can_refilled(water)`, `sprinkler_placed(cell)`, `farm_changed(zone_id)` (views). Crop events carry the crop cell (soil + 1 up). |
 | Terrain | `hit_voxel(cell, tool_type)`, `can_dig(cell) -> Result`, `can_place(cell) -> Result`, `daily_reset(day)` | `voxel_damaged(cell, hits_left)`, `voxel_dug(cell, material_id)`, `voxel_placed(cell, material_id)` |
 | WorldState | `harvest_tree`, `chop_tree`, `open_chest` | `tree_harvested`, `tree_chopped`, `chest_opened` |
 | Stamina | `spend(amount, reason)`, `restore(amount, reason)`, `refill()` | `stamina_changed`, `stamina_low(level)`, `stamina_depleted` |
@@ -702,8 +702,10 @@ Rules:
   },
   "discovery": { "pity": { "geode": 3, "chest": 11 } },
   "farm": {
-    "tilled": { "zone_plot_starter": ["2,0,3", "3,0,3"] },
-    "crops": { "zone_plot_starter/2,1,3": { "crop_id": "crop_carrot", "stage": 2, "growth_days": 2, "watered_day": 14, "planted_day": 12, "harvests": 0 } },
+    "tilled": { "zone_home_meadow": ["2,0,3", "3,0,3"] },
+    "crops": { "zone_home_meadow/2,1,3": { "crop_id": "crop_carrot", "growth_days": 2, "planted_day": 12, "harvests": 0 } },
+    "wet": { "zone_home_meadow/2,0,3": 14 },
+    "sprinklers": ["zone_home_meadow/4,1,3"],
     "watering_can": { "water": 14 }
   },
   "museum": {
@@ -1632,6 +1634,8 @@ Till soil with the HOE, plant seeds, water with the WATERING_CAN (or sprinklers)
 - Farmable cells (D22): top-exposed `mat_grass` or `mat_dirt` inside an owned plot or the starter garden plot (`plot_starter_garden`, 8x8, owned from the start next to the starter cabin), with at least 2 free cells above and not inside a protection volume.
 - Tilling sets the voxel to `mat_farmland` (dug normally with the SHOVEL; drops a dirt BLOCK). Farmland never reverts on its own.
 - Wetness is not a voxel edit: a per-zone `SoilOverlay` (MultiMesh) darkens watered cells, rebuilt from `FarmService` data.
+- Wetness is stored per soil cell as the day watered (`farm.wet`), so empty farmland can be watered too; the crop stage is derived from `growth_days` and not saved.
+- Home Meadow (`zone_home_meadow`, generated overworld) holds the protected starter cabin exterior, the well and the starter garden. `OverworldGenerator` flattens every plot of the zone (plus a 1-cell border) to the natural height at its center. Zone graph: cabin interior <-> Home Meadow <-> Wilderness.
 
 ### 10.3 Data
 | Resource | Key fields |
@@ -1652,6 +1656,10 @@ Evaluated before the plain voxel rule, for the aimed cell within reach:
 | Well, water voxel | any | WATERING_CAN refill (X or RT) | `&"refill"` |
 | Ripe crop | any | no tool; X Harvest | none |
 | Farmable soil | not SEED | normal voxel rule (SHOVEL dig) | `&"voxel_soft"` |
+| Grass or dirt that is not farmable (outside owned plots, protected, < 2 free cells) | SEED | no tool; blocked prompt with the reason (`not_farmable`, `protected`, `no_room`), never a dig | blocked |
+| Farmable soil | not SEED, HOE equipped (manual pick) | HOE: till only | `&"till"` |
+| Empty farmland or owned plot surface | sprinkler item | no tool; place sprinkler on the cell above (Phase 2B minimal command; Phase 3 Build mode takes over) | `&"place_sprinkler"` |
+| Watered farmland with a growing crop | any | normal voxel rule (blocked `supports_object`) | blocked |
 Tilling without seeds: choose HOE on the wheel Tools page (manual override, 2.6 rule 6). An empty can on an unwatered target shows the can with an empty badge and a refill hint.
 
 ### 10.5 Growth rules (`FarmModel`, pure)

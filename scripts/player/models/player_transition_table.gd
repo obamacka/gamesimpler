@@ -32,10 +32,12 @@ const FX_FORAGE := &"forage"
 const FX_BLOCKED := &"blocked"
 const FX_TIER_LOW := &"tier_low"
 const FX_AIR_STRIKE := &"air_strike"
+const FX_FARM := &"farm"
 
 const TARGET_VOXEL := &"voxel"
 const TARGET_TIMBER := &"timber"
 const TARGET_FRUIT_TREE := &"fruit_tree"
+const TARGET_FARM := &"farm"
 
 const GROUNDED: Array[StringName] = [IDLE, WALK, RUN, DUCK]
 const AIRBORNE: Array[StringName] = [JUMP, FALL]
@@ -90,6 +92,8 @@ static func _grounded(state: StringName, f: InputFrame, c: PlayerContext) -> Tra
 	if wants_tool:
 		if c.tool_target_kind == TARGET_FRUIT_TREE:
 			return Transition.new(INTERACT, FX_FORAGE)
+		if c.tool_target_kind == TARGET_FARM and c.tool_blocked == &"":
+			return Transition.new(INTERACT, FX_FARM)
 		if c.tool_blocked != &"":
 			return Transition.new(&"", FX_BLOCKED)
 		if not c.tool_ok:

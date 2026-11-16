@@ -8,6 +8,7 @@ const ZONES := {
 	&"zone_wilderness": "res://test/integration/scenes/fixture_wilderness.tscn",
 	&"zone_starter_cabin": "res://test/integration/scenes/fixture_cabin.tscn",
 	&"zone_deep_mine": "res://test/integration/scenes/fixture_deep_mine.tscn",
+	&"zone_home_meadow": "res://test/integration/scenes/fixture_meadow.tscn",
 }
 
 var suite: Node

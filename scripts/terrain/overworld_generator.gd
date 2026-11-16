@@ -8,6 +8,7 @@ var ids: Dictionary          # material id String -> voxel id
 var bedrock_y := -24
 var seed_value := 1234
 var _noise := FastNoiseLite.new()
+var _flats: Array = []       # [[Rect2i (x, z), height]]: flattened areas such as farm plots
 
 
 func _init(material_ids: Dictionary = {}, bedrock_level: int = -24, s: int = 1234) -> void:
@@ -18,11 +19,21 @@ func _init(material_ids: Dictionary = {}, bedrock_level: int = -24, s: int = 123
 	_noise.frequency = 0.018
 
 
+## Flattens `rect` (x/z cells, inclusive of position, exclusive of end) to the natural height
+## at its center (spec 10.2: the starter garden is level). Call before the terrain generates.
+func add_flat(rect: Rect2i) -> void:
+	var c := rect.get_center()
+	_flats.append([rect, surface_height(_noise, c.x, c.y)])
+
+
 static func surface_height(noise: FastNoiseLite, x: int, z: int) -> int:
 	return int(round(noise.get_noise_2d(x, z) * 6.0)) + 4
 
 
 func height_at(x: int, z: int) -> int:
+	for f in _flats:
+		if (f[0] as Rect2i).has_point(Vector2i(x, z)):
+			return f[1]
 	return surface_height(_noise, x, z)
 
 
@@ -40,7 +51,7 @@ func _generate_block(out: VoxelBuffer, origin: Vector3i, _lod: int) -> void:
 		for z in size.z:
 			var wx := origin.x + x
 			var wz := origin.z + z
-			var h := surface_height(_noise, wx, wz)
+			var h := height_at(wx, wz)
 			for y in size.y:
 				var wy := origin.y + y
 				var v := _voxel(wx, wy, wz, h)

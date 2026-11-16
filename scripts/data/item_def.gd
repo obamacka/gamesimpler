@@ -15,3 +15,4 @@ extends Resource
 @export var tool: ToolData
 @export var food: FoodData
 @export var block_material: StringName = &""   # BLOCK items: the VoxelMaterialDef they place
+@export var seed_crop: StringName = &""        # SEED items: the CropDef they plant

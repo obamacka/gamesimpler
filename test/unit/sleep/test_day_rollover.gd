@@ -44,3 +44,15 @@ func test_clock_round_trip() -> void:
 	c2.from_dict(JSON.parse_string(JSON.stringify(c.to_dict())))
 	assert_int(c2.day).is_equal(14)
 	assert_int(c2.minute).is_equal(545)
+
+
+# P2B.14: the session registers farm growth as step 4, after terrain reset and before mail.
+func test_session_farm_growth_step_order() -> void:
+	var s: GameSession = auto_free(GameSession.create(3))
+	add_child(s)
+	s.rollover.run(6)
+	assert_int(DayRollover.ORDER.find(&"farm_growth")).is_equal(3)
+	var run := s.rollover.last_run
+	assert_int(run.find(&"farm_growth")).is_greater(run.find(&"terrain_reset"))
+	assert_int(run.find(&"farm_growth")).is_less(run.find(&"mail_deliver"))
+	assert_int(run.find(&"terrain_reset")).is_greater_equal(0)

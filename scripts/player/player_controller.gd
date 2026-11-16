@@ -456,6 +456,15 @@ func prompt_target() -> Dictionary:
 		pos = _zone_node(best["key"], aim).global_position + Vector3(0, 1, 0)
 	else:
 		return {}
-	return {"position": pos, "tool": best if blocked == &"" else {}, "blocked": blocked,
+	var target_cell = null if focus else aim.get("cell")
+	return {"position": pos, "tool": best if blocked == &"" else {}, "blocked": blocked, "cell": target_cell,
 		"primary": focus.spec_for(self, false, false) if focus else null,
 		"secondary": focus.spec_for(self, false, true) if focus else null}
+
+
+## True if nothing solid hides `target` (from prompt_target) from `camera_pos` (spec 2.8).
+func prompt_visible_from(camera_pos: Vector3, target: Dictionary) -> bool:
+	var s := session()
+	var ex: Array[RID] = [get_rid()]
+	return PromptOcclusion.is_visible(get_world_3d().direct_space_state, camera_pos, target["position"], ex,
+		s.terrain.world if s else null, target.get("cell"))

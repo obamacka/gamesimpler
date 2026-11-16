@@ -1,5 +1,6 @@
 ## World-anchored button prompts (spec 2.8): glyph + text over the focused target, projected
-## with Camera3D.unproject_position. Hidden while paused (game_paused) and when behind the camera.
+## with Camera3D.unproject_position. Hidden while paused (game_paused), when behind the camera,
+## and when walls or terrain block the line of sight (PromptOcclusion).
 class_name PromptOverlay
 extends CanvasLayer
 
@@ -24,7 +25,8 @@ func _process(_delta: float) -> void:
 		return
 	var target := player.prompt_target()
 	var cam := player.get_viewport().get_camera_3d()
-	if target.is_empty() or cam == null or cam.is_position_behind(target["position"]):
+	if target.is_empty() or cam == null or cam.is_position_behind(target["position"]) \
+			or not player.prompt_visible_from(cam.global_position, target):
 		_box.visible = false
 		return
 	var unread := GameSession.current.mail.model.unread_count()

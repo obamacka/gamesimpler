@@ -111,45 +111,45 @@ All decisions D1 to D26 are resolved (spec 0.4). No phase is blocked on a decisi
 **Spec:** 1.2, 1.4, 1.7, 2.1 to 2.5, 4.1, 4.2 (locomotion rows), 4.2.1, 5.2, 5.5.
 
 ### P1 resources and project settings
-- [ ] **P1.1 Input map** in `project.godot`: every action in spec 2.2, 2.3 (`build_tool_next/prev`, `rotate_cw/ccw`, `undo`, `build_catalog`, `note_1..8`), 2.4 (`ui_*` explicit events, custom `ui_tab_*`, `ui_page_*`, `ui_secondary`, `ui_tertiary`, `ui_wheel_select`), with joypad and KB/M events and deadzones exactly as specified.
-- [ ] **P1.2 `res://resources/config/input_contexts.tres`**: action -> context map (`GAMEPLAY`, `AIRBORNE`, `BUILD`, `INSTRUMENT`, `UI`) used by conflict validation.
-- [ ] **P1.3 `res://resources/config/player_config.tres`** (`PlayerConfig`: capsules, speeds, reach) and **`jump_config.tres`** (`JumpConfig`: gravity 24, 7.9 / 7.6 m/s, coyote 0.12, buffer 0.15, air control 0.8, max fall 20).
-- [ ] **P1.4 Glyph sets** `res://resources/glyphs/{xbox,playstation,nintendo,kbm}.tres` (`GlyphSetDef`: texture per action button, native color per button per spec 2.8). Placeholder art is fine.
+- [x] **P1.1 Input map** in `project.godot` (generated from `scripts/input/input_bindings.gd` by `scripts/tools/generate_input_map.gd`): every action in spec 2.2, 2.3 (`build_tool_next/prev`, `rotate_cw/ccw`, `undo`, `build_catalog`, `note_1..8`), 2.4 (`ui_*` explicit events, custom `ui_tab_*`, `ui_page_*`, `ui_secondary`, `ui_tertiary`, `ui_wheel_select`), with joypad and KB/M events and deadzones exactly as specified.
+- [x] **P1.2 `res://resources/config/input_contexts.tres`**: action -> context map (`GAMEPLAY`, `AIRBORNE`, `BUILD`, `INSTRUMENT`, `UI`) used by conflict validation.
+- [x] **P1.3 `res://resources/config/player_config.tres`** (`PlayerConfig`: capsules, speeds, reach) and **`jump_config.tres`** (`JumpConfig`: gravity 24, 7.9 / 7.6 m/s, coyote 0.12, buffer 0.15, air control 0.8, max fall 20).
+- [x] **P1.4 Glyph sets** `res://resources/glyphs/{xbox,playstation,nintendo,kbm}.tres` (`GlyphSetDef`: texture per action button, native color per button per spec 2.8). Placeholder art is fine.
 
 ### P1 scripts
-- [ ] **P1.5 Core types** `res://scripts/core/result.gd`, `input_frame.gd` (all spec 2.1 fields), `state.gd`, `state_machine.gd`.
-- [ ] **P1.6 `EventBus`** autoload with Phase 1 signals: `input_device_changed`, `player_state_changed`, `game_paused`, `game_resumed`, `pause_changed`. Registered first (spec 1.2 order).
-- [ ] **P1.7 `Settings`** autoload: ConfigFile load/save of `[input]` and `[accessibility]` keys used in Phase 1 (`run_mode`, `duck_mode`, `jump_auto`, `sensitivity`, `invert_y`, `glyph_override`), defaults per spec 5.10; `to_dict()/from_dict()`.
-- [ ] **P1.8 Input models** (`res://scripts/input/models/`): `InputDeviceModel` (event classification thresholds, vendor id -> glyph set, override), `RebindModel` (plain-dict <-> InputEvent for joy button, joy axis with sign, physical key, mouse button; locked actions; context-disjoint conflict check).
-- [ ] **P1.9 `InputService`** autoload (ALWAYS): routes events to `InputDeviceModel`, emits `input_device_changed`, handles `Input.joy_connection_changed` (emits `EventBus.joypad_lost/joypad_restored` for Phase 4), applies rebinds from Settings, mouse capture policy.
-- [ ] **P1.10 `PauseManager`** autoload (ALWAYS): `request_pause`, `release_pause`, `has_reason`, `is_paused`, `reset_for_tests`; sole writer of `get_tree().paused`; edge-only signals.
-- [ ] **P1.11 `InputReader`** (`res://scripts/player/input_reader.gd`): builds `InputFrame` per physics tick, toggle/hold logic for run and duck, `inject(frame)` seam, resume guard (`ResumeGuardModel`, pure) honoring `resume_frame` and release-required set.
-- [ ] **P1.12 `JumpModel`** (pure): apex and velocity math, coyote timer, buffer timer, air-jump counter, ceiling hit.
-- [ ] **P1.13 `PlayerContext`** and **`PlayerTransitionTable`** (pure): all locomotion and airborne rows of spec 4.2; action rows stubbed behind context flags so later phases only add rows.
-- [ ] **P1.14 Player states** `idle.gd`, `walk.gd`, `run.gd`, `duck.gd`, `jump.gd`, `fall.gd` (thin: call table, drive motor, play anims).
-- [ ] **P1.15 `PlayerMotor`**: `CharacterBody3D` movement with air control, max fall speed, collider swap for duck, `HeadClearance` and `StepProbe` queries producing `head_clear`, `headroom_ok`, `ledge_ahead`.
-- [ ] **P1.16 `LedgeModel`** (pure): auto-jump decision from probe results (step solid, above free, 3 free above step top; disabled while ducking or within 0.5 s of a manual jump).
-- [ ] **P1.17 `CameraRig`**: right-stick and mouse look via actions/mouse delta only, sensitivity, invert-Y, SpringArm length standing 4.0 / ducking 2.5, `camera_reset`.
+- [x] **P1.5 Core types** `res://scripts/core/result.gd`, `input_frame.gd` (all spec 2.1 fields), `state.gd`, `state_machine.gd`.
+- [x] **P1.6 `EventBus`** autoload with Phase 1 signals: `input_device_changed`, `player_state_changed`, `game_paused`, `game_resumed`, `pause_changed`. Registered first (spec 1.2 order).
+- [x] **P1.7 `Settings`** autoload: ConfigFile load/save of `[input]` and `[accessibility]` keys used in Phase 1 (`run_mode`, `duck_mode`, `jump_auto`, `sensitivity`, `invert_y`, `glyph_override`), defaults per spec 5.10; `to_dict()/from_dict()`.
+- [x] **P1.8 Input models** (`res://scripts/input/models/`): `InputDeviceModel` (event classification thresholds, vendor id -> glyph set, override), `RebindModel` (plain-dict <-> InputEvent for joy button, joy axis with sign, physical key, mouse button; locked actions; context-disjoint conflict check).
+- [x] **P1.9 `InputService`** autoload (ALWAYS): routes events to `InputDeviceModel`, emits `input_device_changed`, handles `Input.joy_connection_changed` (emits `EventBus.joypad_lost/joypad_restored` for Phase 4), applies rebinds from Settings, mouse capture policy.
+- [x] **P1.10 `PauseManager`** autoload (ALWAYS): `request_pause`, `release_pause`, `has_reason`, `is_paused`, `reset_for_tests`; sole writer of `get_tree().paused`; edge-only signals.
+- [x] **P1.11 `InputReader`** (`res://scripts/player/input_reader.gd`): builds `InputFrame` per physics tick, toggle/hold logic for run and duck, `inject(frame)` seam, resume guard (`ResumeGuardModel`, pure) honoring `resume_frame` and release-required set.
+- [x] **P1.12 `JumpModel`** (pure): apex and velocity math, coyote timer, buffer timer, air-jump counter, ceiling hit.
+- [x] **P1.13 `PlayerContext`** and **`PlayerTransitionTable`** (pure): all locomotion and airborne rows of spec 4.2; action rows stubbed behind context flags so later phases only add rows.
+- [x] **P1.14 Player states** `idle.gd`, `walk.gd`, `run.gd`, `duck.gd`, `jump.gd`, `fall.gd` (thin: call table, drive motor, play anims).
+- [x] **P1.15 `PlayerMotor`**: `CharacterBody3D` movement with air control, max fall speed, collider swap for duck, `HeadClearance` and `StepProbe` queries producing `head_clear`, `headroom_ok`, `ledge_ahead`.
+- [x] **P1.16 `LedgeModel`** (pure): auto-jump decision from probe results (step solid, above free, 3 free above step top; disabled while ducking or within 0.5 s of a manual jump).
+- [x] **P1.17 `CameraRig`**: right-stick and mouse look via actions/mouse delta only, sensitivity, invert-Y, SpringArm length standing 4.0 / ducking 2.5, `camera_reset`.
 
 ### P1 scenes and UI
-- [ ] **P1.18 `res://scenes/player/player.tscn`**: node tree per spec 1.4 (VoxelViewer added but inert until Phase 2), placeholder 2.1 m humanoid with skeleton and the five outfit slots.
-- [ ] **P1.19 `res://scenes/dev/locomotion_room.tscn`**: graybox with flat floor, 1-, 2- and 3-unit steps, a ledge for coyote tests, 2-unit tunnel (duck), low ceiling over a duck spot, ramps.
-- [ ] **P1.20 `res://scenes/main.tscn`** minimal: World, Player, UI layer with a debug overlay showing state, device and glyph set.
-- [ ] **P1.21 Glyph widget** `res://ui/prompts/glyph_icon.tscn` that swaps texture/color on `input_device_changed`.
+- [x] **P1.18 `res://scenes/player/player.tscn`**: node tree per spec 1.4 (VoxelViewer deferred to Phase 2 so Phase 1 does not depend on the voxel extension), placeholder 2.1 m humanoid with skeleton and the five outfit slots.
+- [x] **P1.19 `res://scenes/dev/locomotion_room.tscn`**: graybox with flat floor, 1-, 2- and 3-unit steps, a ledge for coyote tests, 2-unit tunnel (duck), low ceiling over a duck spot, ramps.
+- [x] **P1.20 `res://scenes/main.tscn`** minimal: World, Player, UI layer with a debug overlay showing state, device and glyph set.
+- [x] **P1.21 Glyph widget** `res://ui/prompts/glyph_icon.tscn` that swaps texture/color on `input_device_changed`.
 
 ### P1 tests
 Unit (`res://test/unit/`):
-- [ ] **P1.22** `input/test_input_action_map.gd`: table-driven from spec 2.2 to 2.4. Every action exists; each gameplay action has its specified joypad event and KB/M event; trigger axis thresholds 0.5; stick deadzones; `ui_*` events explicit; `jump`, `pause_menu`, `ui_accept`, `ui_cancel` have gamepad events; no physical input bound twice within one context (uses `input_contexts.tres`).
-- [ ] **P1.23** `input/test_input_device_model.gd` (mouse motion > 4 px switches, joypad axis > 0.5 switches, smaller does not; `0x054C`/`0x045E`/`0x057E`/unknown mapping; override wins), `input/test_rebind_model.gd` (round-trip each event type incl. axis sign; locked actions refuse unbind; conflict detection same context vs disjoint contexts), `input/test_resume_guard.gd` (pressed flags dropped through `resume_frame`; held-at-resume requires release; axes pass; jump suppressed after menu close).
-- [ ] **P1.24** `core/test_pause_safety_lint.gd`: scans `res://scripts` and `res://ui` for `create_timer(` without `false` as second argument and for `get_tree().create_tween(`; fails with file and line.
-- [ ] **P1.25** `player/test_player_transition_table.gd`: Idle/Walk/Run thresholds; duck toggle and hold modes; Duck exit gated by `head_clear`; Run impossible while ducking; jump requires `headroom_ok`; Duck -> Jump stands first; coyote jump within 0.12 s and not after; buffer 0.15 s; exactly one air jump; `air_jumps_left` reset only on landing; walking off a ledge keeps the double jump; ceiling hit -> Fall with `vy = 0`; auto-jump only when `jump_auto` and `ledge_ahead` for 0.3 s; no action states entered while airborne (rows stubbed).
-- [ ] **P1.26** `player/test_jump_model.gd` (apex 1.30 m and double-jump total >= 2.0 m + capsule margin for configured values; fall speed capped), `player/test_ledge_model.gd`.
-- [ ] **P1.27** `settings/test_settings_model.gd` (defaults, round-trip, unknown keys ignored).
+- [x] **P1.22** `input/test_input_action_map.gd`: table-driven from spec 2.2 to 2.4. Every action exists; each gameplay action has its specified joypad event and KB/M event; trigger axis thresholds 0.5; stick deadzones; `ui_*` events explicit; `jump`, `pause_menu`, `ui_accept`, `ui_cancel` have gamepad events; no physical input bound twice within one context (uses `input_contexts.tres`).
+- [x] **P1.23** `input/test_input_device_model.gd` (mouse motion > 4 px switches, joypad axis > 0.5 switches, smaller does not; `0x054C`/`0x045E`/`0x057E`/unknown mapping; override wins), `input/test_rebind_model.gd` (round-trip each event type incl. axis sign; locked actions refuse unbind; conflict detection same context vs disjoint contexts), `input/test_resume_guard.gd` (pressed flags dropped through `resume_frame`; held-at-resume requires release; axes pass; jump suppressed after menu close).
+- [x] **P1.24** `core/test_pause_safety_lint.gd`: scans `res://scripts` and `res://ui` for `create_timer(` without `false` as second argument and for `get_tree().create_tween(`; fails with file and line.
+- [x] **P1.25** `player/test_player_transition_table.gd`: Idle/Walk/Run thresholds; duck toggle and hold modes; Duck exit gated by `head_clear`; Run impossible while ducking; jump requires `headroom_ok`; Duck -> Jump stands first; coyote jump within 0.12 s and not after; buffer 0.15 s; exactly one air jump; `air_jumps_left` reset only on landing; walking off a ledge keeps the double jump; ceiling hit -> Fall with `vy = 0`; auto-jump only when `jump_auto` and `ledge_ahead` for 0.3 s; no action states entered while airborne (rows stubbed).
+- [x] **P1.26** `player/test_jump_model.gd` (apex 1.30 m and double-jump total >= 2.0 m + capsule margin for configured values; fall speed capped), `player/test_ledge_model.gd`.
+- [x] **P1.27** `settings/test_settings_model.gd` (defaults, round-trip, unknown keys ignored).
 
 Integration (`res://test/integration/`):
-- [ ] **P1.28** `test_pause_manager.gd`: ref-counted reasons; `game_paused` once on first reason, `game_resumed` once on last release; duplicate request idempotent; release of unknown reason no-op; `reset_for_tests` clears; `monitor_signals(EventBus, false)`.
-- [ ] **P1.29** `test_player_locomotion.gd` (fixture `locomotion_room.tscn`, `InputReader.inject`, `await_physics_frames`): walk and run displacement; duck swaps colliders and fits the 2-unit tunnel; cannot stand under the low ceiling and stands after leaving it; jump lands on the 1-unit step, double jump on the 2-unit step, cannot reach the 3-unit step; coyote jump off the ledge; auto-jump on and off; landing from > 4 m produces no damage state and recovers within 0.2 s.
-- [ ] **P1.30** `test_input_service.gd`: calling `InputService` handlers directly with constructed InputEvent objects emits `input_device_changed` with the right glyph set; rebind applied from Settings updates `InputMap`.
+- [x] **P1.28** `test_pause_manager.gd`: ref-counted reasons; `game_paused` once on first reason, `game_resumed` once on last release; duplicate request idempotent; release of unknown reason no-op; `reset_for_tests` clears; `monitor_signals(EventBus, false)`.
+- [x] **P1.29** `test_player_locomotion.gd` (fixture `locomotion_room.tscn`, `InputReader.inject`, `await_physics_frames`): walk and run displacement; duck swaps colliders and fits the 2-unit tunnel; cannot stand under the low ceiling and stands after leaving it; jump lands on the 1-unit step, double jump on the 2-unit step, cannot reach the 3-unit step; coyote jump off the ledge; auto-jump on and off; landing from > 4 m produces no damage state and recovers within 0.2 s.
+- [x] **P1.30** `test_input_service.gd`: calling `InputService` handlers directly with constructed InputEvent objects emits `input_device_changed` with the right glyph set; rebind applied from Settings updates `InputMap`.
 
 ### P1 manual checklist
 - [ ] Xbox pad and DualShock/DualSense on Windows and Linux (macOS if available): every gameplay action in spec 2.2 fires; glyphs switch on device change; hotplug does not crash.

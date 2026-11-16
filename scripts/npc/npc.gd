@@ -94,6 +94,10 @@ func react(reaction: StringName) -> void:
 
 
 func interaction_spec(_player: Node, _forage: bool, alt: bool) -> InteractionSpec:
+	if alt and def and def.is_curator:
+		var dn := InteractionSpec.new(&"DONATE", 0.0)   # spec 5.8: curator Y opens donation
+		dn.opens_menu = &"donation"
+		return dn
 	if alt:
 		var g := InteractionSpec.new(&"GIFT", 0.0)
 		g.opens_menu = &"gift_picker"

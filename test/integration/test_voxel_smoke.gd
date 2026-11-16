@@ -385,3 +385,78 @@ func test_home_meadow_garden_is_level_and_farmable() -> void:
 	SceneRouter.reset_for_tests()
 	SceneRouter.player = null
 	SceneRouter.zone_root = null
+
+
+# P6.18: dig and place on real terrain, full slot save through SaveService (SQLite flush,
+# epoch, JSON), leave the zone, load the slot, return: voxels and inventory agree.
+# Also: Home Meadow bakes a navmesh over its level voxel town (spec 9.4).
+func test_real_terrain_save_load_and_town_navmesh() -> void:
+	SaveService.base_dir = "user://test_tmp/voxel_save"
+	VoxelPersistence.remove_dir(SaveService.base_dir)
+	SaveService.begin_new_game()
+	var session := GameSession.create(11)
+	_root.add_child(session)
+	session.new_game()
+	var zone_root := Node3D.new()
+	_root.add_child(zone_root)
+	SceneRouter.reset_for_tests()
+	SceneRouter.fade_duration = 0.0
+	SceneRouter.zone_root = zone_root
+	var player: PlayerController = preload("res://scenes/player/player.tscn").instantiate()
+	_root.add_child(player)
+	player.tool_selector.set_aim_for_tests(Vector3(0, 1000, 0), Vector3.UP)
+	SceneRouter.player = player
+	var baked := [0]
+	var cb := func(n): baked[0] = n
+	EventBus.navigation_baked.connect(cb)
+	await SceneRouter.change_zone(&"zone_home_meadow", &"spawn_start")
+	var zone: Zone = SceneRouter.current_zone
+	var t := zone.terrain_node as VoxelTerrain
+	assert_object(t.stream).is_not_null()
+	var gen := zone.generator as OverworldGenerator
+	var plot: PlotDef = Database.plots[&"plot_starter_garden"]
+	var area := AABB(Vector3(plot.min_cell.x, -10, plot.min_cell.z), Vector3(8, 30, 8))
+	var start := Time.get_ticks_msec()
+	while not t.is_area_meshed(area) and Time.get_ticks_msec() - start < LOAD_TIMEOUT_MS:
+		await get_tree().process_frame
+	start = Time.get_ticks_msec()
+	while baked[0] == 0 and Time.get_ticks_msec() - start < LOAD_TIMEOUT_MS:
+		await get_tree().process_frame
+	assert_int(baked[0]).override_failure_message("town navmesh not baked").is_greater(0)
+	var town_a := SceneRouter.find_marker(&"npc_hilde_shop").global_position
+	var town_b := SceneRouter.find_marker(&"npc_tailor_shop").global_position
+	await PhysicsWait.frames(get_tree(), 8)
+	assert_int(NavigationServer3D.map_get_path(player.get_world_3d().navigation_map, town_a, town_b, true).size()).is_greater(1)
+	EventBus.navigation_baked.disconnect(cb)
+	var h := gen.height_at(plot.min_cell.x, plot.min_cell.z)
+	var dug := Vector3i(plot.min_cell.x + 1, h, plot.min_cell.z + 1)
+	var shovel := session.toolbelt.model.tool_data(ToolTypes.SHOVEL)
+	var n := 0
+	while session.terrain.world.get_voxel(dug) != 0 and n < 10:
+		session.terrain.hit_voxel(dug, shovel)
+		n += 1
+	var placed := Vector3i(plot.min_cell.x + 4, h + 1, plot.min_cell.z + 4)
+	session.inventory.add(&"item_stone", 1)
+	assert_bool(session.build.try_place_block(placed, &"mat_stone").ok).is_true()
+	var inv_before := session.inventory.model.to_dict()
+	var saved: Result = await SaveService.save_slot(1, session)
+	assert_bool(saved.ok).override_failure_message(str(saved.error)).is_true()
+	assert_bool(FileAccess.file_exists(SaveService.paths(1)["vox"].path_join("home_meadow.sqlite"))).is_true()
+	await SceneRouter.change_zone(&"zone_starter_cabin", &"spawn_start")
+	session.inventory.model.from_dict({"backpack": []})
+	var r: Result = await SaveService.load_into(1, session)
+	assert_bool(r.ok).is_true()
+	assert_str(SceneRouter.current_zone_id).is_equal(&"zone_home_meadow")
+	zone = SceneRouter.current_zone
+	t = zone.terrain_node as VoxelTerrain
+	start = Time.get_ticks_msec()
+	while not t.is_area_meshed(area) and Time.get_ticks_msec() - start < LOAD_TIMEOUT_MS:
+		await get_tree().process_frame
+	assert_int(session.terrain.world.get_voxel(dug)).is_equal(0)
+	assert_int(session.terrain.world.get_voxel(placed)).is_equal(Database.voxel_id_of(&"mat_stone"))
+	assert_dict(session.inventory.model.to_dict()).is_equal(inv_before)
+	SceneRouter.reset_for_tests()
+	SceneRouter.player = null
+	SceneRouter.zone_root = null
+	VoxelPersistence.remove_dir(SaveService.base_dir)
+	SaveService.base_dir = "user://test_tmp/saves"

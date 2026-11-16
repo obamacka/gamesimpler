@@ -18,3 +18,4 @@ extends Resource
 @export var seed_crop: StringName = &""        # SEED items: the CropDef they plant
 @export var piece_id: StringName = &""         # BUILD_PIECE items: the BuildPieceDef they place
 @export var outfit_id: StringName = &""        # OUTFIT items: the OutfitDef they wear as
+@export var collection: CollectionEntryDef     # donatable items (spec 3.7)

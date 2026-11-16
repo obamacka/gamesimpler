@@ -30,6 +30,7 @@ func start(zone_id: StringName = &"zone_wilderness", spawn_key: StringName = &"s
 	SceneRouter.reset_for_tests()
 	SceneRouter.fade_duration = 0.0
 	SaveService.autosave_count = 0
+	SaveService.base_dir = "user://test_tmp/saves"   # never touch real player saves from tests
 	GameClock.running = false
 	world = FakeVoxelWorld.new()
 	session = GameSession.create(seed_value, world)

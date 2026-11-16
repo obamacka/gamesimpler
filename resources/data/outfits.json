@@ -101,6 +101,16 @@
    "id": "dye_plum",
    "name_key": "Plum purple",
    "color": "#8e44ad"
+  },
+  {
+   "id": "dye_amethyst",
+   "name_key": "Amethyst purple",
+   "color": "#9966cc"
+  },
+  {
+   "id": "dye_ember",
+   "name_key": "Ember orange",
+   "color": "#e2725b"
   }
  ],
  "default_dyes": [

@@ -28,6 +28,12 @@ const MENUS := {
 	&"pet_adoption": "res://ui/menus/pet_adoption.gd",
 	&"pet_wardrobe": "res://ui/menus/pet_wardrobe.gd",
 	&"wheel": "res://ui/menus/wheel_menu.gd",
+	&"donation": "res://ui/menus/donation_menu.gd",
+	&"collection_book": "res://ui/menus/collection_book.gd",
+	&"chest_reveal": "res://ui/menus/chest_reveal.gd",
+	&"dye_palette": "res://ui/menus/dye_palette.gd",
+	&"sticker_sheet": "res://ui/menus/sticker_sheet.gd",
+	&"save_load": "res://ui/menus/save_load_menu.gd",
 }
 
 var registry: Dictionary = MENUS.duplicate()

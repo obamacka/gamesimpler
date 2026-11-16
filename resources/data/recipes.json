@@ -227,6 +227,75 @@
    "required_job": "job_tailor",
    "xp_reward": 20,
    "unlock": "DEFAULT"
+  },
+  {
+   "id": "recipe_piece_radio",
+   "station": "WORKBENCH",
+   "inputs": [
+    {
+     "item": "item_wood",
+     "qty": 2
+    },
+    {
+     "item": "item_iron_ore",
+     "qty": 1
+    }
+   ],
+   "outputs": [
+    {
+     "item": "item_piece_radio",
+     "qty": 1
+    }
+   ],
+   "craft_time_sec": 2.0,
+   "xp_reward": 10,
+   "unlock": "BLUEPRINT"
+  },
+  {
+   "id": "recipe_piece_sofa",
+   "station": "WORKBENCH",
+   "inputs": [
+    {
+     "item": "item_wood",
+     "qty": 4
+    },
+    {
+     "item": "item_cotton_cloth",
+     "qty": 2
+    }
+   ],
+   "outputs": [
+    {
+     "item": "item_piece_sofa",
+     "qty": 1
+    }
+   ],
+   "craft_time_sec": 3.0,
+   "xp_reward": 15,
+   "unlock": "BLUEPRINT"
+  },
+  {
+   "id": "recipe_piece_window_wall",
+   "station": "WORKBENCH",
+   "inputs": [
+    {
+     "item": "item_wood",
+     "qty": 3
+    },
+    {
+     "item": "item_quartz",
+     "qty": 1
+    }
+   ],
+   "outputs": [
+    {
+     "item": "item_piece_window_wall",
+     "qty": 1
+    }
+   ],
+   "craft_time_sec": 2.0,
+   "xp_reward": 10,
+   "unlock": "BLUEPRINT"
   }
  ]
 }

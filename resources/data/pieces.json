@@ -173,12 +173,21 @@
       0.05,
       0.5
      ],
-     "solid": true
+     "solid": true,
+     "region": "PRIMARY"
     }
    ],
    "opening": [],
    "interactions": [],
-   "item_id": "item_piece_floor"
+   "item_id": "item_piece_floor",
+   "paint_regions": [
+    {
+     "region_id": "PRIMARY",
+     "shader_param": "primary_color",
+     "default_dye_id": ""
+    }
+   ],
+   "stampable": true
   },
   {
    "id": "piece_wall",
@@ -318,12 +327,21 @@
       1.5,
       0.075
      ],
-     "solid": true
+     "solid": true,
+     "region": "PRIMARY"
     }
    ],
    "opening": [],
    "interactions": [],
-   "item_id": "item_piece_wall"
+   "item_id": "item_piece_wall",
+   "paint_regions": [
+    {
+     "region_id": "PRIMARY",
+     "shader_param": "primary_color",
+     "default_dye_id": ""
+    }
+   ],
+   "stampable": true
   },
   {
    "id": "piece_wall_door",
@@ -453,7 +471,8 @@
       1.5,
       0.075
      ],
-     "solid": true
+     "solid": true,
+     "region": "PRIMARY"
     },
     {
      "size": [
@@ -466,7 +485,8 @@
       1.5,
       0.075
      ],
-     "solid": true
+     "solid": true,
+     "region": "PRIMARY"
     },
     {
      "size": [
@@ -479,11 +499,25 @@
       2.7,
       0.075
      ],
-     "solid": true
+     "solid": true,
+     "region": "TRIM"
     }
    ],
    "interactions": [],
-   "item_id": "item_piece_wall_door"
+   "item_id": "item_piece_wall_door",
+   "paint_regions": [
+    {
+     "region_id": "PRIMARY",
+     "shader_param": "primary_color",
+     "default_dye_id": ""
+    },
+    {
+     "region_id": "TRIM",
+     "shader_param": "trim_color",
+     "default_dye_id": ""
+    }
+   ],
+   "stampable": true
   },
   {
    "id": "piece_window_wall",
@@ -623,7 +657,8 @@
       0.5,
       0.075
      ],
-     "solid": true
+     "solid": true,
+     "region": "PRIMARY"
     },
     {
      "size": [
@@ -636,7 +671,8 @@
       2.5,
       0.075
      ],
-     "solid": true
+     "solid": true,
+     "region": "PRIMARY"
     },
     {
      "size": [
@@ -649,7 +685,8 @@
       1.5,
       0.075
      ],
-     "solid": true
+     "solid": true,
+     "region": "TRIM"
     },
     {
      "size": [
@@ -662,12 +699,26 @@
       1.5,
       0.075
      ],
-     "solid": true
+     "solid": true,
+     "region": "TRIM"
     }
    ],
    "opening": [],
    "interactions": [],
-   "item_id": "item_piece_window_wall"
+   "item_id": "item_piece_window_wall",
+   "paint_regions": [
+    {
+     "region_id": "PRIMARY",
+     "shader_param": "primary_color",
+     "default_dye_id": ""
+    },
+    {
+     "region_id": "TRIM",
+     "shader_param": "trim_color",
+     "default_dye_id": ""
+    }
+   ],
+   "stampable": true
   },
   {
    "id": "piece_stairs",
@@ -714,7 +765,8 @@
       0.165,
       0.835
      ],
-     "solid": true
+     "solid": true,
+     "region": ""
     },
     {
      "size": [
@@ -727,7 +779,8 @@
       0.33,
       0.5
      ],
-     "solid": true
+     "solid": true,
+     "region": ""
     },
     {
      "size": [
@@ -740,12 +793,15 @@
       0.5,
       0.17
      ],
-     "solid": true
+     "solid": true,
+     "region": ""
     }
    ],
    "opening": [],
    "interactions": [],
-   "item_id": "item_piece_stairs"
+   "item_id": "item_piece_stairs",
+   "paint_regions": [],
+   "stampable": false
   },
   {
    "id": "piece_roof",
@@ -849,12 +905,21 @@
       0.075,
       0.5
      ],
-     "solid": true
+     "solid": true,
+     "region": "PRIMARY"
     }
    ],
    "opening": [],
    "interactions": [],
-   "item_id": "item_piece_roof"
+   "item_id": "item_piece_roof",
+   "paint_regions": [
+    {
+     "region_id": "PRIMARY",
+     "shader_param": "primary_color",
+     "default_dye_id": ""
+    }
+   ],
+   "stampable": true
   },
   {
    "id": "piece_fence",
@@ -931,12 +996,21 @@
       0.45,
       0.05
      ],
-     "solid": true
+     "solid": true,
+     "region": "PRIMARY"
     }
    ],
    "opening": [],
    "interactions": [],
-   "item_id": "item_piece_fence"
+   "item_id": "item_piece_fence",
+   "paint_regions": [
+    {
+     "region_id": "PRIMARY",
+     "shader_param": "primary_color",
+     "default_dye_id": ""
+    }
+   ],
+   "stampable": true
   },
   {
    "id": "piece_shelf",
@@ -984,12 +1058,21 @@
       0.8,
       0.33
      ],
-     "solid": true
+     "solid": true,
+     "region": "PRIMARY"
     }
    ],
    "opening": [],
    "interactions": [],
-   "item_id": "item_piece_shelf"
+   "item_id": "item_piece_shelf",
+   "paint_regions": [
+    {
+     "region_id": "PRIMARY",
+     "shader_param": "primary_color",
+     "default_dye_id": ""
+    }
+   ],
+   "stampable": false
   },
   {
    "id": "piece_chair",
@@ -1022,7 +1105,8 @@
       0.225,
       0.55
      ],
-     "solid": true
+     "solid": true,
+     "region": "PRIMARY"
     },
     {
      "size": [
@@ -1035,7 +1119,8 @@
       0.75,
       0.25
      ],
-     "solid": true
+     "solid": true,
+     "region": "SECONDARY"
     }
    ],
    "interactions": [
@@ -1063,7 +1148,20 @@
    "provides_support": false,
    "snap_sockets": [],
    "opening": [],
-   "item_id": "item_piece_chair"
+   "item_id": "item_piece_chair",
+   "paint_regions": [
+    {
+     "region_id": "PRIMARY",
+     "shader_param": "primary_color",
+     "default_dye_id": ""
+    },
+    {
+     "region_id": "SECONDARY",
+     "shader_param": "secondary_color",
+     "default_dye_id": ""
+    }
+   ],
+   "stampable": false
   },
   {
    "id": "piece_sofa",
@@ -1101,7 +1199,8 @@
       0.225,
       0.5
      ],
-     "solid": true
+     "solid": true,
+     "region": "PRIMARY"
     },
     {
      "size": [
@@ -1114,7 +1213,8 @@
       0.7,
       0.2
      ],
-     "solid": true
+     "solid": true,
+     "region": "SECONDARY"
     }
    ],
    "interactions": [
@@ -1152,7 +1252,20 @@
    "provides_support": false,
    "snap_sockets": [],
    "opening": [],
-   "item_id": "item_piece_sofa"
+   "item_id": "item_piece_sofa",
+   "paint_regions": [
+    {
+     "region_id": "PRIMARY",
+     "shader_param": "primary_color",
+     "default_dye_id": ""
+    },
+    {
+     "region_id": "SECONDARY",
+     "shader_param": "secondary_color",
+     "default_dye_id": ""
+    }
+   ],
+   "stampable": false
   },
   {
    "id": "piece_table",
@@ -1185,7 +1298,8 @@
       0.75,
       0.5
      ],
-     "solid": true
+     "solid": true,
+     "region": "PRIMARY"
     },
     {
      "size": [
@@ -1198,7 +1312,8 @@
       0.36,
       0.5
      ],
-     "solid": true
+     "solid": true,
+     "region": "PRIMARY"
     }
    ],
    "hits_per_socket": 0,
@@ -1207,7 +1322,15 @@
    "snap_sockets": [],
    "opening": [],
    "interactions": [],
-   "item_id": "item_piece_table"
+   "item_id": "item_piece_table",
+   "paint_regions": [
+    {
+     "region_id": "PRIMARY",
+     "shader_param": "primary_color",
+     "default_dye_id": ""
+    }
+   ],
+   "stampable": true
   },
   {
    "id": "piece_bed",
@@ -1245,7 +1368,8 @@
       0.25,
       1.0
      ],
-     "solid": true
+     "solid": true,
+     "region": "PRIMARY"
     }
    ],
    "interactions": [
@@ -1258,7 +1382,20 @@
    "provides_support": false,
    "snap_sockets": [],
    "opening": [],
-   "item_id": "item_piece_bed"
+   "item_id": "item_piece_bed",
+   "paint_regions": [
+    {
+     "region_id": "PRIMARY",
+     "shader_param": "primary_color",
+     "default_dye_id": ""
+    },
+    {
+     "region_id": "SECONDARY",
+     "shader_param": "secondary_color",
+     "default_dye_id": ""
+    }
+   ],
+   "stampable": false
   },
   {
    "id": "piece_lamp",
@@ -1291,7 +1428,8 @@
       0.7,
       0.5
      ],
-     "solid": true
+     "solid": true,
+     "region": ""
     }
    ],
    "interactions": [
@@ -1305,7 +1443,9 @@
    "provides_support": false,
    "snap_sockets": [],
    "opening": [],
-   "item_id": "item_piece_lamp"
+   "item_id": "item_piece_lamp",
+   "paint_regions": [],
+   "stampable": false
   },
   {
    "id": "piece_radio",
@@ -1338,7 +1478,8 @@
       0.175,
       0.5
      ],
-     "solid": true
+     "solid": true,
+     "region": ""
     }
    ],
    "interactions": [
@@ -1352,7 +1493,9 @@
    "provides_support": false,
    "snap_sockets": [],
    "opening": [],
-   "item_id": "item_piece_radio"
+   "item_id": "item_piece_radio",
+   "paint_regions": [],
+   "stampable": false
   },
   {
    "id": "piece_chest",
@@ -1385,7 +1528,8 @@
       0.3,
       0.5
      ],
-     "solid": true
+     "solid": true,
+     "region": "PRIMARY"
     }
    ],
    "interactions": [
@@ -1399,7 +1543,15 @@
    "provides_support": false,
    "snap_sockets": [],
    "opening": [],
-   "item_id": "item_piece_chest"
+   "item_id": "item_piece_chest",
+   "paint_regions": [
+    {
+     "region_id": "PRIMARY",
+     "shader_param": "primary_color",
+     "default_dye_id": ""
+    }
+   ],
+   "stampable": true
   },
   {
    "id": "piece_pet_bed",
@@ -1433,7 +1585,8 @@
       0.1,
       0.5
      ],
-     "solid": false
+     "solid": false,
+     "region": ""
     }
    ],
    "interactions": [
@@ -1445,7 +1598,9 @@
    "fastener_sockets": [],
    "provides_support": false,
    "snap_sockets": [],
-   "opening": []
+   "opening": [],
+   "paint_regions": [],
+   "stampable": false
   },
   {
    "id": "piece_feed_bowl",
@@ -1479,7 +1634,8 @@
       0.06,
       0.5
      ],
-     "solid": false
+     "solid": false,
+     "region": ""
     }
    ],
    "interactions": [
@@ -1492,7 +1648,9 @@
    "fastener_sockets": [],
    "provides_support": false,
    "snap_sockets": [],
-   "opening": []
+   "opening": [],
+   "paint_regions": [],
+   "stampable": false
   }
  ]
 }

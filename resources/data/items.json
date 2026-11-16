@@ -50,13 +50,27 @@
       "id": "item_quartz",
       "category": "MINERAL",
       "max_stack": 99,
-      "base_value": 20
+      "base_value": 20,
+      "collection": {
+        "category": "MINERAL",
+        "set_id": "set_gems",
+        "case_id": "case_minerals",
+        "hint_key": "A clear crystal from stone",
+        "sort_order": 1
+      }
     },
     {
       "id": "item_amethyst",
       "category": "MINERAL",
       "max_stack": 99,
-      "base_value": 35
+      "base_value": 35,
+      "collection": {
+        "category": "MINERAL",
+        "set_id": "set_gems",
+        "case_id": "case_minerals",
+        "hint_key": "A purple crystal inside geodes",
+        "sort_order": 2
+      }
     },
     {
       "id": "item_geode",
@@ -81,6 +95,13 @@
       "food": {
         "stamina_restore": 10,
         "pet_happiness": 0
+      },
+      "collection": {
+        "category": "PRODUCE",
+        "set_id": "set_forage",
+        "case_id": "case_produce",
+        "hint_key": "Picked from apple trees",
+        "sort_order": 20
       }
     },
     {
@@ -275,6 +296,13 @@
       "food": {
         "stamina_restore": 8,
         "pet_happiness": 0
+      },
+      "collection": {
+        "category": "PRODUCE",
+        "set_id": "set_crops",
+        "case_id": "case_produce",
+        "hint_key": "Grows from carrot seeds",
+        "sort_order": 21
       }
     },
     {
@@ -285,7 +313,14 @@
       "tags": [
         "crop",
         "flower"
-      ]
+      ],
+      "collection": {
+        "category": "PRODUCE",
+        "set_id": "set_crops",
+        "case_id": "case_produce",
+        "hint_key": "Tall and yellow",
+        "sort_order": 22
+      }
     },
     {
       "id": "item_pumpkin",
@@ -295,7 +330,14 @@
       "tags": [
         "crop",
         "vegetable"
-      ]
+      ],
+      "collection": {
+        "category": "PRODUCE",
+        "set_id": "set_crops",
+        "case_id": "case_produce",
+        "hint_key": "Big, round and orange",
+        "sort_order": 23
+      }
     },
     {
       "id": "item_cotton",
@@ -305,7 +347,14 @@
       "tags": [
         "crop",
         "fiber"
-      ]
+      ],
+      "collection": {
+        "category": "PRODUCE",
+        "set_id": "set_crops",
+        "case_id": "case_produce",
+        "hint_key": "Fluffy, from cotton seeds",
+        "sort_order": 24
+      }
     },
     {
       "id": "item_strawberry",
@@ -319,6 +368,13 @@
       "food": {
         "stamina_restore": 6,
         "pet_happiness": 0
+      },
+      "collection": {
+        "category": "PRODUCE",
+        "set_id": "set_crops",
+        "case_id": "case_produce",
+        "hint_key": "Sweet red berries that grow back",
+        "sort_order": 25
       }
     },
     {
@@ -333,6 +389,13 @@
       "food": {
         "stamina_restore": 6,
         "pet_happiness": 0
+      },
+      "collection": {
+        "category": "PRODUCE",
+        "set_id": "set_crops",
+        "case_id": "case_produce",
+        "hint_key": "Juicy and red, grows back",
+        "sort_order": 26
       }
     },
     {
@@ -478,7 +541,14 @@
       "id": "item_cotton_cloth",
       "category": "FABRIC",
       "max_stack": 99,
-      "base_value": 12
+      "base_value": 12,
+      "collection": {
+        "category": "FABRIC",
+        "set_id": "set_fabrics",
+        "case_id": "case_fabrics",
+        "hint_key": "Sewn from cotton at the tailor bench",
+        "sort_order": 10
+      }
     },
     {
       "id": "item_outfit_hat_straw",
@@ -586,6 +656,45 @@
       "max_stack": 5,
       "base_value": 15,
       "piece_id": "piece_feed_bowl"
+    },
+    {
+      "id": "item_agate",
+      "category": "MINERAL",
+      "max_stack": 99,
+      "base_value": 40,
+      "collection": {
+        "category": "MINERAL",
+        "set_id": "set_gems",
+        "case_id": "case_minerals",
+        "hint_key": "Striped stone from geodes",
+        "sort_order": 3
+      }
+    },
+    {
+      "id": "item_jasper",
+      "category": "MINERAL",
+      "max_stack": 99,
+      "base_value": 45,
+      "collection": {
+        "category": "MINERAL",
+        "set_id": "set_gems",
+        "case_id": "case_minerals",
+        "hint_key": "A red stone from geodes",
+        "sort_order": 4
+      }
+    },
+    {
+      "id": "item_topaz",
+      "category": "MINERAL",
+      "max_stack": 99,
+      "base_value": 70,
+      "collection": {
+        "category": "MINERAL",
+        "set_id": "set_gems",
+        "case_id": "case_minerals",
+        "hint_key": "A rare golden gem",
+        "sort_order": 5
+      }
     }
   ]
 }

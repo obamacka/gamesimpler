@@ -17,10 +17,24 @@ var pieces: Dictionary = {}        # uid -> {"uid", "piece_id", "zone", "cell", 
 var occupancy: Dictionary = {}     # zone -> {key -> uid}
 var placed_blocks: Dictionary = {} # "zone/x,y,z" -> material id (blocks placed inside owned plots)
 var next_uid := 1
+var undo := DecorUndoModel.new()
 
 
 func setup(s: GameSession) -> void:
 	session = s
+
+
+func _ready() -> void:
+	EventBus.zone_unloading.connect(_on_zone_unloading)
+
+
+func _exit_tree() -> void:
+	if EventBus.zone_unloading.is_connected(_on_zone_unloading):
+		EventBus.zone_unloading.disconnect(_on_zone_unloading)
+
+
+func _on_zone_unloading(_z: StringName) -> void:
+	undo.clear()   # spec P6.7: the undo history ends at a zone change
 
 
 func zone() -> StringName:
@@ -74,7 +88,7 @@ func try_place(piece_id: StringName, cell: Vector3i, rot: int, z: StringName = &
 	var uid := "p%04d" % next_uid
 	next_uid += 1
 	pieces[uid] = {"uid": uid, "piece_id": String(piece_id), "zone": String(z), "cell": cell, "rot": posmod(rot, 4),
-		"state": LOOSE if def.needs_fastening() else FASTENED, "fasten": [], "toggle": 0}
+		"state": LOOSE if def.needs_fastening() else FASTENED, "fasten": [], "toggle": 0, "paint": {}, "stamps": []}
 	for o in BuildGrid.occupancy(def, cell, rot):
 		occ(z)[o["key"]] = uid
 	if v["nudge_pet"]:
@@ -163,6 +177,87 @@ func toggle_furniture(uid: String) -> Result:
 	pieces[uid]["toggle"] = (int(pieces[uid]["toggle"]) + 1) % maxi(2, int(t["toggle_states"]))
 	EventBus.furniture_toggled.emit(uid, pieces[uid]["toggle"])
 	return Result.success(pieces[uid]["toggle"])
+
+
+## Decor targets only pieces on plots the player owns, never job-site pieces (spec 4.4).
+func decor_owned(uid: String) -> bool:
+	var inst: Dictionary = pieces.get(uid, {})
+	if inst.is_empty():
+		return false
+	for p in Database.plots.values():
+		if session.housing.owns(p.id) and p.contains(StringName(inst["zone"]), inst["cell"]):
+			return true
+	return false
+
+
+func try_paint(uid: String, region_id: StringName, dye_id: StringName) -> Result:
+	var def := def_of(uid)
+	if def == null:
+		return Result.failure(UNKNOWN)
+	var inst: Dictionary = pieces[uid]
+	var reason := PaintModel.check(def, inst, region_id, dye_id, decor_owned(uid), session.unlocks.model.is_unlocked(&"DYE", dye_id))
+	if reason != &"":
+		return Result.failure(reason)
+	var prev: String = inst["paint"].get(String(region_id), "")
+	inst["paint"][String(region_id)] = String(dye_id)
+	undo.push({"type": "paint", "uid": uid, "region": String(region_id), "prev": prev})
+	EventBus.piece_painted.emit(uid, region_id, dye_id)
+	EventBus.build_changed.emit(StringName(inst["zone"]))
+	return Result.success()
+
+
+func try_stamp(uid: String, sticker_id: StringName, local_pos: Vector3, local_normal: Vector3, rot_deg: int, size: String) -> Result:
+	var def := def_of(uid)
+	if def == null:
+		return Result.failure(UNKNOWN)
+	var inst: Dictionary = pieces[uid]
+	var reason := StampModel.check(def, inst["stamps"], decor_owned(uid), session.unlocks.model.is_unlocked(&"STICKER", sticker_id))
+	if reason != &"":
+		return Result.failure(reason)
+	inst["stamps"].append(StampModel.make(sticker_id, local_pos, local_normal, rot_deg, size))
+	undo.push({"type": "stamp_add", "uid": uid})
+	EventBus.piece_stamped.emit(uid, inst["stamps"].size())
+	EventBus.build_changed.emit(StringName(inst["zone"]))
+	return Result.success(inst["stamps"].size())
+
+
+## Removes the stamp nearest `local_point` (use_alt hold in the Stamp tool).
+func try_remove_stamp(uid: String, local_point: Vector3) -> Result:
+	var inst: Dictionary = pieces.get(uid, {})
+	if inst.is_empty() or not decor_owned(uid):
+		return Result.failure(PaintModel.NOT_OWNED)
+	var i := StampModel.nearest(inst["stamps"], local_point)
+	if i < 0:
+		return Result.failure(StampModel.NONE)
+	var st: Dictionary = inst["stamps"][i]
+	inst["stamps"].remove_at(i)
+	undo.push({"type": "stamp_remove", "uid": uid, "index": i, "stamp": st})
+	EventBus.piece_stamped.emit(uid, inst["stamps"].size())
+	EventBus.build_changed.emit(StringName(inst["zone"]))
+	return Result.success()
+
+
+func undo_decor() -> Result:
+	var op := undo.pop()
+	if op.is_empty():
+		return Result.failure(&"nothing_to_undo")
+	var inst: Dictionary = pieces.get(op["uid"], {})
+	if inst.is_empty():
+		return Result.failure(UNKNOWN)
+	match op["type"]:
+		"paint":
+			if op["prev"] == "":
+				inst["paint"].erase(op["region"])
+			else:
+				inst["paint"][op["region"]] = op["prev"]
+		"stamp_add":
+			if not inst["stamps"].is_empty():
+				inst["stamps"].pop_back()
+		"stamp_remove":
+			inst["stamps"].insert(mini(int(op["index"]), inst["stamps"].size()), op["stamp"])
+	EventBus.decor_undone.emit(op)
+	EventBus.build_changed.emit(StringName(inst["zone"]))
+	return Result.success(op)
 
 
 func block_item_of(material_id: StringName) -> StringName:
@@ -254,7 +349,8 @@ func to_dict() -> Dictionary:
 		var p: Dictionary = pieces[uid]
 		var c: Vector3i = p["cell"]
 		out[uid] = {"piece_id": p["piece_id"], "zone": p["zone"], "cell": [c.x, c.y, c.z], "rot": p["rot"],
-			"state": String(p["state"]), "fasten": p["fasten"].duplicate(), "toggle": p["toggle"]}
+			"state": String(p["state"]), "fasten": p["fasten"].duplicate(), "toggle": p["toggle"],
+			"paint": p.get("paint", {}).duplicate(), "stamps": p.get("stamps", []).duplicate(true)}
 	return {"pieces": out, "next_uid": next_uid, "placed_blocks": placed_blocks.duplicate()}
 
 
@@ -272,9 +368,28 @@ func from_dict(d: Dictionary) -> void:
 		var c: Array = p["cell"]
 		var inst := {"uid": String(uid), "piece_id": String(p["piece_id"]), "zone": String(p["zone"]),
 			"cell": Vector3i(int(c[0]), int(c[1]), int(c[2])), "rot": int(p["rot"]), "state": StringName(p["state"]),
-			"fasten": (p.get("fasten", []) as Array).map(func(v): return int(v)), "toggle": int(p.get("toggle", 0))}
+			"fasten": (p.get("fasten", []) as Array).map(func(v): return int(v)), "toggle": int(p.get("toggle", 0)),
+			"paint": _paint_from(p.get("paint", {})), "stamps": _stamps_from(p.get("stamps", []))}
 		pieces[String(uid)] = inst
 		for o in BuildGrid.occupancy(def, inst["cell"], inst["rot"]):
 			occ(StringName(inst["zone"]))[o["key"]] = String(uid)
+	undo.clear()
 	for k in d.get("placed_blocks", {}):
 		placed_blocks[String(k)] = String(d["placed_blocks"][k])
+
+
+static func _paint_from(d: Dictionary) -> Dictionary:
+	var out := {}
+	for k in d:
+		if Database.dyes.has(StringName(d[k])):
+			out[String(k)] = String(d[k])
+	return out
+
+
+static func _stamps_from(a: Array) -> Array:
+	var out: Array = []
+	for st in a:
+		if Database.stickers.has(StringName(st.get("sticker_id", ""))) and out.size() < StampModel.CAP:
+			out.append({"sticker_id": String(st["sticker_id"]), "pos": (st["pos"] as Array).map(func(v): return float(v)),
+				"normal": (st["normal"] as Array).map(func(v): return float(v)), "rot_deg": int(st.get("rot_deg", 0)), "size": String(st.get("size", "M"))})
+	return out

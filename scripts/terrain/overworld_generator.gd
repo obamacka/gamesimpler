@@ -21,9 +21,11 @@ func _init(material_ids: Dictionary = {}, bedrock_level: int = -24, s: int = 123
 
 ## Flattens `rect` (x/z cells, inclusive of position, exclusive of end) to the natural height
 ## at its center (spec 10.2: the starter garden is level). Call before the terrain generates.
-func add_flat(rect: Rect2i) -> void:
+func add_flat(rect: Rect2i, height: int = -100000) -> int:
 	var c := rect.get_center()
-	_flats.append([rect, surface_height(_noise, c.x, c.y)])
+	var h := surface_height(_noise, c.x, c.y) if height == -100000 else height
+	_flats.append([rect, h])
+	return h
 
 
 static func surface_height(noise: FastNoiseLite, x: int, z: int) -> int:

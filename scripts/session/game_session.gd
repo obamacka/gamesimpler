@@ -26,6 +26,8 @@ var outfit: OutfitService
 var storage: StorageService
 var npcs: NpcService
 var pets: PetService
+var collection: CollectionService
+var museum: MuseumService
 var hotbar := HotbarModel.new()
 var exhaustion := {"last_snack_day": 0, "count_total": 0}
 var zone_root: Node3D
@@ -60,6 +62,8 @@ func _build(world: IVoxelWorld) -> void:
 	storage = _add(StorageService.new(), "StorageService")
 	npcs = _add(NpcService.new(), "NpcService")
 	pets = _add(PetService.new(), "PetService")
+	collection = _add(CollectionService.new(), "CollectionService")
+	museum = _add(MuseumService.new(), "MuseumService")
 	terrain.setup(self, world)
 	world_state.setup(self)
 	mail.setup(self)
@@ -72,6 +76,8 @@ func _build(world: IVoxelWorld) -> void:
 	storage.setup(self)
 	npcs.setup(self)
 	pets.setup(self)
+	collection.setup(self)
+	museum.setup(self)
 	rollover.register(&"pet_reset", func(day): pets.daily_reset(day))
 	housing.extra_plots = func(z: StringName) -> Array: return jobs.site_plots(z)
 	rollover.register(&"restock", func(day):
@@ -119,6 +125,8 @@ func new_game() -> void:
 		unlocks.model.grant(&"EMOTE", e)
 	for i in Database.default_instruments:
 		unlocks.model.grant(&"INSTRUMENT", i)
+	for st in Database.default_stickers:
+		unlocks.model.grant(&"STICKER", st)
 	GameClock.model.set_morning(1)
 	var welcome: MailTemplateDef = Database.mail_templates.get(&"mail_tpl_welcome")
 	if welcome:
@@ -140,13 +148,34 @@ func _on_late_night() -> void:
 		sleep.begin_sleep(&"late_night")
 
 
-## Phase 2 save sections (spec 3.5). Phase 6 adds files, slots and the voxel DB.
+const SCHEMA_VERSION := 2
+
+
+## Builds a fully set-up session for tests (spec 8.2 item 2, P6.10).
+static func new_for_tests(seed_value: int = 918273, world: IVoxelWorld = null) -> GameSession:
+	var s := create(seed_value, world)
+	return s
+
+
+## Player transform for saving (zone, position, yaw, ducking).
+func player_state() -> Dictionary:
+	var out := {"zone_id": String(SceneRouter.current_zone_id), "position": [0.0, 0.0, 0.0], "yaw": 0.0, "ducking": false}
+	if is_instance_valid(player):
+		var p: Vector3 = player.global_position
+		out["position"] = [snappedf(p.x, 0.001), snappedf(p.y, 0.001), snappedf(p.z, 0.001)]
+		out["yaw"] = snappedf(player.get("camera_rig").yaw if player.get("camera_rig") else 0.0, 0.0001)
+		out["ducking"] = bool(player.get("is_ducking"))
+	return out
+
+
+## The single save entry point (spec 3.5, P6.10): every service, one fixed section list.
 func to_dict() -> Dictionary:
 	return {
-		"schema_version": 1,
+		"schema_version": SCHEMA_VERSION,
 		"rng": rng.to_dict(),
 		"clock": GameClock.model.to_dict(),
-		"player": stamina.model.to_dict().merged({"home": housing.to_dict(), "hotbar_index": hotbar.selected, "outfit": outfit.model.to_dict()}),
+		"player": stamina.model.to_dict().merged({"home": housing.to_dict(), "hotbar_index": hotbar.selected,
+			"outfit": outfit.model.to_dict()}).merged(player_state()),
 		"exhaustion": exhaustion.duplicate(),
 		"toolbelt": toolbelt.model.to_dict(),
 		"inventory": inventory.model.to_dict().merged({"hotbar_refs": hotbar.refs.duplicate(), "containers": storage.to_dict()}),
@@ -163,9 +192,12 @@ func to_dict() -> Dictionary:
 		"shops": economy.stock_to_dict(),
 		"npcs": npcs.model.to_dict(),
 		"pets": pets.to_dict(),
+		"museum": museum.model.to_dict(),
+		"collection": collection.model.to_dict(),
 	}
 
 
+## Applies a sanitized save (SaveCodec.decode). The museum reconciles afterwards (spec 6.5).
 func from_dict(d: Dictionary) -> void:
 	rng.from_dict(d.get("rng", {}))
 	GameClock.model.from_dict(d.get("clock", {}))
@@ -193,3 +225,6 @@ func from_dict(d: Dictionary) -> void:
 	pets.from_dict(d.get("pets", []))
 	hotbar.from_dict({"hotbar_refs": d.get("inventory", {}).get("hotbar_refs", hotbar.refs),
 		"hotbar_index": d.get("player", {}).get("hotbar_index", 0)})
+	collection.model.from_dict(d.get("collection", {}))
+	museum.model.from_dict(d.get("museum", {}))
+	museum.reconcile()

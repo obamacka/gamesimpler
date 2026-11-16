@@ -15,5 +15,7 @@ func interaction_spec(_player: Node, _forage: bool, alt: bool) -> InteractionSpe
 
 
 func resolve_interaction(_spec: InteractionSpec, _player: Node) -> void:
-	session().world_state.open_chest(key, global_position + Vector3(0, 0.5, 0))
+	var reward := session().world_state.open_chest(key, global_position + Vector3(0, 0.5, 0))
+	if MenuStack.instance and not reward.is_empty():
+		MenuStack.instance.push(&"chest_reveal", {"reward": reward})   # spec 6.4: unlock card
 	queue_free()

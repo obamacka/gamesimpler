@@ -19,6 +19,12 @@ var catalog_open := false
 ## Selected placeable: {"kind": &"piece" | &"block", "id": StringName}
 var selected: Dictionary = {}
 var manual_rot := 0
+# Paint and Stamp tools (spec 7.2)
+var paint_region := 0          # index into the aimed piece's paint regions
+var dye: StringName = &""
+var sticker: StringName = &""
+var stamp_rot := 0             # degrees, 45 steps
+var stamp_size := "M"
 
 
 func reset() -> void:
@@ -29,7 +35,7 @@ func reset() -> void:
 
 
 func tool_enabled() -> bool:
-	return tool == PLACE
+	return tool in TOOLS
 
 
 func next_tool() -> void:
@@ -47,8 +53,16 @@ func _leave_sub() -> void:
 	remove_t = 0.0
 
 
+## RB/LB: rotate the ghost (Place), cycle the paint region (Paint), turn the stamp 45 degrees
+## (Stamp) (spec 2.3).
 func rotate(step: int) -> void:
-	manual_rot = posmod(manual_rot + step, 4)
+	match tool:
+		PLACE:
+			manual_rot = posmod(manual_rot + step, 4)
+		PAINT:
+			paint_region += step
+		STAMP:
+			stamp_rot = posmod(stamp_rot + step * 45, 360)
 
 
 func begin_fasten() -> bool:
@@ -64,8 +78,9 @@ func end_fasten() -> void:
 
 
 ## LT held on own piece or placed block. Returns true on the tick removal completes.
+## LT held: remove a piece or block (Place) or the nearest stamp (Stamp).
 func tick_remove(delta: float, alt_held: bool, has_target: bool) -> bool:
-	if tool != PLACE:
+	if tool == PAINT:
 		return false
 	if sub == PREVIEW and alt_held and has_target:
 		sub = REMOVING

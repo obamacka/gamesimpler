@@ -1,0 +1,107 @@
+{
+ "cases": [
+  {
+   "id": "case_minerals",
+   "category": "MINERAL",
+   "unlock_rule": "COUNT",
+   "count": 2
+  },
+  {
+   "id": "case_fabrics",
+   "category": "FABRIC",
+   "unlock_rule": "COUNT",
+   "count": 1
+  },
+  {
+   "id": "case_produce",
+   "category": "PRODUCE",
+   "unlock_rule": "COUNT",
+   "count": 3
+  }
+ ],
+ "trophies": [
+  {
+   "id": "trophy_first_donation",
+   "condition": "TOTAL_COUNT",
+   "count": 1,
+   "reward": {
+    "max_stamina_bonus": 10,
+    "coins": 50,
+    "unlocks": []
+   }
+  },
+  {
+   "id": "trophy_crop_set",
+   "condition": "SET_COMPLETE",
+   "set_id": "set_crops",
+   "reward": {
+    "max_stamina_bonus": 10,
+    "coins": 100,
+    "unlocks": [
+     {
+      "kind": "STICKER",
+      "id": "sticker_carrot"
+     }
+    ]
+   }
+  },
+  {
+   "id": "trophy_gems",
+   "condition": "CATEGORY_COUNT",
+   "category": "MINERAL",
+   "count": 4,
+   "reward": {
+    "max_stamina_bonus": 10,
+    "coins": 150,
+    "unlocks": [
+     {
+      "kind": "DYE",
+      "id": "dye_amethyst"
+     }
+    ]
+   }
+  },
+  {
+   "id": "trophy_all",
+   "condition": "ALL_COMPLETE",
+   "reward": {
+    "max_stamina_bonus": 20,
+    "coins": 500,
+    "unlocks": [
+     {
+      "kind": "STICKER",
+      "id": "sticker_crown"
+     }
+    ]
+   }
+  }
+ ],
+ "reward_mail": "mail_tpl_museum_reward",
+ "geodes": {
+  "item_geode": {
+   "contents": [
+    {
+     "item": "item_quartz",
+     "weight": 30
+    },
+    {
+     "item": "item_amethyst",
+     "weight": 25
+    },
+    {
+     "item": "item_agate",
+     "weight": 20
+    },
+    {
+     "item": "item_jasper",
+     "weight": 15
+    },
+    {
+     "item": "item_topaz",
+     "weight": 5
+    }
+   ],
+   "undiscovered_bias_pct": 200
+  }
+ }
+}

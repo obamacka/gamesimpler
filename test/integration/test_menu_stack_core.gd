@@ -75,7 +75,6 @@ func test_catalog_returns_to_same_build_substate() -> void:
 	await h.frames(3)
 	await BuildFixture.enter_build(h)
 	var ctl := h.player.build_ctl
-	ctl.model.next_tool()   # Paint
 	h.press("catalog_pressed")
 	await h.frames(2)
 	assert_str(h.menus.top().menu_id).is_equal(&"build_catalog")
@@ -84,10 +83,20 @@ func test_catalog_returns_to_same_build_substate() -> void:
 	await get_tree().process_frame
 	await get_tree().process_frame
 	assert_bool(get_tree().paused).is_false()
-	assert_str(ctl.model.tool).is_equal(BuildModel.PAINT)
+	assert_str(ctl.model.tool).is_equal(BuildModel.PLACE)
 	assert_str(ctl.model.sub).is_equal(BuildModel.PREVIEW)
 	assert_str(ctl.model.selected["id"]).is_equal(&"piece_chair")
 	assert_str(h.player.machine.current_id).is_equal(&"build")
+	ctl.model.next_tool()   # Paint: Y opens the dye palette and returns to Paint (spec 2.3)
+	await h.frames(1)
+	h.press("catalog_pressed")
+	await h.frames(2)
+	assert_str(h.menus.top().menu_id).is_equal(&"dye_palette")
+	h.menus.top().close(&"dye_sky")
+	await get_tree().process_frame
+	await get_tree().process_frame
+	assert_str(ctl.model.tool).is_equal(BuildModel.PAINT)
+	assert_str(ctl.model.dye).is_equal(&"dye_sky")
 
 
 func test_ui_cancel_pops() -> void:

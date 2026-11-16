@@ -33,6 +33,7 @@ func rebuild() -> void:
 		keep[uid] = true
 		var v: PieceView = views.get(uid)
 		if v and v.state == inst["state"]:
+			v.apply_decor(inst)   # paint and stamps change without rebuilding the piece
 			continue
 		if v:
 			remove_child(v)

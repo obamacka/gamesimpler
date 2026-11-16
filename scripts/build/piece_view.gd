@@ -4,10 +4,14 @@ class_name PieceView
 extends Node3D
 
 const LAYER := 64   # build_pieces (layer 7)
+const SHADER := preload("res://resources/shaders/piece.gdshader")
+const REGION_INDEX := {&"PRIMARY": 1, &"SECONDARY": 2, &"TRIM": 3}
 
 var uid := ""
 var def: BuildPieceDef
 var state: StringName = &"LOOSE"
+var meshes: Array[MeshInstance3D] = []
+var decals: Array[Decal] = []
 var seats: Array[Vector3] = []     # world seat positions
 var exits: Array[Vector3] = []
 
@@ -28,7 +32,18 @@ func setup(inst: Dictionary) -> void:
 	add_child(body)
 	for p in def.parts:
 		var center: Vector3 = p["center"] - Vector3(0.5, 0, 0.5)
-		add_child(WorldObject.box_mesh(p["size"], color, center))
+		var mi := MeshInstance3D.new()
+		var bm := BoxMesh.new()
+		bm.size = p["size"]
+		mi.mesh = bm
+		mi.position = center
+		var mat := ShaderMaterial.new()
+		mat.shader = SHADER
+		mat.set_shader_parameter(&"base_color", color)
+		mat.set_shader_parameter(&"region", REGION_INDEX.get(p.get("region", &""), 0))
+		mi.material_override = mat
+		add_child(mi)
+		meshes.append(mi)
 		if p["solid"]:
 			var cs := CollisionShape3D.new()
 			var box := BoxShape3D.new()
@@ -36,6 +51,7 @@ func setup(inst: Dictionary) -> void:
 			cs.shape = box
 			cs.position = center
 			body.add_child(cs)
+	apply_decor(inst)
 	if state == &"LOOSE" and def.needs_fastening():
 		var z := ToolTargetZone.new()
 		z.key = "piece:" + uid
@@ -56,6 +72,44 @@ func setup(inst: Dictionary) -> void:
 		i.radius = 1.2
 		i.position = Vector3(0, 0.8, 0)
 		add_child(i)
+
+
+## Paint (spec 7.2): one instance shader parameter per region on every part; no material
+## duplication. Stamps: one Decal per stamp in local space.
+func apply_decor(inst: Dictionary) -> void:
+	for mi in meshes:
+		for r in def.paint_regions:
+			mi.set_instance_shader_parameter(r["shader_param"], PaintModel.color_of(inst, r["region_id"]))
+	for d in decals:
+		d.queue_free()
+	decals.clear()
+	for st in inst.get("stamps", []):
+		var dc := Decal.new()
+		var size: float = StampModel.SIZES.get(st["size"], 0.5)
+		dc.size = Vector3(size, 0.3, size)
+		var tex := GradientTexture2D.new()
+		tex.width = 64
+		tex.height = 64
+		tex.fill = GradientTexture2D.FILL_RADIAL
+		tex.fill_from = Vector2(0.5, 0.5)
+		var g := Gradient.new()
+		var sticker: StickerDef = Database.stickers.get(StringName(st["sticker_id"]))
+		var c := sticker.color if sticker else Color.WHITE
+		g.set_color(0, c)
+		g.set_color(1, Color(c.r, c.g, c.b, 0.0))
+		tex.gradient = g
+		dc.texture_albedo = tex
+		var p: Array = st["pos"]
+		var n: Array = st["normal"]
+		var normal := Vector3(n[0], n[1], n[2]).normalized()
+		dc.position = Vector3(p[0], p[1], p[2])
+		# A Decal projects along its local -Y: +Y follows the surface normal, rotation turns it.
+		var up := normal if normal.length() > 0.5 else Vector3.UP
+		var x := up.cross(Vector3.FORWARD if absf(up.dot(Vector3.FORWARD)) < 0.9 else Vector3.RIGHT).normalized()
+		dc.basis = Basis(x, up, x.cross(up)).orthonormalized().rotated(up, deg_to_rad(float(st["rot_deg"])))
+		dc.set_meta(&"sticker", st["sticker_id"])
+		add_child(dc)
+		decals.append(dc)
 
 
 ## Loose-piece zones are active only in Build mode with the Place tool (spec 2.6).

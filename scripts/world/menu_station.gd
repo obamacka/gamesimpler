@@ -3,7 +3,7 @@
 class_name MenuStation
 extends WorldObject
 
-const MENUS := {&"SHOP": &"shop", &"JOB_BOARD": &"job_board", &"WORKBENCH": &"crafting",
+const MENUS := {&"DONATE": &"donation", &"SHOP": &"shop", &"JOB_BOARD": &"job_board", &"WORKBENCH": &"crafting",
 	&"TAILOR_BENCH": &"crafting", &"WARDROBE": &"outfit_customizer", &"PLOT_SIGN": &"house_purchase"}
 
 @export var kind: StringName = &"SHOP"

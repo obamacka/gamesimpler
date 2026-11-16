@@ -23,7 +23,10 @@ func build() -> void:
 	outfit = _page("Outfit")
 	jobs = _page("Jobs")
 	_page("Pet").add_child(_note("Your pet arrives on day 2."))
-	_page("Collection").add_child(_note("The Collection Book opens with the Museum."))
+	var col := _page("Collection")
+	add_row("Open the Collection Book", Color(0.9, 0.8, 0.4), func(): MenuStack.instance.push(&"collection_book"), true, col)
+	var s0 := GameSession.current
+	col.add_child(_note("Found %d of %d, donated %d" % [s0.collection.model.discovered.size(), Database.collectibles().size(), s0.museum.model.donated.size()]))
 	_page("Map").add_child(_note("Map coming soon."))
 	refresh()
 

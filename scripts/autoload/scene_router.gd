@@ -58,23 +58,29 @@ func change_zone(zone_id: StringName, spawn_key: StringName) -> void:
 		push_warning("SceneRouter: no zone root, cannot load %s" % zone_id)
 		return
 	busy = true
+	# Hold the player still for the whole change: nothing may raycast the old terrain while it
+	# is saved and freed, and the new ground must have collision before the player moves.
+	var frozen := is_instance_valid(player)
+	if frozen:
+		player.process_mode = Node.PROCESS_MODE_DISABLED
 	EventBus.zone_unloading.emit(current_zone_id)
+	if is_instance_valid(current_zone) and current_zone.has_method("save_terrain"):
+		await current_zone.save_terrain()
 	if is_instance_valid(current_zone):
+		if current_zone.has_method("detach"):
+			current_zone.detach()
 		current_zone.queue_free()
 		await get_tree().process_frame
 	var path := scene_path(zone_id)
 	var packed: PackedScene = load(path) if path != "" and ResourceLoader.exists(path) else null
 	if packed == null:
 		push_warning("SceneRouter: no scene for zone %s" % zone_id)
+		if frozen and is_instance_valid(player):
+			player.process_mode = Node.PROCESS_MODE_INHERIT
 		busy = false
 		return
 	current_zone = packed.instantiate()
 	current_zone_id = zone_id
-	# Hold the player still at the spawn (its VoxelViewer drives terrain loading there) until
-	# the zone says the ground around it has collision; generated terrain meshes asynchronously.
-	var frozen := is_instance_valid(player)
-	if frozen:
-		player.process_mode = Node.PROCESS_MODE_DISABLED
 	zone_root.add_child(current_zone)
 	await get_tree().process_frame
 	place_player(spawn_key)

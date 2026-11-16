@@ -9,6 +9,7 @@ var session: GameSession
 func _ready() -> void:
 	session = GameSession.create(randi())
 	add_child(session)
+	SaveService.begin_new_game()   # spec 9.6: a new game streams from an empty working copy
 	session.new_game()
 	if OS.is_debug_build():
 		session.build.grant_debug_kit()   # plan P3.2: test plot and pieces until Phase 4 sells plots

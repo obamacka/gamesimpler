@@ -63,6 +63,9 @@ var _target_destroyed := false
 
 
 func _ready() -> void:
+	# Zone changes freeze the player with PROCESS_MODE_DISABLED; keep the body in the physics
+	# space meanwhile so the first tick after unfreezing has a space to move in.
+	disable_mode = CollisionObject3D.DISABLE_MODE_KEEP_ACTIVE
 	jump.configure(jump_config)
 	_air_speed = config.walk_speed
 	for s in machine.states.values():

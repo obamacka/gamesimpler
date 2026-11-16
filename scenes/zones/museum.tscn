@@ -1,0 +1,126 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/world/zone.gd" id="1_zone"]
+[ext_resource type="Script" path="res://scripts/world/mine_entrance.gd" id="2_door"]
+[ext_resource type="Script" path="res://scripts/museum/display_case.gd" id="3_case"]
+[ext_resource type="Script" path="res://scripts/museum/trophy_pedestal.gd" id="4_trophy"]
+[ext_resource type="Script" path="res://scripts/world/menu_station.gd" id="5_station"]
+[ext_resource type="Script" path="res://scripts/npc/npc.gd" id="6_npc"]
+
+[sub_resource type="BoxShape3D" id="floor_shape"]
+size = Vector3(24, 1, 24)
+
+[sub_resource type="BoxMesh" id="floor_mesh"]
+size = Vector3(24, 1, 24)
+
+[sub_resource type="BoxShape3D" id="wall_shape"]
+size = Vector3(24, 4, 0.3)
+
+[sub_resource type="BoxMesh" id="wall_mesh"]
+size = Vector3(24, 4, 0.3)
+
+[node name="Museum" type="Node3D"]
+script = ExtResource("1_zone")
+zone_id = &"zone_museum"
+spawn_chests = false
+
+[node name="Floor" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
+
+[node name="Shape" type="CollisionShape3D" parent="Floor"]
+shape = SubResource("floor_shape")
+
+[node name="Mesh" type="MeshInstance3D" parent="Floor"]
+mesh = SubResource("floor_mesh")
+
+[node name="WallNorth" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, -12)
+
+[node name="Shape" type="CollisionShape3D" parent="WallNorth"]
+shape = SubResource("wall_shape")
+
+[node name="Mesh" type="MeshInstance3D" parent="WallNorth"]
+mesh = SubResource("wall_mesh")
+
+[node name="WallEast" type="StaticBody3D" parent="."]
+transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, 12, 2, 0)
+
+[node name="Shape" type="CollisionShape3D" parent="WallEast"]
+shape = SubResource("wall_shape")
+
+[node name="Mesh" type="MeshInstance3D" parent="WallEast"]
+mesh = SubResource("wall_mesh")
+
+[node name="WallWest" type="StaticBody3D" parent="."]
+transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, -12, 2, 0)
+
+[node name="Shape" type="CollisionShape3D" parent="WallWest"]
+shape = SubResource("wall_shape")
+
+[node name="Mesh" type="MeshInstance3D" parent="WallWest"]
+mesh = SubResource("wall_mesh")
+
+[node name="Light" type="OmniLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.5, 0)
+omni_range = 18.0
+
+[node name="spawn_start" type="Marker3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 9)
+
+[node name="spawn_from_meadow" type="Marker3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 9)
+
+[node name="npc_curator_desk" type="Marker3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 3.2)
+
+[node name="CaseMinerals" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9, 0, -8)
+script = ExtResource("3_case")
+case_id = &"case_minerals"
+
+[node name="CaseFabrics" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 0, -8)
+script = ExtResource("3_case")
+case_id = &"case_fabrics"
+
+[node name="CaseProduce" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 0, -8)
+script = ExtResource("3_case")
+case_id = &"case_produce"
+
+[node name="TrophyFirst" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 0, 0)
+script = ExtResource("4_trophy")
+trophy_id = &"trophy_first_donation"
+
+[node name="TrophyCrops" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 0, 3)
+script = ExtResource("4_trophy")
+trophy_id = &"trophy_crop_set"
+
+[node name="TrophyGems" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 0, 0)
+script = ExtResource("4_trophy")
+trophy_id = &"trophy_gems"
+
+[node name="TrophyAll" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 0, 3)
+script = ExtResource("4_trophy")
+trophy_id = &"trophy_all"
+
+[node name="DonationDesk" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 2)
+script = ExtResource("5_station")
+kind = &"DONATE"
+color = Color(0.4, 0.3, 0.5, 1)
+size = Vector3(2, 1.1, 0.8)
+
+[node name="Npc_curator" type="CharacterBody3D" parent="."]
+script = ExtResource("6_npc")
+npc_id = &"npc_curator"
+
+[node name="Door" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 11.6)
+script = ExtResource("2_door")
+target_zone = &"zone_home_meadow"
+target_spawn = &"spawn_from_museum"

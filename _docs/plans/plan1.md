@@ -387,35 +387,38 @@ Integration:
 **Spec:** 3.5, 3.7, 3.9, 6.5, 7.2, 9.6, 8.5.
 
 ### P6 resources
-- [ ] **P6.1** `CollectionEntryDef` on all minerals, fabrics and produce (farmed crops and foraged produce); `MuseumDef` (cases, trophies, rewards); `DyeDef` palette with names and patterns; `StickerDef`s; `PaintRegionDef`s on paintable pieces and a piece shader with `instance uniform` per region; `GeodeDef`s; reward mail templates.
+- [x] **P6.1** (sticker textures and dye `pattern_tex` are placeholders: colored gradients and swatches) `CollectionEntryDef` on all minerals, fabrics and produce (farmed crops and foraged produce); `MuseumDef` (cases, trophies, rewards); `DyeDef` palette with names and patterns; `StickerDef`s; `PaintRegionDef`s on paintable pieces and a piece shader with `instance uniform` per region; `GeodeDef`s; reward mail templates.
 
 ### P6 scripts
-- [ ] **P6.2 Collection:** `CollectionModel`/`CollectionService` (discover on `item_added`, once per id).
-- [ ] **P6.3 Museum:** `MuseumModel`/`MuseumService` (`try_donate` guard order, batch dedupe, instance data ignored, plain-stack preference, case and trophy evaluation, `rewards_granted`, load reconcile), museum STATIC zone with cases, slot markers and pedestals, curator Y Donate, `donation` menu (List, Confirm, Result; Geodes tab with undiscovered bias), `collection_book` menu (silhouette, icon, ribbon, hints), inventory Collection tab.
-- [ ] **P6.4 Unlock effects:** dyes into the palette, stickers into the sheet and book, blueprints into recipes; chest reveal card shows unlock pictograms.
-- [ ] **P6.5 Painting:** `PaintModel` (owned plot only, region cycling, dye must be unlocked), Build Paint tool, eyedropper, `set_instance_shader_parameter` application, dye palette menu; outfit and pet dyes read the same `DyeDef`s.
-- [ ] **P6.6 Stamps:** `StampModel` (cap 8 per piece, local-space transform, 45-degree rotation, S/M/L sizes, nearest removal), `Decal` placement, sticker sheet menu.
-- [ ] **P6.7 Decor undo:** ring buffer of 20 operations, cleared on zone change.
-- [ ] **P6.8 SaveService (real):** JSON codec (int casting and validation, vectors as arrays, unknown-id drop, content sanitization, structural failure), atomic write (`.tmp`, `.bak`, rename), slot management (3 manual + autosave), migrations framework (`migrate_N_to_N1` registry), `save_load` menu, enable Save/Load in `pause_menu`, autosave after sleep (replaces the Phase 2 stub).
-- [ ] **P6.9 Voxel persistence:** working-copy SQLite per slot, `save_modified_blocks()` tracker wait with timeout, epoch files, JSON-before-DB ordering, mismatch fallback to the `.bak` pair, per the P0.10 decision (copy vs fresh `database_path`).
-- [ ] **P6.10 `GameSession` snapshot:** one `to_dict()/from_dict()` entry point aggregating every service in a fixed order; `GameSession.new_for_tests(seed)` complete.
+- [x] **P6.2 Collection:** `CollectionModel`/`CollectionService` (discover on `item_added`, once per id).
+- [x] **P6.3 Museum:** `MuseumModel`/`MuseumService` (`try_donate` guard order, batch dedupe, instance data ignored, plain-stack preference, case and trophy evaluation, `rewards_granted`, load reconcile), museum STATIC zone with cases, slot markers and pedestals, curator Y Donate, `donation` menu (List, Confirm, Result; Geodes tab with undiscovered bias), `collection_book` menu (silhouette, icon, ribbon, hints), inventory Collection tab.
+- [x] **P6.4 Unlock effects:** dyes into the palette, stickers into the sheet and book, blueprints into recipes; chest reveal card shows unlock pictograms.
+- [x] **P6.5 Painting:** `PaintModel` (owned plot only, region cycling, dye must be unlocked), Build Paint tool, eyedropper, `set_instance_shader_parameter` application, dye palette menu; outfit and pet dyes read the same `DyeDef`s.
+- [x] **P6.6 Stamps:** `StampModel` (cap 8 per piece, local-space transform, 45-degree rotation, S/M/L sizes, nearest removal), `Decal` placement, sticker sheet menu.
+- [x] **P6.7 Decor undo:** ring buffer of 20 operations, cleared on zone change.
+- [x] **P6.8 SaveService (real):** JSON codec (int casting and validation, vectors as arrays, unknown-id drop, content sanitization, structural failure), atomic write (`.tmp`, `.bak`, rename), slot management (3 manual + autosave), migrations framework (`migrate_N_to_N1` registry), `save_load` menu, enable Save/Load in `pause_menu`, autosave after sleep (replaces the Phase 2 stub).
+- [x] **P6.9 Voxel persistence:** working-copy SQLite per slot, `save_modified_blocks()` tracker wait with timeout, epoch files, JSON-before-DB ordering, mismatch fallback to the `.bak` pair, per the P0.10 decision (copy vs fresh `database_path`).
+- [x] **P6.10 `GameSession` snapshot:** one `to_dict()/from_dict()` entry point aggregating every service in a fixed order; `GameSession.new_for_tests(seed)` complete.
 
 ### P6 tests
 Unit:
-- [ ] **P6.11** `museum/test_museum_model.gd`: guard order (not_collectible, already_donated before any inventory change, not_in_inventory); exactly one removed; plain stack preferred; dyed and undyed count as one entry; batch dedupe and per-id results; case unlock once; trophy unlock once; reward granted once via `rewards_granted`; reconcile unlocks newly satisfied trophies once and never re-rewards.
-- [ ] **P6.12** `museum/test_collection_model.gd`, `decor/test_paint_model.gd`, `decor/test_stamp_model.gd` (cap 8, transforms, removal), `decor/test_decor_undo.gd`.
-- [ ] **P6.13** `save/test_save_codec.gd` (every integer field returns `TYPE_INT`; non-integral rejected; vectors; unknown ids dropped with notice flag; duplicates removed; donated ids added to discovered; structural type error fails the load), `save/test_save_migrations.gd` (ordered application, idempotence, fixture v1 -> current), `save/test_save_atomic_write.gd` (crash simulation between steps leaves a loadable primary or `.bak`), `save/test_voxel_epoch.gd` (fake stream: ordering JSON then DB; mismatch picks the consistent pair; aborted tracker writes nothing).
+- [x] **P6.11** `museum/test_museum_model.gd`: guard order (not_collectible, already_donated before any inventory change, not_in_inventory); exactly one removed; plain stack preferred; dyed and undyed count as one entry; batch dedupe and per-id results; case unlock once; trophy unlock once; reward granted once via `rewards_granted`; reconcile unlocks newly satisfied trophies once and never re-rewards.
+- [x] **P6.12** `museum/test_collection_model.gd`, `decor/test_paint_model.gd`, `decor/test_stamp_model.gd` (cap 8, transforms, removal), `decor/test_decor_undo.gd`.
+- [x] **P6.13** `save/test_save_codec.gd` (every integer field returns `TYPE_INT`; non-integral rejected; vectors; unknown ids dropped with notice flag; duplicates removed; donated ids added to discovered; structural type error fails the load), `save/test_save_migrations.gd` (ordered application, idempotence, fixture v1 -> current), `save/test_save_atomic_write.gd` (crash simulation between steps leaves a loadable primary or `.bak`), `save/test_voxel_epoch.gd` (fake stream: ordering JSON then DB; mismatch picks the consistent pair; aborted tracker writes nothing).
 
 Integration:
-- [ ] **P6.14** `test_museum_collection.gd`: spec 8.5 cases **C1 to C17**, including duplicate donation guards (C2 to C5) and serialization (C10 to C14).
-- [ ] **P6.15** `test_save_load_roundtrip.gd`: build a session touching every system (player transform, stamina and bonus, home, outfit with dye, toolbelt, inventory incl. instance data and containers, wallet, unlocks, plots, build pieces with fasten, toggle state, paint and stamps, world trees, timber, chests, terrain damage, discovery pity, museum, collection, pet with accessories, jobs, mail inbox and scheduled, NPCs, shops, clock, exhaustion, RNG counters); save to `user://test_tmp/`; load into a fresh session; deep-equal every section; second save byte-identical to the first (determinism).
-- [ ] **P6.16** `test_save_failures.gd`: corrupt primary -> `.bak` loads with a notice; save refused during transition except the SleepDirector autosave; spec 8.4 case **B12** (autosave content after exhaustion wake).
-- [ ] **P6.17** `test_paint_stamp.gd`: painting sets the instance shader parameter on the piece; stamp creates a `Decal` child; ninth stamp refused; undo restores; all survive save and load.
-- [ ] **P6.18** `test_voxel_smoke.gd` (`@voxel_real`) extended: dig and place in a real terrain, full slot save via SaveService, reload, voxels and inventory consistent.
+- [x] **P6.14** `test_museum_collection.gd`: spec 8.5 cases **C1 to C17**, including duplicate donation guards (C2 to C5) and serialization (C10 to C14).
+- [x] **P6.15** `test_save_load_roundtrip.gd`: build a session touching every system (player transform, stamina and bonus, home, outfit with dye, toolbelt, inventory incl. instance data and containers, wallet, unlocks, plots, build pieces with fasten, toggle state, paint and stamps, world trees, timber, chests, terrain damage, discovery pity, museum, collection, pet with accessories, jobs, mail inbox and scheduled, NPCs, shops, clock, exhaustion, RNG counters); save to `user://test_tmp/`; load into a fresh session; deep-equal every section; second save byte-identical to the first (determinism).
+- [x] **P6.16** `test_save_failures.gd`: corrupt primary -> `.bak` loads with a notice; save refused during transition except the SleepDirector autosave; spec 8.4 case **B12** (autosave content after exhaustion wake).
+- [x] **P6.17** `test_paint_stamp.gd`: painting sets the instance shader parameter on the piece; stamp creates a `Decal` child; ninth stamp refused; undo restores; all survive save and load.
+- [x] **P6.18** `test_voxel_smoke.gd` (`@voxel_real`) extended: dig and place in a real terrain, full slot save via SaveService, reload, voxels and inventory consistent.
 
 ### P6 manual checklist
 - [ ] Donate across categories, unlock a case and a trophy, read the collection book with pad only.
 - [ ] Paint and stamp a house; save, quit, reload; kill the process during a save and confirm the game loads a consistent state.
+
+### P6 addition: navigation meshes (owner request)
+- [x] **P6.19** `ZoneNavigation`: bake on zone load from static colliders and voxel top faces (STATIC zones: bounds; overworld: TOWN volumes, generated level); NPCs on `NavigationAgent3D`, pet on navmesh in STATIC zones; tests for detours, NPC routing around a wall, the museum, the real Home Meadow town, and face winding.
 
 ### Release-candidate checklist (end of Phase 6)
 - [ ] Exports for Windows x86_64, Linux x86_64, macOS (universal) launch, save and load.

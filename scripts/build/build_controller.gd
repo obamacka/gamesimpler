@@ -101,11 +101,19 @@ func tick(delta: float, f: InputFrame, airborne: bool) -> void:
 		if f.catalog_pressed:
 			open_catalog()
 			return
-		if f.interact_pressed:
+		if f.interact_pressed and model.tool == BuildModel.PLACE:
 			pick()
 	_update_aim(s)
-	if model.tool != BuildModel.PLACE:
+	if f.undo_pressed and not airborne:
+		s.build.undo_decor()
+	if model.tool == BuildModel.PAINT:
 		preview = {}
+		_paint_tick(s, f, airborne)
+		_show()
+		return
+	if model.tool == BuildModel.STAMP:
+		preview = {}
+		_stamp_tick(s, f, delta, airborne)
 		_show()
 		return
 	if model.sub == BuildModel.FASTEN:
@@ -244,11 +252,69 @@ func pick() -> void:
 			model.selected = {"kind": &"block", "id": mat.id}
 
 
+## Y: catalog (Place), dye palette (Paint), sticker sheet (Stamp) (spec 2.3).
 func open_catalog() -> void:
 	if MenuStack.instance == null:
 		return
 	model.open_catalog()
-	MenuStack.instance.push(&"build_catalog", {"on_close": func(res): model.close_catalog(res if res is Dictionary else {})})
+	match model.tool:
+		BuildModel.PAINT:
+			MenuStack.instance.push(&"dye_palette", {"on_close": func(res):
+				model.close_catalog()
+				if res is StringName and res != &"": model.dye = res})
+		BuildModel.STAMP:
+			MenuStack.instance.push(&"sticker_sheet", {"on_close": func(res):
+				model.close_catalog()
+				if res is Dictionary:
+					model.sticker = res.get("id", model.sticker)
+					model.stamp_size = res.get("size", model.stamp_size)})
+		_:
+			MenuStack.instance.push(&"build_catalog", {"on_close": func(res): model.close_catalog(res if res is Dictionary else {})})
+
+
+func _first_unlocked(kind: StringName, ids: Array) -> StringName:
+	for id in ids:
+		if session().unlocks.model.is_unlocked(kind, id):
+			return id
+	return &""
+
+
+## The aimed piece's region id for the current paint_region index (wraps).
+func aimed_region(s: GameSession) -> StringName:
+	var def := s.build.def_of(aim.get("piece_uid", ""))
+	if def == null or def.paint_regions.is_empty():
+		return &""
+	return def.paint_regions[posmod(model.paint_region, def.paint_regions.size())]["region_id"]
+
+
+func _paint_tick(s: GameSession, f: InputFrame, airborne: bool) -> void:
+	if model.dye == &"":
+		model.dye = _first_unlocked(&"DYE", Database.dyes.keys())
+	if airborne or not aim.has("piece_uid"):
+		return
+	var uid: String = aim["piece_uid"]
+	var region := aimed_region(s)
+	if f.interact_pressed and region != &"":   # eyedropper
+		var copied := StringName(s.build.pieces[uid].get("paint", {}).get(String(region), ""))
+		if copied != &"":
+			model.dye = copied
+	elif f.use_pressed and region != &"":
+		s.build.try_paint(uid, region, model.dye)
+
+
+func _stamp_tick(s: GameSession, f: InputFrame, delta: float, airborne: bool) -> void:
+	if model.sticker == &"":
+		model.sticker = _first_unlocked(&"STICKER", Database.stickers.keys())
+	if airborne or not aim.has("piece_uid"):
+		return
+	var uid: String = aim["piece_uid"]
+	var inst: Dictionary = s.build.pieces[uid]
+	var local := StampModel.to_local(aim["point"], inst["cell"], inst["rot"])
+	var local_n: Vector3 = (aim["normal"] as Vector3).rotated(Vector3.UP, -inst["rot"] * PI / 2.0)
+	if model.tick_remove(delta, f.alt_held, not inst["stamps"].is_empty()):
+		s.build.try_remove_stamp(uid, local)
+	elif f.use_pressed:
+		s.build.try_stamp(uid, model.sticker, local, local_n, model.stamp_rot, model.stamp_size)
 
 
 func remove_target(s: GameSession) -> Dictionary:

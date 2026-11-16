@@ -1,29 +1,211 @@
 {
   "loot_tables": [
-    {"id": "loot_dirt", "rolls": 0, "guaranteed": [{"item": "item_dirt", "qty": 1}]},
-    {"id": "loot_sand", "rolls": 0, "guaranteed": [{"item": "item_sand", "qty": 1}]},
-    {"id": "loot_clay", "rolls": 0, "guaranteed": [{"item": "item_clay", "qty": 1}]},
-    {"id": "loot_stone", "rolls": 0, "guaranteed": [{"item": "item_stone", "qty": 1}]},
-    {"id": "loot_copper", "rolls": 1, "guaranteed": [{"item": "item_copper_ore", "qty": 1}], "entries": [{"item": "item_copper_ore", "min": 0, "max": 1, "weight": 1}]},
-    {"id": "loot_iron", "rolls": 1, "guaranteed": [{"item": "item_iron_ore", "qty": 1}], "entries": [{"item": "item_iron_ore", "min": 0, "max": 1, "weight": 1}]},
-    {"id": "loot_quartz", "rolls": 0, "guaranteed": [{"item": "item_quartz", "qty": 1}]},
-    {"id": "loot_geode_rock", "rolls": 0, "guaranteed": [{"item": "item_geode", "qty": 1}]},
-    {"id": "loot_timber", "rolls": 1, "guaranteed": [{"item": "item_wood", "qty": 2}], "entries": [{"item": "item_wood", "min": 0, "max": 2, "weight": 1}]},
-    {"id": "loot_log", "rolls": 0, "guaranteed": [{"item": "item_wood", "qty": 2}]}
+    {
+      "id": "loot_dirt",
+      "rolls": 0,
+      "guaranteed": [
+        {
+          "item": "item_dirt",
+          "qty": 1
+        }
+      ]
+    },
+    {
+      "id": "loot_sand",
+      "rolls": 0,
+      "guaranteed": [
+        {
+          "item": "item_sand",
+          "qty": 1
+        }
+      ]
+    },
+    {
+      "id": "loot_clay",
+      "rolls": 0,
+      "guaranteed": [
+        {
+          "item": "item_clay",
+          "qty": 1
+        }
+      ]
+    },
+    {
+      "id": "loot_stone",
+      "rolls": 0,
+      "guaranteed": [
+        {
+          "item": "item_stone",
+          "qty": 1
+        }
+      ]
+    },
+    {
+      "id": "loot_copper",
+      "rolls": 1,
+      "guaranteed": [
+        {
+          "item": "item_copper_ore",
+          "qty": 1
+        }
+      ],
+      "entries": [
+        {
+          "item": "item_copper_ore",
+          "min": 0,
+          "max": 1,
+          "weight": 1
+        }
+      ]
+    },
+    {
+      "id": "loot_iron",
+      "rolls": 1,
+      "guaranteed": [
+        {
+          "item": "item_iron_ore",
+          "qty": 1
+        }
+      ],
+      "entries": [
+        {
+          "item": "item_iron_ore",
+          "min": 0,
+          "max": 1,
+          "weight": 1
+        }
+      ]
+    },
+    {
+      "id": "loot_quartz",
+      "rolls": 0,
+      "guaranteed": [
+        {
+          "item": "item_quartz",
+          "qty": 1
+        }
+      ]
+    },
+    {
+      "id": "loot_geode_rock",
+      "rolls": 0,
+      "guaranteed": [
+        {
+          "item": "item_geode",
+          "qty": 1
+        }
+      ]
+    },
+    {
+      "id": "loot_timber",
+      "rolls": 1,
+      "guaranteed": [
+        {
+          "item": "item_wood",
+          "qty": 2
+        }
+      ],
+      "entries": [
+        {
+          "item": "item_wood",
+          "min": 0,
+          "max": 2,
+          "weight": 1
+        }
+      ]
+    },
+    {
+      "id": "loot_log",
+      "rolls": 0,
+      "guaranteed": [
+        {
+          "item": "item_wood",
+          "qty": 2
+        }
+      ]
+    }
   ],
   "treasure_tables": [
-    {"id": "loot_chest_overworld", "fallback_coins_min": 20, "fallback_coins_max": 40, "entries": [
-      {"kind": "BLUEPRINT", "weight": 2, "id_pool": ["recipe_fence_pine", "recipe_bench_oak"]},
-      {"kind": "DYE", "weight": 3, "id_pool": ["dye_sky", "dye_moss", "dye_sun"]},
-      {"kind": "STICKER", "weight": 3, "id_pool": ["sticker_star", "sticker_heart"]},
-      {"kind": "COINS", "weight": 2, "coins_min": 20, "coins_max": 60},
-      {"kind": "ITEM", "weight": 1, "item": "item_honey_bun", "qty": 2}
-    ]},
-    {"id": "loot_chest_mine", "fallback_coins_min": 30, "fallback_coins_max": 60, "entries": [
-      {"kind": "BLUEPRINT", "weight": 1, "id_pool": ["recipe_lantern_iron"]},
-      {"kind": "DYE", "weight": 2, "id_pool": ["dye_amethyst", "dye_ember"]},
-      {"kind": "STICKER", "weight": 2, "id_pool": ["sticker_pickaxe", "sticker_gem"]},
-      {"kind": "COINS", "weight": 3, "coins_min": 30, "coins_max": 80}
-    ]}
+    {
+      "id": "loot_chest_overworld",
+      "fallback_coins_min": 20,
+      "fallback_coins_max": 40,
+      "entries": [
+        {
+          "kind": "BLUEPRINT",
+          "weight": 2,
+          "id_pool": [
+            "recipe_piece_lamp",
+            "recipe_piece_sofa"
+          ]
+        },
+        {
+          "kind": "DYE",
+          "weight": 3,
+          "id_pool": [
+            "dye_plum",
+            "dye_coal",
+            "dye_ember"
+          ]
+        },
+        {
+          "kind": "STICKER",
+          "weight": 3,
+          "id_pool": [
+            "sticker_star",
+            "sticker_heart"
+          ]
+        },
+        {
+          "kind": "COINS",
+          "weight": 2,
+          "coins_min": 20,
+          "coins_max": 60
+        },
+        {
+          "kind": "ITEM",
+          "weight": 1,
+          "item": "item_honey_bun",
+          "qty": 2
+        }
+      ]
+    },
+    {
+      "id": "loot_chest_mine",
+      "fallback_coins_min": 30,
+      "fallback_coins_max": 60,
+      "entries": [
+        {
+          "kind": "BLUEPRINT",
+          "weight": 1,
+          "id_pool": [
+            "recipe_piece_radio",
+            "recipe_piece_window_wall"
+          ]
+        },
+        {
+          "kind": "DYE",
+          "weight": 2,
+          "id_pool": [
+            "dye_amethyst",
+            "dye_ember"
+          ]
+        },
+        {
+          "kind": "STICKER",
+          "weight": 2,
+          "id_pool": [
+            "sticker_pickaxe",
+            "sticker_gem"
+          ]
+        },
+        {
+          "kind": "COINS",
+          "weight": 3,
+          "coins_min": 30,
+          "coins_max": 80
+        }
+      ]
+    }
   ]
 }

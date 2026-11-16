@@ -30,7 +30,7 @@ func begin_sleep(reason: StringName) -> void:
 	session.rollover.run(new_day)
 	await SceneRouter.change_zone(session.housing.home_zone, session.housing.home_bed_key)
 	session.stamina.refill()
-	SaveService.autosave(session)
+	await SaveService.autosave(session)
 	await SceneRouter.fade_in()
 	EventBus.player_woke.emit(reason, new_day)
 	PauseManager.release_pause(PauseManager.TRANSITION)

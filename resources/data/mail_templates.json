@@ -162,6 +162,14 @@
           "amount": 50
         }
       ]
+    },
+    {
+      "id": "mail_tpl_museum_reward",
+      "sender_id": "npc_curator",
+      "kind": "REWARD",
+      "subject_key": "A museum award!",
+      "body_key": "Thank you for your wonderful donations. Please accept this gift.",
+      "attachments": []
     }
   ]
 }

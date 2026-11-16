@@ -33,6 +33,16 @@ const SCREWS := &"SCREWS"
 ## [{"size": Vector3, "center": Vector3, "solid": bool}] placeholder geometry
 @export var parts: Array = []
 @export var color := Color.WHITE
+## [{"region_id": PRIMARY|SECONDARY|TRIM, "shader_param": StringName, "default_dye_id"}] (max 3)
+@export var paint_regions: Array = []
+@export var stampable := false
+
+
+func region_param(region_id: StringName) -> StringName:
+	for r in paint_regions:
+		if r["region_id"] == region_id:
+			return r["shader_param"]
+	return &""
 
 
 func is_furniture() -> bool:

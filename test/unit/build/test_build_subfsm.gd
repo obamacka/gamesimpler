@@ -7,7 +7,7 @@ func test_tool_cycle() -> void:
 	assert_str(m.tool).is_equal(BuildModel.PLACE)
 	m.next_tool()
 	assert_str(m.tool).is_equal(BuildModel.PAINT)
-	assert_bool(m.tool_enabled()).is_false()   # Phase 6
+	assert_bool(m.tool_enabled()).is_true()   # Paint enabled in Phase 6
 	m.next_tool()
 	assert_str(m.tool).is_equal(BuildModel.STAMP)
 	m.next_tool()
@@ -49,5 +49,17 @@ func test_fasten_only_from_place_preview_and_rotation_wraps() -> void:
 	assert_bool(m.begin_fasten()).is_true()
 	m.next_tool()   # changing tools leaves Fasten
 	assert_str(m.sub).is_equal(BuildModel.PREVIEW)
+	m.prev_tool()
 	m.rotate(-1)
 	assert_int(m.manual_rot).is_equal(3)
+
+
+func test_rotate_means_region_in_paint_and_45_degrees_in_stamp() -> void:
+	var m := BuildModel.new()
+	m.next_tool()
+	m.rotate(1)
+	assert_int(m.paint_region).is_equal(1)
+	assert_int(m.manual_rot).is_equal(0)
+	m.next_tool()
+	m.rotate(-1)
+	assert_int(m.stamp_rot).is_equal(315)

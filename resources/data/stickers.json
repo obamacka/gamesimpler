@@ -1,0 +1,49 @@
+{
+ "stickers": [
+  {
+   "id": "sticker_star",
+   "name_key": "Star",
+   "color": "#f1c232",
+   "rarity": "COMMON"
+  },
+  {
+   "id": "sticker_heart",
+   "name_key": "Heart",
+   "color": "#e06080",
+   "rarity": "COMMON"
+  },
+  {
+   "id": "sticker_pickaxe",
+   "name_key": "Pickaxe",
+   "color": "#909090",
+   "rarity": "COMMON"
+  },
+  {
+   "id": "sticker_gem",
+   "name_key": "Gem",
+   "color": "#8e44ad",
+   "rarity": "RARE"
+  },
+  {
+   "id": "sticker_carrot",
+   "name_key": "Carrot",
+   "color": "#e67e22",
+   "rarity": "RARE"
+  },
+  {
+   "id": "sticker_flower",
+   "name_key": "Flower",
+   "color": "#f0a0c0",
+   "rarity": "COMMON"
+  },
+  {
+   "id": "sticker_crown",
+   "name_key": "Crown",
+   "color": "#d4af37",
+   "rarity": "SPECIAL"
+  }
+ ],
+ "default_stickers": [
+  "sticker_flower"
+ ]
+}

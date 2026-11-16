@@ -36,6 +36,9 @@ var emotes: Dictionary = {}          # StringName -> EmoteDef
 var default_emotes: Array[StringName] = []
 var instruments: Dictionary = {}     # StringName -> InstrumentDef
 var default_instruments: Array[StringName] = []
+var museum := MuseumDef.new()
+var stickers: Dictionary = {}        # StringName -> StickerDef
+var default_stickers: Array[StringName] = []
 var farm := FarmConfig.new()
 var stamina := StaminaConfig.new()
 var discovery := DiscoveryConfig.new()
@@ -59,7 +62,7 @@ func load_all(dir: String) -> void:
 	treasure_tables.clear(); fruit_trees.clear(); timber_trees.clear(); zones.clear(); mail_templates.clear()
 	crops.clear(); plots.clear(); pieces.clear()
 	recipes.clear(); shops.clear(); jobs.clear(); contracts.clear(); blueprints.clear(); outfits.clear(); dyes.clear()
-	npcs.clear(); pet_species.clear(); pet_accessories.clear(); emotes.clear(); instruments.clear()
+	npcs.clear(); pet_species.clear(); pet_accessories.clear(); emotes.clear(); instruments.clear(); stickers.clear()
 	var items_json := _read(dir.path_join("items.json"))
 	for d in items_json.get("items", []):
 		var it := _item(d)
@@ -117,6 +120,7 @@ func load_all(dir: String) -> void:
 		pieces[p.id] = p
 	_load_phase4(dir)
 	_load_phase5(dir)
+	_load_phase6(dir)
 	var home: Dictionary = world.get("home", {})
 	home_zone = StringName(home.get("zone_id", "zone_starter_cabin"))
 	home_bed_key = StringName(home.get("bed_key", "bed_01"))
@@ -292,6 +296,7 @@ func validate() -> Array[String]:
 			errors.append("outfit item %s wears unknown outfit" % id)
 	errors.append_array(_validate_phase4())
 	errors.append_array(_validate_phase5())
+	errors.append_array(_validate_phase6())
 	return errors
 
 
@@ -373,6 +378,12 @@ func _item(d: Dictionary) -> ItemDef:
 	it.seed_crop = StringName(d.get("seed_crop", ""))
 	it.piece_id = StringName(d.get("piece_id", ""))
 	it.outfit_id = StringName(d.get("outfit_id", ""))
+	if d.has("collection"):
+		var c := CollectionEntryDef.new()
+		var cd: Dictionary = d["collection"]
+		c.category = StringName(cd.get("category", "MINERAL")); c.set_id = StringName(cd.get("set_id", ""))
+		c.case_id = StringName(cd.get("case_id", "")); c.hint_key = cd.get("hint_key", ""); c.sort_order = int(cd.get("sort_order", 0))
+		it.collection = c
 	if d.has("tool"):
 		var t := ToolData.new()
 		var td: Dictionary = d["tool"]
@@ -489,6 +500,102 @@ func _load_phase5(dir: String) -> void:
 	default_instruments.assign((ee.get("default_instruments", []) as Array).map(func(v): return StringName(v)))
 
 
+func _load_phase6(dir: String) -> void:
+	var mm := _read(dir.path_join("museum.json"))
+	museum = MuseumDef.new()
+	museum.cases = (mm.get("cases", []) as Array).map(func(c): return {"id": StringName(c["id"]), "category": StringName(c.get("category", "")),
+		"unlock_rule": StringName(c.get("unlock_rule", "COUNT")), "count": int(c.get("count", 0)), "set_id": StringName(c.get("set_id", ""))})
+	museum.trophies = (mm.get("trophies", []) as Array).map(func(t):
+		var rw: Dictionary = t.get("reward", {})
+		return {"id": StringName(t["id"]), "condition": StringName(t["condition"]), "category": StringName(t.get("category", "")),
+			"set_id": StringName(t.get("set_id", "")), "count": int(t.get("count", 0)),
+			"reward": {"max_stamina_bonus": int(rw.get("max_stamina_bonus", 0)), "coins": int(rw.get("coins", 0)),
+				"unlocks": (rw.get("unlocks", []) as Array).map(func(u): return {"kind": StringName(u["kind"]), "id": StringName(u["id"])})}})
+	museum.reward_mail = StringName(mm.get("reward_mail", ""))
+	var g := {}
+	for k in mm.get("geodes", {}):
+		var e: Dictionary = mm["geodes"][k]
+		g[StringName(k)] = {"contents": (e.get("contents", []) as Array).map(func(c): return {"item": StringName(c["item"]), "weight": int(c["weight"])}),
+			"undiscovered_bias_pct": int(e.get("undiscovered_bias_pct", 200))}
+	museum.geodes = g
+	var st := _read(dir.path_join("stickers.json"))
+	for d in st.get("stickers", []):
+		var s := StickerDef.new()
+		s.id = StringName(d["id"]); s.name_key = d.get("name_key", ""); s.color = Color.html(d.get("color", "#ffffff"))
+		s.rarity = StringName(d.get("rarity", "COMMON"))
+		stickers[s.id] = s
+	default_stickers.assign((st.get("default_stickers", []) as Array).map(func(v): return StringName(v)))
+
+
+func collectibles() -> Array:
+	var out: Array = items.values().filter(func(it): return it.collection != null)
+	out.sort_custom(func(a, b): return a.collection.sort_order < b.collection.sort_order or (a.collection.sort_order == b.collection.sort_order and String(a.id) < String(b.id)))
+	return out
+
+
+func _validate_phase6() -> Array[String]:
+	var errors: Array[String] = []
+	var case_ids := museum.cases.map(func(c): return c["id"])
+	for it in collectibles():
+		if not (it.collection.case_id in case_ids):
+			errors.append("collectible %s has unknown case %s" % [it.id, it.collection.case_id])
+		if not (it.collection.category in [&"MINERAL", &"FABRIC", &"PRODUCE"]):
+			errors.append("collectible %s has unknown category" % it.id)
+	for c in museum.cases:
+		var n := collectibles().filter(func(it): return it.collection.case_id == c["id"] or (c["unlock_rule"] == &"SET_COMPLETE" and it.collection.set_id == c["set_id"])).size()
+		if c["unlock_rule"] == &"COUNT" and n < int(c["count"]):
+			errors.append("case %s needs %d entries, only %d exist" % [c["id"], c["count"], n])
+	for t in museum.trophies:
+		match t["condition"]:
+			&"CATEGORY_COUNT":
+				if collectibles().filter(func(it): return it.collection.category == t["category"]).size() < int(t["count"]):
+					errors.append("trophy %s cannot be satisfied" % t["id"])
+			&"TOTAL_COUNT":
+				if collectibles().size() < int(t["count"]):
+					errors.append("trophy %s cannot be satisfied" % t["id"])
+			&"SET_COMPLETE":
+				if collectibles().filter(func(it): return it.collection.set_id == t["set_id"]).is_empty():
+					errors.append("trophy %s has an empty set" % t["id"])
+		for u in t["reward"]["unlocks"]:
+			if not _unlock_exists(u["kind"], u["id"]):
+				errors.append("trophy %s rewards unknown %s %s" % [t["id"], u["kind"], u["id"]])
+	if museum.reward_mail != &"" and not mail_templates.has(museum.reward_mail):
+		errors.append("museum reward mail unknown")
+	for k in museum.geodes:
+		if not items.has(k) or items[k].category != &"GEODE":
+			errors.append("geode %s is not a GEODE item" % k)
+		for c in museum.geodes[k]["contents"]:
+			if not items.has(c["item"]):
+				errors.append("geode %s yields unknown item" % k)
+	for id in treasure_tables:
+		for e in treasure_tables[id].entries:
+			for u in e.get("id_pool", []):
+				if not _unlock_exists(StringName(e["kind"]), StringName(u)):
+					errors.append("treasure %s pool has unknown %s %s" % [id, e["kind"], u])
+	var shader := FileAccess.get_file_as_string("res://resources/shaders/piece.gdshader")
+	for id in pieces:
+		var p: BuildPieceDef = pieces[id]
+		if p.paint_regions.size() > 3:
+			errors.append("piece %s has more than 3 paint regions" % id)
+		for r in p.paint_regions:
+			if not ("instance uniform vec4 %s" % r["shader_param"]) in shader:
+				errors.append("piece %s paints %s, not an instance uniform of piece.gdshader" % [id, r["shader_param"]])
+	for d in default_stickers:
+		if not stickers.has(d):
+			errors.append("default sticker %s unknown" % d)
+	return errors
+
+
+func _unlock_exists(kind: StringName, id: StringName) -> bool:
+	match kind:
+		&"BLUEPRINT": return recipes.has(id) and recipes[id].unlock == &"BLUEPRINT"
+		&"DYE": return dyes.has(id)
+		&"STICKER": return stickers.has(id)
+		&"EMOTE": return emotes.has(id)
+		&"INSTRUMENT": return instruments.has(id)
+	return false
+
+
 func _validate_phase5() -> Array[String]:
 	var errors: Array[String] = []
 	for id in npcs:
@@ -568,6 +675,11 @@ func _piece(d: Dictionary) -> BuildPieceDef:
 		return o)
 	p.parts = (d.get("parts", []) as Array).map(func(b): return {"size": _v3(b["size"]), "center": _v3(b["center"]), "solid": bool(b.get("solid", true))})
 	p.color = Color.html(d.get("color", "#ffffff"))
+	p.paint_regions = (d.get("paint_regions", []) as Array).map(func(r): return {"region_id": StringName(r["region_id"]),
+		"shader_param": StringName(r["shader_param"]), "default_dye_id": StringName(r.get("default_dye_id", ""))})
+	p.stampable = bool(d.get("stampable", false))
+	for i in p.parts.size():
+		p.parts[i]["region"] = StringName((d.get("parts", [])[i] as Dictionary).get("region", ""))
 	return p
 
 

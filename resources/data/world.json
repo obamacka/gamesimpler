@@ -117,6 +117,24 @@
         48
       ],
       "treasure_table": "loot_chest_overworld"
+    },
+    {
+      "id": "zone_museum",
+      "kind": "STATIC",
+      "scene_path": "res://scenes/zones/museum.tscn",
+      "seed_mode": "FIXED",
+      "persist_edits": false,
+      "stream_db_key": "",
+      "bounds_min": [
+        -20,
+        -4,
+        -20
+      ],
+      "bounds_max": [
+        20,
+        10,
+        20
+      ]
     }
   ],
   "home": {

@@ -9,6 +9,7 @@ size = Vector3(80, 1, 80)
 
 [node name="fixture_cabin" type="Node3D"]
 script = ExtResource("1_zone")
+bake_navigation = false
 zone_id = &"zone_starter_cabin"
 
 [node name="Floor" type="StaticBody3D" parent="."]

@@ -31,3 +31,6 @@ mono_crash.*.json
 
 # Voxel Tools binaries are fetched by ci/fetch_voxel.sh
 /addons/zylann.voxel/bin/
+
+# Benchmark downloads and logs (ci/run_benchmark.*)
+/.bench/

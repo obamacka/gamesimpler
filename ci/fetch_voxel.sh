@@ -9,7 +9,11 @@ ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 TMP="$(mktemp -d)"
 trap 'rm -rf "$TMP"' EXIT
 curl -sSL -o "$TMP/voxel.zip" "$URL"
-echo "$SHA256  $TMP/voxel.zip" | sha256sum -c -
+if command -v sha256sum > /dev/null; then
+  echo "$SHA256  $TMP/voxel.zip" | sha256sum -c -
+else
+  echo "$SHA256  $TMP/voxel.zip" | shasum -a 256 -c -   # macOS
+fi
 unzip -q "$TMP/voxel.zip" -d "$TMP/x"
 SRC="$TMP/x/addons/zylann.voxel"
 DST="$ROOT/addons/zylann.voxel"

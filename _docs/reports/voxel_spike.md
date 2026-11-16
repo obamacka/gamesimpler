@@ -32,19 +32,25 @@
 3. The GDExtension binaries are 134 MB for all platforms, 65 MB for the desktop set. They are not committed; `ci/fetch_voxel.sh` downloads and verifies them (SHA256 pinned). Owner decision 2026-11-16: keep the fetch script (no Git LFS).
 
 ## How to run the hardware checks (b, d, j, k, P0.9)
-On each machine (i7-3770/GTX 1070, Ryzen 5 3600/RTX 2070, M1 16 GB, M2 16 GB):
-1. Clone, run `ci/fetch_voxel.sh` (or unzip the release into `addons/zylann.voxel/` on Windows), open once in Godot 4.7.2 to import.
-2. Set the window to 1920x1080 and run:
-   `godot --path . res://spikes/voxel/voxel_benchmark.tscn -- --duration=60`
-3. Copy the printed JSON (also saved to `user://voxel_benchmark_<time>.json`) into the table below.
-4. Pass criteria: min spec `avg_fps >= 30` and `frames_over_33ms` close to 0 with `edit_to_collision_max_ms <= 100`; recommended spec `avg_fps >= 60`; no crash; on the M1/M2 `rendering_driver` is `metal`.
+On each machine, from the repository root, with the window able to show 1920x1080:
 
-| Machine | avg fps | p99 ms | max ms | frames > 33.3 ms | edit-to-collision max ms | driver | Pass |
+| Machine | Command |
+|---|---|
+| i7-3770 / GTX 1070 (Windows) | `powershell -ExecutionPolicy Bypass -File ci\run_benchmark.ps1 -Tier min -Machine "i7-3770 / GTX 1070"` |
+| i7-3770 / GTX 1070 (Linux) | `ci/run_benchmark.sh --tier min --machine "i7-3770 / GTX 1070"` |
+| Ryzen 5 3600 / RTX 2070 | same script, `--tier rec` / `-Tier rec`, `--machine "Ryzen 5 3600 / RTX 2070"` |
+| M1 16 GB | `ci/run_benchmark.sh --tier min --machine "M1 16 GB"` |
+| M2 16 GB | `ci/run_benchmark.sh --tier rec --machine "M2 16 GB"` |
+
+The scripts download and verify Godot 4.7.2 (SHA512) and Voxel Tools 1.7 (SHA256) into `.bench/` and `addons/zylann.voxel/bin/`, import the project, run the 60 s benchmark, and print a ready-to-paste row for the table below. The full JSON is also saved to `user://voxel_benchmark_<time>.json`.
+
+Pass criteria (computed by the benchmark): `--tier min`: average fps >= 30, at most 1% of frames over 33.3 ms, edit-to-collision <= 100 ms. `--tier rec`: average fps >= 60, at most 1% of frames over 16.7 ms, edit-to-collision <= 100 ms. On macOS the rendering driver must be `metal`.
+
+Script status: `ci/run_benchmark.sh` was run end to end in the cloud container with `--headless-smoke` (Linux path). The macOS path and `ci/run_benchmark.ps1` have not been executed (no Mac or PowerShell available in the cloud session); report any error output.
+
+| Machine (CPU, GPU) | avg fps | p99 ms | max ms | frames > 33.3 ms | edit-to-collision max ms | driver | Result |
 |---|---|---|---|---|---|---|---|
-| i7-3770 / GTX 1070 | | | | | | | |
-| Ryzen 5 3600 / RTX 2070 | | | | | | | |
-| M1 16 GB | | | | | | | |
-| M2 16 GB | | | | | | | |
+| (paste rows here) | | | | | | | |
 
 Note: the benchmark uses a medium-quality default environment (procedural sky, one shadowed sun). A formal "medium preset" does not exist yet; it is defined in Phase 4 settings, and the benchmark should be re-run then.
 

@@ -150,7 +150,7 @@ Status values: `Not started`, `In progress`, `Blocked`, `Done`.
 | 2026-11-16 | Confirmed: the CLAUDE.md command hangs at `debug>` on GDScript parse errors; `--remote-debug tcp://127.0.0.1:0` fixes it (exit 105). `ci/run_tests.sh` uses the fix | owner | Closed 2026-11-16: CLAUDE.md updated (owner approved) |
 | 2026-11-15 | Voxel GDExtension maturity, collision latency, headless behavior, SQLite copy safety unverified (spec 0.6 items 18, 19, 21, 22) | P0.8 | Partly closed 2026-11-16: headless, SQLite copy and container latency verified; hardware frame budget pending |
 | 2026-11-16 | Voxel binaries (65 MB desktop) kept out of git via fetch script; Git LFS is the alternative | owner | Closed 2026-11-16: keep the fetch script |
-| 2026-11-16 | Hardware runs of `spikes/voxel/voxel_benchmark.tscn` on the four target machines (P0.8 b, d, j, k; P0.9) | team | Open |
+| 2026-11-16 | Hardware runs of `spikes/voxel/voxel_benchmark.tscn` on the four target machines (P0.8 b, d, j, k; P0.9). One-command scripts: `ci/run_benchmark.sh` (Linux/macOS), `ci/run_benchmark.ps1` (Windows, untested) | team | Open |
 | 2026-11-15 | Min-spec hardware undefined | owner, P0.7 | Closed 2026-11-16 (Windows/Linux and macOS) |
 | 2026-11-16 | Recommended spec for the 60 fps target undefined (D26) | owner | Closed 2026-11-16 |
 | 2026-11-16 | i7-3770 has no AVX2; Voxel Tools GDExtension instruction-set requirement unverified | P0.8 j | Open |

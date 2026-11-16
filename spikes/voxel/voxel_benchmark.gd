@@ -1,6 +1,8 @@
-# Voxel spike benchmark (plan P0.8 b, d, j, k; P0.9). Run windowed on each target machine:
-#   godot --path . res://spikes/voxel/voxel_benchmark.tscn -- --duration=60
-# or from an export of this scene. Writes user://voxel_benchmark_<time>.json and prints a summary.
+# Voxel spike benchmark (plan P0.8 b, d, j, k; P0.9). Run windowed on each target machine with
+# ci/run_benchmark.sh (Linux, macOS) or ci/run_benchmark.ps1 (Windows), or directly:
+#   godot --path . --resolution 1920x1080 res://spikes/voxel/voxel_benchmark.tscn -- --duration=60 --tier=min --machine="i7-3770 / GTX 1070"
+# --tier=min checks the 30 fps target, --tier=rec the 60 fps target (spec D25, D26).
+# Writes user://voxel_benchmark_<time>.json and prints a summary plus a markdown table row.
 # A capsule "player" runs across generated hills at run speed (5 m/s) with the camera behind it,
 # digs one voxel ahead every 0.25 s, and every 3 s digs a 3x3 pit under itself to time
 # edit-to-collision (physics frames until the body is no longer on the floor).
@@ -14,6 +16,8 @@ const PIT_INTERVAL := 3.0
 const MESH_WAIT_TIMEOUT := 30.0
 
 var duration := 60.0
+var tier := "min"
+var machine := "unnamed"
 
 var _terrain: VoxelTerrain
 var _vt: VoxelTool
@@ -36,6 +40,10 @@ func _ready() -> void:
 	for arg in OS.get_cmdline_user_args():
 		if arg.begins_with("--duration="):
 			duration = float(arg.get_slice("=", 1))
+		elif arg.begins_with("--tier="):
+			tier = arg.get_slice("=", 1)
+		elif arg.begins_with("--machine="):
+			machine = arg.get_slice("=", 1)
 	DisplayServer.window_set_vsync_mode(DisplayServer.VSYNC_DISABLED)
 	_build_world()
 
@@ -189,10 +197,32 @@ func _finish() -> void:
 		"edit_to_collision_max_ms": pit_max_ms,
 		"edit_to_collision_max_frames": pit_max_frames,
 	}
+	var target_fps := 60.0 if tier == "rec" else 30.0
+	var budget_ms := 1000.0 / target_fps
+	var over_budget := over_16 if tier == "rec" else over_33
+	var avg_fps: float = report["avg_fps"]
+	var reasons: Array[String] = []
+	if avg_fps < target_fps:
+		reasons.append("avg fps below %d" % int(target_fps))
+	if n > 0 and float(over_budget) / n > 0.01:
+		reasons.append("more than 1%% of frames over %.1f ms" % budget_ms)
+	if pit_max_ms > 100.0:
+		reasons.append("edit-to-collision over 100 ms")
+	if OS.get_name() == "macOS" and report["rendering_driver"] != "metal":
+		reasons.append("not using Metal")
+	report["tier"] = tier
+	report["machine"] = machine
+	report["pass"] = reasons.is_empty()
+	report["fail_reasons"] = reasons
 	var path := "user://voxel_benchmark_%s.json" % Time.get_datetime_string_from_system().replace(":", "-")
 	var f := FileAccess.open(path, FileAccess.WRITE)
 	f.store_string(JSON.stringify(report, "  "))
 	f.close()
 	print("[voxel_benchmark] %s" % JSON.stringify(report))
 	print("[voxel_benchmark] report written to %s" % ProjectSettings.globalize_path(path))
+	# Same columns as the table in _docs/reports/voxel_spike.md
+	print("[voxel_benchmark_row] | %s (%s, %s) | %.1f | %.1f | %.1f | %d | %.1f | %s | %s |" % [
+		machine, report["cpu"], report["gpu"], avg_fps, p99, report["max_frame_ms"], over_33,
+		pit_max_ms, report["rendering_driver"],
+		("PASS (%s)" % tier) if reasons.is_empty() else ("FAIL (%s): %s" % [tier, ", ".join(reasons)])])
 	get_tree().quit(0)

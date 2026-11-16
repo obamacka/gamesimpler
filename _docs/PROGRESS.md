@@ -22,7 +22,7 @@ Status values: `Not started`, `In progress`, `Blocked`, `Done`.
 | gdUnit4 v6.2.3 | Installed in `addons/gdUnit4` (tag v6.2.3, commit f2e4f86) |
 | Voxel Tools 1.7 GDExtension | Fetched by `ci/fetch_voxel.sh` (tag v1.7x, SHA256 pinned); binaries gitignored |
 | Headless test command | CLAUDE.md (owner, 2026-11-16): `godot --headless --path . -s -d res://addons/gdUnit4/bin/GdUnitCmdTool.gd --ignoreHeadlessMode -a res://test`. Not yet run; P0.3 also tests the `--remote-debug tcp://127.0.0.1:0` variant (parse-error hang risk, spec 0.6 item 1) |
-| CI | GitHub Actions `tests` workflow; run 1 passed (0abde5d) |
+| CI | GitHub Actions `tests` workflow; runs 1 (0abde5d) and 2 (24a5cfd, with voxel suite) passed |
 | Min-spec hardware (Windows/Linux) | Intel Core i7-3770, 16 GB DDR3-1333, Nvidia GTX 1070 (spec 0.7) |
 | Min-spec hardware (macOS) | Base Apple M1, 16 GB RAM (D24) |
 | Performance target | 30 fps at 1920x1080 medium on min spec; 60 fps on recommended spec (D25) |
@@ -130,6 +130,7 @@ Status values: `Not started`, `In progress`, `Blocked`, `Done`.
 | 2026-11-16 | df1a866 | 0 | `--remote-debug tcp://127.0.0.1:0` variant + parse error | 105 | n/a | exits cleanly |
 | 2026-11-16 | df1a866 | 0 | `ci/run_tests.sh` | 0 | 0 | 11 cases |
 | 2026-11-16 | 0abde5d | 0 | CI run 1 | 0 | 0 | GitHub Actions |
+| 2026-11-16 | 24a5cfd | 0 | CI run 2 | 0 | 0 | GitHub Actions, 17 cases incl. voxel smoke |
 | 2026-11-16 | 24a5cfd | 0 | `ci/run_tests.sh` | 0 | 0 | 17 cases incl. voxel smoke |
 
 ## Decisions

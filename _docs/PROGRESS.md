@@ -2,9 +2,9 @@
 
 | Field | Value |
 |---|---|
-| Spec | `_docs/specs/spec1.md` rev 3.5 |
+| Spec | `_docs/specs/spec1.md` rev 3.6 |
 | Plan | `_docs/plans/plan1.md` |
-| Active phase | Phase 2B (automated tasks done; manual checklist pending); Phase 2 and Phase 1 manual checks and Phase 0 hardware checks pending |
+| Active phase | Phases 3 to 5 started on owner request before the Phase 1, 2 and 2B gates passed (manual checklists open); Phase 0 hardware checks pending |
 | Last updated | 2026-11-16 |
 
 ## How to update
@@ -35,7 +35,7 @@ Status values: `Not started`, `In progress`, `Blocked`, `Done`.
 | 1 | Core Engine, Gamepad Input, Camera, Tall Character FSM | In progress: all automated tasks done, manual checklist pending | |
 | 2 | Mining, Foraging, Stamina Loop, Auto-Tool | In progress: all automated tasks done, manual checklist and min-spec performance check pending | |
 | 2B | Farming | In progress: all automated tasks done, manual checklist pending | |
-| 3 | Magnetic Grid Building, Screw/Hammer Mini-Games | Not started | |
+| 3 | Magnetic Grid Building, Screw/Hammer Mini-Games | In progress: automated tasks done except P3.8 icons; manual checklist pending | |
 | 4 | Economy, Jobs, Wardrobe UI, Game Pause | Not started | |
 | 5 | NPCs, Mail, Pet Companion | Not started | |
 | 6 | Museum, Collection Book, Dye Painting, Save/Load | Not started | |
@@ -88,11 +88,11 @@ Status values: `Not started`, `In progress`, `Blocked`, `Done`.
 ### Phase 3
 | Task | Status | Date | Commit | Notes |
 |---|---|---|---|---|
-| P3.1 to P3.2 Resources | Not started | | | |
-| P3.3 to P3.13 Scripts | Not started | | | |
-| P3.14 to P3.16 Unit suites | Not started | | | |
-| P3.17 to P3.21 Integration suites | Not started | | | Suite A: A8 to A10 |
-| Manual checklist | Not started | | | |
+| P3.1 to P3.2 Resources | Done | 2026-11-16 | 405aae6 | 15 pieces in `resources/data/pieces.json` with placeholder box geometry (no per-piece .tscn); `plot_test` in Home Meadow granted by `BuildService.grant_debug_kit()` (debug builds, main.gd) |
+| P3.3 to P3.13 Scripts | Done except P3.8 | 2026-11-16 | 405aae6 | P3.8 ghost lacks icons, reason pictograms, stripes and pulse (text label stands in); STORAGE (chest) opens in Phase 4 |
+| P3.14 to P3.16 Unit suites | Done | 2026-11-16 | 405aae6 | placement 8, snap 8, fasten 7, sub-FSM 4, blocks 6, build round trip 1, script compile check 1 |
+| P3.17 to P3.21 Integration suites | Done | 2026-11-16 | 405aae6 | Suite A 22/22 (A8-A10 added), build placement 5, fasten 3, menu stack 6, furniture 6 |
+| Manual checklist | Not started | | | 3x3 room with door, roof and furniture by pad; magnetic feel on High; three ghost palettes readable; sockets auto-advance |
 
 ### Phase 4
 | Task | Status | Date | Commit | Notes |
@@ -138,6 +138,7 @@ Status values: `Not started`, `In progress`, `Blocked`, `Done`.
 | 2026-11-16 | 5e4c70e | 2 | `ci/run_tests.sh` | 0 | 0 | 262 cases (Phases 0 to 2) |
 | 2026-11-16 | 24a5cfd | 0 | `ci/run_tests.sh` | 0 | 0 | 17 cases incl. voxel smoke |
 | 2026-11-16 | 93b088c | 2B | `ci/run_tests.sh` | 0 | 0 | 311 cases (Phases 0 to 2B) |
+| 2026-11-16 | 405aae6 | 3 | `ci/run_tests.sh` | 0 | 0 | 369 cases (Phases 0 to 3) |
 
 ## Decisions
 | ID | Status | Value |
@@ -155,6 +156,9 @@ Status values: `Not started`, `In progress`, `Blocked`, `Done`.
 | 2026-11-16 | Phase 2 manual checklist and min-spec performance check | team | Open |
 | 2026-11-16 | Phase 2 choices for owner review: JSON content authoring (spec 3 conventions updated); care-letter snack rule compares against the collapse day (spec 6.2 corrected, the old rule could never trigger); `player_woke` emitted just before the transition pause is released (spec 6.2 diagram updated to match Suite B); Bed and Mine Entrance act without the confirm dialog until Phase 3 adds menus; SafeGround uses the standing-capsule clearance as the "3 free voxels" check; prompt occlusion implemented in 5ac70f4 | owner review | Open |
 | 2026-11-16 | Phase 2B manual checklist (plan P2B) | team | Open |
+| 2026-11-16 | Plan 0 rule broken on owner request: Phases 3 to 5 started while the Phase 1, 2 and 2B gates (manual checklists, min-spec performance) are open. Rework risk if those checks find feel or performance problems | owner | Open |
+| 2026-11-16 | Bug found and fixed in 405aae6: `ui/hud/hud.gd` from 93b088c did not parse, so the HUD was missing in the playable build; no test loaded it. New `core/test_scripts_parse.gd` compiles every script | team | Closed |
+| 2026-11-16 | Phase 3 choices for owner review: occupancy per cell and layer (floor, body, wall faces) so thin walls, floors and furniture can share cells (spec 1.6 rev 3.6); furniture on whole cells (0.5 m sub-grid deferred); support needs one supported bottom cell, not all; furniture is FASTENED on placement; removal refused while anything rests on the piece; block removal instant for any placeable block in an owned plot; RB rotates clockwise; pieces have no per-piece scenes yet | owner review | Open |
 | 2026-11-16 | Phase 2B choices for owner review: seeds aimed at non-farmable grass/dirt show a blocked prompt instead of digging (spec 10.4 row added); wetness stored per soil cell so empty farmland can be watered (save shape in spec 3.5 updated, crop `stage`/`watered_day` no longer saved); harvest is X only per spec 10.4 (RT does nothing on a ripe crop); sprinkler is an item placed with RT while selected on owned plot soil until Phase 3; crop visuals are placeholder boxes; plots are flattened to the natural height at their center, which can leave a ledge at the border; no water voxels yet, so the well is the only refill source | owner review | Open |
 | 2026-11-16 | Phase 1 implementation choices recorded in spec: input map generated from InputBindings; `ui_tertiary` KB moved from Shift+Enter to R; Esc overlap rule; ledge probes are direct physics queries; VoxelViewer added in Phase 2 | owner review | Open |
 | 2026-11-15 | CLAUDE.md headless command does not match gdUnit4 v6.2.3 (spec 0.6 item 1) | owner | Closed 2026-11-16 (3682356) |

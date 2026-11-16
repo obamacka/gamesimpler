@@ -29,7 +29,7 @@
 ## Testing & Verification Rules
 - Framework: GdUnit4 plugin.
 - Test Directory Structure: `res://test/unit/` (data/FSM logic) and `res://test/integration/` (UI/world signals).
-- Headless CLI Command: `godot --headless -s addons/gdUnit4/bin/GdUnitCmdLine.gd`
+- Headless CLI Command: `godot --headless --path . -s -d res://addons/gdUnit4/bin/GdUnitCmdTool.gd --ignoreHeadlessMode -a res://test`
 - Mandatory Validation:
   1. Write GdUnit4 test suites (`TestSuite`) for pure logic components (Inventory, Economy, FSM transitions, Save/Load serialization) before feature sign-off.
   2. Execute the headless test suite CLI command and verify 0 failures (exit code 0) before marking any task complete in `_docs/PROGRESS.md`.

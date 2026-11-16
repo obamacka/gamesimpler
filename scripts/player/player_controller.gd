@@ -39,6 +39,8 @@ var farm_target: FarmActionTarget
 var _farm_aim: Dictionary = {}    # this tick's farm action (spec 10.4) or {}
 var _farm_pos := Vector3.ZERO
 var build_ctl: BuildController
+var pending_craft: Dictionary = {}
+var hidden_body_regions: Array[StringName] = []
 var build_active := false
 var _target: Dictionary = {}     # current tool target: {"kind": &"voxel", "cell"} or {"kind": &"zone", "node"}
 var _safe_timer := 0.0
@@ -78,6 +80,7 @@ func _ready() -> void:
 	farm_target.top_level = true
 	add_child(farm_target)
 	EventBus.player_woke.connect(_on_woke)
+	EventBus.outfit_changed.connect(func(_slot): refresh_outfit())
 	last_safe_position = global_position
 	if GameSession.current:
 		GameSession.current.player = self
@@ -419,6 +422,34 @@ func _resolve_focus(prefer_tree: bool) -> Interactable:
 			lookup[cands.back()["key"]] = a
 	var best := InteractionResolver.best(cands)
 	return lookup.get(best.get("key", ""))
+
+
+const OUTFIT_NODES := {&"HEAD": "Head", &"TOP": "Top", &"BOTTOM": "Bottom", &"FEET": "Feet", &"ACCESSORY": "Accessory"}
+const OUTFIT_BOXES := {&"HEAD": [Vector3(0.45, 0.2, 0.45), 1.95], &"TOP": [Vector3(0.6, 0.6, 0.38), 1.35],
+	&"BOTTOM": [Vector3(0.58, 0.6, 0.36), 0.7], &"FEET": [Vector3(0.6, 0.15, 0.4), 0.08], &"ACCESSORY": [Vector3(0.62, 0.12, 0.42), 1.62]}
+
+
+## Placeholder outfit meshes on the OutfitSlots nodes, tinted by dye (spec 3.4, P4.8).
+func refresh_outfit() -> void:
+	var s := session()
+	if s == null:
+		return
+	var slots := visual.get_node_or_null("Rig/Skeleton3D/OutfitSlots")
+	for slot in OUTFIT_NODES:
+		var mi := slots.get_node_or_null(OUTFIT_NODES[slot]) as MeshInstance3D if slots else null
+		if mi == null:
+			continue
+		if s.outfit.model.slots[slot] == null:
+			mi.mesh = null
+			continue
+		var bm := BoxMesh.new()
+		bm.size = OUTFIT_BOXES[slot][0]
+		var mat := StandardMaterial3D.new()
+		mat.albedo_color = s.outfit.model.color_of(slot)
+		bm.material = mat
+		mi.mesh = bm
+		mi.position = Vector3(0, OUTFIT_BOXES[slot][1], 0)
+	hidden_body_regions = s.outfit.model.hidden_regions()
 
 
 func build_place_active() -> bool:

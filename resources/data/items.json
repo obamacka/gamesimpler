@@ -473,6 +473,74 @@
       "max_stack": 5,
       "base_value": 30,
       "piece_id": "piece_chest"
+    },
+    {
+      "id": "item_cotton_cloth",
+      "category": "FABRIC",
+      "max_stack": 99,
+      "base_value": 12
+    },
+    {
+      "id": "item_outfit_hat_straw",
+      "category": "OUTFIT",
+      "max_stack": 1,
+      "base_value": 30,
+      "has_instance_data": true,
+      "outfit_id": "outfit_hat_straw"
+    },
+    {
+      "id": "item_outfit_shirt_cotton",
+      "category": "OUTFIT",
+      "max_stack": 1,
+      "base_value": 45,
+      "has_instance_data": true,
+      "outfit_id": "outfit_shirt_cotton"
+    },
+    {
+      "id": "item_outfit_overalls",
+      "category": "OUTFIT",
+      "max_stack": 1,
+      "base_value": 50,
+      "has_instance_data": true,
+      "outfit_id": "outfit_overalls"
+    },
+    {
+      "id": "item_outfit_boots_rain",
+      "category": "OUTFIT",
+      "max_stack": 1,
+      "base_value": 35,
+      "has_instance_data": true,
+      "outfit_id": "outfit_boots_rain"
+    },
+    {
+      "id": "item_outfit_scarf",
+      "category": "OUTFIT",
+      "max_stack": 1,
+      "base_value": 20,
+      "has_instance_data": true,
+      "outfit_id": "outfit_scarf"
+    },
+    {
+      "id": "item_outfit_raincoat",
+      "category": "OUTFIT",
+      "max_stack": 1,
+      "base_value": 60,
+      "has_instance_data": true,
+      "outfit_id": "outfit_raincoat"
+    },
+    {
+      "id": "item_petacc_bandana",
+      "category": "PET_ACCESSORY",
+      "max_stack": 1,
+      "base_value": 25,
+      "has_instance_data": true
+    },
+    {
+      "id": "item_petacc_beanie",
+      "category": "PET_ACCESSORY",
+      "max_stack": 1,
+      "base_value": 35,
+      "has_instance_data": true
     }
   ]
 }

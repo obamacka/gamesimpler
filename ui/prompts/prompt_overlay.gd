@@ -9,6 +9,7 @@ const GLYPH := preload("res://ui/prompts/glyph_icon.tscn")
 var player: PlayerController
 var _box: VBoxContainer
 var _paused := false
+var _last_spoken := ""
 
 
 func _ready() -> void:
@@ -52,4 +53,10 @@ func _show(rows: Array) -> void:
 			g.visible = rows[i]["button"] != &"lock"
 			g.button = rows[i]["button"]
 			g.queue_redraw()
-			(row.get_child(1) as Label).text = ("[locked] " if rows[i]["button"] == &"lock" else "") + rows[i]["text"]
+			var text: String = ("[locked] " if rows[i]["button"] == &"lock" else "") + rows[i]["text"]
+			(row.get_child(1) as Label).text = text
+			(row.get_child(1) as Label).visible = Accessibility.prompt_labels() or rows[i]["button"] == &"lock"
+	var spoken := " / ".join(rows.map(func(r): return r["text"]))
+	if spoken != _last_spoken:
+		_last_spoken = spoken
+		Accessibility.speak(spoken)   # spec 5.10: prompt verbs read aloud when TTS is on

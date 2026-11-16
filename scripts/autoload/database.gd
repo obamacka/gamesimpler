@@ -17,6 +17,15 @@ var crops: Dictionary = {}           # StringName -> CropDef
 var plots: Dictionary = {}           # StringName -> PlotDef
 var pieces: Dictionary = {}          # StringName -> BuildPieceDef
 var build: Dictionary = {}           # config.json "build" (radii, angles, hold times, debug kit)
+var recipes: Dictionary = {}         # StringName -> RecipeDef
+var shops: Dictionary = {}           # StringName -> ShopDef
+var jobs: Dictionary = {}            # StringName -> JobDef
+var contracts: Dictionary = {}       # StringName -> ContractDef
+var blueprints: Dictionary = {}      # StringName -> BlueprintDef
+var outfits: Dictionary = {}         # StringName -> OutfitDef
+var dyes: Dictionary = {}            # StringName -> DyeDef
+var default_dyes: Array[StringName] = []
+var economy: Dictionary = {"sell_pct": 50, "starting_coins": 0}
 var farm := FarmConfig.new()
 var stamina := StaminaConfig.new()
 var discovery := DiscoveryConfig.new()
@@ -39,6 +48,7 @@ func load_all(dir: String) -> void:
 	items.clear(); materials.clear(); materials_by_voxel.clear(); loot_tables.clear()
 	treasure_tables.clear(); fruit_trees.clear(); timber_trees.clear(); zones.clear(); mail_templates.clear()
 	crops.clear(); plots.clear(); pieces.clear()
+	recipes.clear(); shops.clear(); jobs.clear(); contracts.clear(); blueprints.clear(); outfits.clear(); dyes.clear()
 	var items_json := _read(dir.path_join("items.json"))
 	for d in items_json.get("items", []):
 		var it := _item(d)
@@ -94,6 +104,7 @@ func load_all(dir: String) -> void:
 	for d in _read(dir.path_join("pieces.json")).get("pieces", []):
 		var p := _piece(d)
 		pieces[p.id] = p
+	_load_phase4(dir)
 	var home: Dictionary = world.get("home", {})
 	home_zone = StringName(home.get("zone_id", "zone_starter_cabin"))
 	home_bed_key = StringName(home.get("bed_key", "bed_01"))
@@ -151,7 +162,7 @@ func voxel_id_of(material_id: StringName) -> int:
 func templates_in_pool(pool_id: StringName) -> Array[MailTemplateDef]:
 	var out: Array[MailTemplateDef] = []
 	var ids := mail_templates.keys()
-	ids.sort()
+	ids.sort_custom(func(a, b): return String(a) < String(b))   # StringName sort is by address, not text
 	for id in ids:
 		if mail_templates[id].pool_id == pool_id:
 			out.append(mail_templates[id])
@@ -265,6 +276,58 @@ func validate() -> Array[String]:
 	for id in items:
 		if items[id].category == &"BUILD_PIECE" and not pieces.has(items[id].piece_id):
 			errors.append("build piece item %s places unknown piece" % id)
+		if items[id].category == &"OUTFIT" and not outfits.has(items[id].outfit_id):
+			errors.append("outfit item %s wears unknown outfit" % id)
+	errors.append_array(_validate_phase4())
+	return errors
+
+
+func _validate_phase4() -> Array[String]:
+	var errors: Array[String] = []
+	var known := func(id): return items.has(StringName(id))
+	for id in shops:
+		for e in shops[id].stock:
+			if not known.call(e["item"]):
+				errors.append("shop %s sells unknown item %s" % [id, e["item"]])
+	for id in recipes:
+		var r: RecipeDef = recipes[id]
+		if r.inputs.is_empty() or r.inputs.size() > 6 or r.outputs.is_empty() or r.outputs.size() > 3:
+			errors.append("recipe %s needs 1-6 inputs and 1-3 outputs" % id)
+		var seen := {}
+		for e in r.inputs + r.outputs:
+			if not known.call(e["item"]):
+				errors.append("recipe %s uses unknown item %s" % [id, e["item"]])
+		for e in r.inputs:
+			if seen.has(e["item"]):
+				errors.append("recipe %s repeats input %s" % [id, e["item"]])
+			seen[e["item"]] = true
+		if r.required_job != &"" and not jobs.has(r.required_job):
+			errors.append("recipe %s needs unknown job" % id)
+	for id in contracts:
+		var c: ContractDef = contracts[id]
+		if not jobs.has(c.job_id):
+			errors.append("contract %s has unknown job" % id)
+		if c.kind == &"BUILD_BLUEPRINT" and not blueprints.has(c.blueprint):
+			errors.append("contract %s has unknown blueprint" % id)
+		for e in c.items + c.provided:
+			if not known.call(e["item"]):
+				errors.append("contract %s uses unknown item %s" % [id, e["item"]])
+	for id in blueprints:
+		for p in blueprints[id].pieces:
+			if not pieces.has(p["piece_id"]):
+				errors.append("blueprint %s uses unknown piece" % id)
+	for id in outfits:
+		var o: OutfitDef = outfits[id]
+		if not (o.slot in OutfitDef.SLOTS):
+			errors.append("outfit %s has unknown slot" % id)
+		if o.default_dye_id != &"" and not dyes.has(o.default_dye_id):
+			errors.append("outfit %s default dye unknown" % id)
+	for id in dyes:
+		if dyes[id].name_key == "":
+			errors.append("dye %s has no name_key" % id)
+	for d in default_dyes:
+		if not dyes.has(d):
+			errors.append("default dye %s unknown" % d)
 	return errors
 
 
@@ -296,6 +359,7 @@ func _item(d: Dictionary) -> ItemDef:
 	it.block_material = StringName(d.get("block_material", ""))
 	it.seed_crop = StringName(d.get("seed_crop", ""))
 	it.piece_id = StringName(d.get("piece_id", ""))
+	it.outfit_id = StringName(d.get("outfit_id", ""))
 	if d.has("tool"):
 		var t := ToolData.new()
 		var td: Dictionary = d["tool"]
@@ -307,6 +371,58 @@ func _item(d: Dictionary) -> ItemDef:
 		f.stamina_restore = int(d["food"].get("stamina_restore", 0)); f.pet_happiness = int(d["food"].get("pet_happiness", 0))
 		it.food = f
 	return it
+
+
+static func _amounts(a: Array) -> Array:
+	return a.map(func(e): return {"item": StringName(e["item"]), "qty": int(e["qty"])})
+
+
+func _load_phase4(dir: String) -> void:
+	var eco := _read(dir.path_join("economy.json"))
+	economy = {"sell_pct": int(eco.get("economy", {}).get("sell_pct", 50)), "starting_coins": int(eco.get("economy", {}).get("starting_coins", 0))}
+	for d in eco.get("shops", []):
+		var sh := ShopDef.new()
+		sh.id = StringName(d["id"]); sh.buy_pct = int(d.get("buy_pct", 100)); sh.sell_pct = int(d.get("sell_pct", 100))
+		sh.stock = (d.get("stock", []) as Array).map(func(e): return {"item": StringName(e["item"]), "daily": int(e.get("daily", -1))})
+		shops[sh.id] = sh
+	for d in _read(dir.path_join("recipes.json")).get("recipes", []):
+		var r := RecipeDef.new()
+		r.id = StringName(d["id"]); r.station = StringName(d.get("station", "HAND"))
+		r.inputs = _amounts(d.get("inputs", [])); r.outputs = _amounts(d.get("outputs", []))
+		r.coin_cost = int(d.get("coin_cost", 0)); r.craft_time_sec = float(d.get("craft_time_sec", 0.0))
+		r.required_job = StringName(d.get("required_job", "")); r.required_rank = int(d.get("required_rank", 0))
+		r.unlock = StringName(d.get("unlock", "DEFAULT")); r.xp_reward = int(d.get("xp_reward", 0))
+		recipes[r.id] = r
+	var jj := _read(dir.path_join("jobs.json"))
+	for d in jj.get("jobs", []):
+		var j := JobDef.new()
+		j.id = StringName(d["id"])
+		j.ranks_xp.assign((d.get("ranks_xp", [0]) as Array).map(func(v): return int(v)))
+		jobs[j.id] = j
+	for d in jj.get("contracts", []):
+		var c := ContractDef.new()
+		c.id = StringName(d["id"]); c.job_id = StringName(d["job_id"]); c.kind = StringName(d["kind"])
+		c.blueprint = StringName(d.get("blueprint", "")); c.items = _amounts(d.get("items", [])); c.provided = _amounts(d.get("provided", []))
+		c.pay = int(d.get("pay", 0)); c.xp = int(d.get("xp", 0)); c.days = int(d.get("days", 3)); c.min_rank = int(d.get("min_rank", 0))
+		contracts[c.id] = c
+	for d in jj.get("blueprints", []):
+		var b := BlueprintDef.new()
+		b.id = StringName(d["id"]); b.zone_id = StringName(d["zone_id"]); b.site_min = _v3i(d["site_min"]); b.site_max = _v3i(d["site_max"])
+		b.pieces = (d.get("pieces", []) as Array).map(func(p): return {"piece_id": StringName(p["piece_id"]), "cell": _v3i(p["cell"]), "rot": int(p.get("rot", 0))})
+		blueprints[b.id] = b
+	var oo := _read(dir.path_join("outfits.json"))
+	for d in oo.get("outfits", []):
+		var o := OutfitDef.new()
+		o.id = StringName(d["id"]); o.item_id = StringName(d["item_id"]); o.slot = StringName(d["slot"])
+		o.color = Color.html(d.get("color", "#ffffff")); o.dyeable = bool(d.get("dyeable", true))
+		o.default_dye_id = StringName(d.get("default_dye_id", ""))
+		o.hide_body_regions.assign((d.get("hide_body_regions", []) as Array).map(func(v): return StringName(v)))
+		outfits[o.id] = o
+	for d in oo.get("dyes", []):
+		var y := DyeDef.new()
+		y.id = StringName(d["id"]); y.name_key = d.get("name_key", ""); y.color = Color.html(d.get("color", "#ffffff"))
+		dyes[y.id] = y
+	default_dyes.assign((oo.get("default_dyes", []) as Array).map(func(v): return StringName(v)))
 
 
 func _v3(a: Array) -> Vector3:

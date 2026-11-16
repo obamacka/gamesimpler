@@ -155,6 +155,22 @@
       ],
       "owned_from_start": false,
       "price_coins": 0
+    },
+    {
+      "id": "plot_meadow_east",
+      "zone_id": "zone_home_meadow",
+      "min_cell": [
+        20,
+        -24,
+        -10
+      ],
+      "max_cell": [
+        27,
+        48,
+        -3
+      ],
+      "owned_from_start": false,
+      "price_coins": 500
     }
   ]
 }

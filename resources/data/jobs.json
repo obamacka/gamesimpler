@@ -1,0 +1,140 @@
+{
+ "jobs": [
+  {
+   "id": "job_builder",
+   "ranks_xp": [
+    0,
+    100,
+    300,
+    700
+   ]
+  },
+  {
+   "id": "job_tailor",
+   "ranks_xp": [
+    0,
+    100,
+    300,
+    700
+   ]
+  }
+ ],
+ "contracts": [
+  {
+   "id": "contract_builder_shed",
+   "job_id": "job_builder",
+   "kind": "BUILD_BLUEPRINT",
+   "blueprint": "bp_garden_shed",
+   "pay": 120,
+   "xp": 60,
+   "days": 3,
+   "provided": [
+    {
+     "item": "item_piece_floor",
+     "qty": 2
+    },
+    {
+     "item": "item_piece_wall",
+     "qty": 2
+    }
+   ]
+  },
+  {
+   "id": "contract_tailor_cloth",
+   "job_id": "job_tailor",
+   "kind": "DELIVER_ITEMS",
+   "items": [
+    {
+     "item": "item_cotton_cloth",
+     "qty": 3
+    }
+   ],
+   "pay": 90,
+   "xp": 40,
+   "days": 3
+  },
+  {
+   "id": "contract_tailor_bandanas",
+   "job_id": "job_tailor",
+   "kind": "CRAFT_ITEMS",
+   "items": [
+    {
+     "item": "item_petacc_bandana",
+     "qty": 2
+    }
+   ],
+   "pay": 80,
+   "xp": 40,
+   "days": 4
+  },
+  {
+   "id": "contract_builder_fence",
+   "job_id": "job_builder",
+   "kind": "DELIVER_ITEMS",
+   "items": [
+    {
+     "item": "item_piece_fence",
+     "qty": 4
+    }
+   ],
+   "pay": 70,
+   "xp": 30,
+   "days": 4,
+   "min_rank": 1
+  }
+ ],
+ "blueprints": [
+  {
+   "id": "bp_garden_shed",
+   "zone_id": "zone_home_meadow",
+   "site_min": [
+    16,
+    -24,
+    6
+   ],
+   "site_max": [
+    22,
+    48,
+    12
+   ],
+   "pieces": [
+    {
+     "piece_id": "piece_floor",
+     "cell": [
+      2,
+      0,
+      2
+     ],
+     "rot": 0
+    },
+    {
+     "piece_id": "piece_floor",
+     "cell": [
+      3,
+      0,
+      2
+     ],
+     "rot": 0
+    },
+    {
+     "piece_id": "piece_wall",
+     "cell": [
+      2,
+      0,
+      2
+     ],
+     "rot": 0
+    },
+    {
+     "piece_id": "piece_wall",
+     "cell": [
+      3,
+      0,
+      2
+     ],
+     "rot": 0
+    }
+   ]
+  }
+ ]
+}

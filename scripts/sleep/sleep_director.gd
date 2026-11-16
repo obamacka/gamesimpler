@@ -26,6 +26,7 @@ func begin_sleep(reason: StringName) -> void:
 	_schedule_care_letter(reason, new_day)
 	if reason == &"exhausted":
 		session.exhaustion["count_total"] = int(session.exhaustion["count_total"]) + 1
+		session.jobs.extend_deadlines(new_day - 1)   # spec 8.4 B13
 	session.rollover.run(new_day)
 	await SceneRouter.change_zone(session.housing.home_zone, session.housing.home_bed_key)
 	session.stamina.refill()

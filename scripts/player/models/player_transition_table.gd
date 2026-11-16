@@ -15,6 +15,7 @@ const MINE := &"mine"
 const INTERACT := &"interact"
 const BUILD := &"build"
 const SIT := &"sit"
+const CRAFT := &"craft"
 
 const MOVE_THRESHOLD := 0.2
 const SOFT_LAND_HEIGHT := 4.0
@@ -75,6 +76,8 @@ static func next(state: StringName, f: InputFrame, c: PlayerContext) -> Transiti
 		return _build(f, c)
 	if state == SIT:
 		return _sit(f, c)
+	if state == CRAFT:
+		return _craft(f, c)
 	return Transition.new()
 
 
@@ -213,6 +216,15 @@ static func _build(f: InputFrame, c: PlayerContext) -> Transition:
 		return Transition.new(IDLE, FX_BUILD_EXIT)
 	if (f.jump_pressed or c.jump_buffered) and c.headroom_ok:
 		return Transition.new(JUMP, FX_GROUND_JUMP)
+	return Transition.new()
+
+
+## Craft (spec 4.2): done -> Idle; move or duck cancels (nothing consumed).
+static func _craft(f: InputFrame, c: PlayerContext) -> Transition:
+	if c.craft_done:
+		return Transition.new(_moving_state(c))
+	if f.duck_pressed or c.move_len > MOVE_THRESHOLD:
+		return Transition.new(IDLE, FX_STAND)
 	return Transition.new()
 
 

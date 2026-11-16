@@ -20,6 +20,10 @@ var housing: HousingService
 var sleep: SleepDirector
 var farm: FarmService
 var build: BuildService
+var economy: EconomyService
+var jobs: JobService
+var outfit: OutfitService
+var storage: StorageService
 var hotbar := HotbarModel.new()
 var exhaustion := {"last_snack_day": 0, "count_total": 0}
 var zone_root: Node3D
@@ -48,12 +52,24 @@ func _build(world: IVoxelWorld) -> void:
 	sleep = _add(SleepDirector.new(), "SleepDirector")
 	farm = _add(FarmService.new(), "FarmService")
 	build = _add(BuildService.new(), "BuildService")
+	economy = _add(EconomyService.new(), "EconomyService")
+	jobs = _add(JobService.new(), "JobService")
+	outfit = _add(OutfitService.new(), "OutfitService")
+	storage = _add(StorageService.new(), "StorageService")
 	terrain.setup(self, world)
 	world_state.setup(self)
 	mail.setup(self)
 	sleep.setup(self)
 	farm.setup(self)
 	build.setup(self)
+	economy.setup(self)
+	jobs.setup(self)
+	outfit.setup(self)
+	storage.setup(self)
+	housing.extra_plots = func(z: StringName) -> Array: return jobs.site_plots(z)
+	rollover.register(&"restock", func(day):
+		economy.restock(day)
+		jobs.expire_due(day))
 	rollover.register(&"clock", func(day): GameClock.model.set_morning(day))
 	rollover.register(&"world_respawn", func(day): world_state.respawn_due(day))
 	rollover.register(&"terrain_reset", func(day): terrain.daily_reset(day))
@@ -89,6 +105,9 @@ func new_game() -> void:
 		toolbelt.model.grant(t)
 	stamina.model.configure(Database.stamina)
 	farm.model.refill()
+	wallet.model.coins = int(Database.economy["starting_coins"])
+	for d in Database.default_dyes:
+		unlocks.model.grant(&"DYE", d)
 	GameClock.model.set_morning(1)
 	var welcome: MailTemplateDef = Database.mail_templates.get(&"mail_tpl_welcome")
 	if welcome:
@@ -113,10 +132,10 @@ func to_dict() -> Dictionary:
 		"schema_version": 1,
 		"rng": rng.to_dict(),
 		"clock": GameClock.model.to_dict(),
-		"player": stamina.model.to_dict().merged({"home": housing.to_dict(), "hotbar_index": hotbar.selected}),
+		"player": stamina.model.to_dict().merged({"home": housing.to_dict(), "hotbar_index": hotbar.selected, "outfit": outfit.model.to_dict()}),
 		"exhaustion": exhaustion.duplicate(),
 		"toolbelt": toolbelt.model.to_dict(),
-		"inventory": inventory.model.to_dict().merged({"hotbar_refs": hotbar.refs.duplicate()}),
+		"inventory": inventory.model.to_dict().merged({"hotbar_refs": hotbar.refs.duplicate(), "containers": storage.to_dict()}),
 		"wallet": wallet.model.to_dict(),
 		"unlocks": unlocks.model.to_dict(),
 		"terrain": {"damaged": terrain.dig.to_dict()},
@@ -126,6 +145,8 @@ func to_dict() -> Dictionary:
 		"farm": farm.to_dict(),
 		"housing": housing.plots_to_dict(),
 		"build": build.to_dict(),
+		"jobs": jobs.to_dict(),
+		"shops": economy.stock_to_dict(),
 	}
 
 
@@ -147,5 +168,10 @@ func from_dict(d: Dictionary) -> void:
 	farm.from_dict(d.get("farm", {}))
 	housing.plots_from_dict(d.get("housing", {}))
 	build.from_dict(d.get("build", {}))
+	jobs.from_dict(d.get("jobs", {}))
+	if d.has("shops"):
+		economy.stock_from_dict(d["shops"])
+	outfit.model.from_dict(d.get("player", {}).get("outfit", {}))
+	storage.from_dict(d.get("inventory", {}).get("containers", {}))
 	hotbar.from_dict({"hotbar_refs": d.get("inventory", {}).get("hotbar_refs", hotbar.refs),
 		"hotbar_index": d.get("player", {}).get("hotbar_index", 0)})

@@ -30,3 +30,4 @@ var interact_handoff: StringName = &""
 var in_build_zone := false
 var build_active := false
 var build_fastening := false
+var craft_done := false

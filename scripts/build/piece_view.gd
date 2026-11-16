@@ -76,6 +76,12 @@ func interaction_spec(player: Node, _forage: bool, alt: bool) -> InteractionSpec
 			&"TOGGLE":
 				if not alt:
 					return InteractionSpec.new(&"TOGGLE", 0.3)
+			&"STORAGE":
+				if not alt:
+					var st := InteractionSpec.new(&"STORAGE", 0.2)
+					st.opens_menu = &"storage"
+					st.menu_args = {"uid": uid}
+					return st
 			&"SLEEP":
 				var spec := InteractionSpec.new(&"SET_HOME" if alt else &"BED", 0.0)
 				spec.opens_menu = &"confirm"

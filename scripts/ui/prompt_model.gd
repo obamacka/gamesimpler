@@ -7,7 +7,9 @@ extends RefCounted
 const VERBS := {
 	&"FORAGE": "Pick", &"CHEST": "Open", &"PICKUP": "Pick up", &"BED": "Sleep",
 	&"MAILBOX": "Open mail", &"MINE_ENTRANCE": "Enter", &"TALK": "Talk", &"GIFT": "Gift",
-	&"HARVEST": "Harvest", &"REFILL": "Refill",
+	&"HARVEST": "Harvest", &"REFILL": "Refill", &"SHOP": "Shop", &"JOB_BOARD": "Jobs", &"WORKBENCH": "Craft",
+	&"TAILOR_BENCH": "Sew", &"WARDROBE": "Change clothes", &"PLOT_SIGN": "Look", &"SIT": "Sit", &"TOGGLE": "Switch",
+	&"STORAGE": "Open", &"SET_HOME": "Set home",
 }
 ## Farm rows for RT (spec 10.4), keyed by target_kind.
 const FARM_TEXT := {

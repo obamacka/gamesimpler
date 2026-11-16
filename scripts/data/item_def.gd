@@ -17,3 +17,4 @@ extends Resource
 @export var block_material: StringName = &""   # BLOCK items: the VoxelMaterialDef they place
 @export var seed_crop: StringName = &""        # SEED items: the CropDef they plant
 @export var piece_id: StringName = &""         # BUILD_PIECE items: the BuildPieceDef they place
+@export var outfit_id: StringName = &""        # OUTFIT items: the OutfitDef they wear as

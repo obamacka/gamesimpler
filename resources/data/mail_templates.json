@@ -82,6 +82,22 @@
           "qty": 3
         }
       ]
+    },
+    {
+      "id": "mail_tpl_job_materials",
+      "sender_id": "npc_foreman",
+      "kind": "PACKAGE",
+      "subject_key": "Materials for your job",
+      "body_key": "Here is what you need. Build it at the marked site!",
+      "attachments": []
+    },
+    {
+      "id": "mail_tpl_job_receipt",
+      "sender_id": "system",
+      "kind": "RECEIPT",
+      "subject_key": "Job done!",
+      "body_key": "Thank you for your great work.",
+      "attachments": []
     }
   ]
 }

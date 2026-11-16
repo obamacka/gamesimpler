@@ -4,6 +4,7 @@
 [ext_resource type="Script" path="res://scripts/world/bed.gd" id="2_bed"]
 [ext_resource type="Script" path="res://scripts/world/mailbox.gd" id="3_mail"]
 [ext_resource type="Script" path="res://scripts/world/mine_entrance.gd" id="4_door"]
+[ext_resource type="Script" path="res://scripts/world/menu_station.gd" id="5_station"]
 
 [sub_resource type="BoxShape3D" id="floor_shape"]
 size = Vector3(12, 1, 12)
@@ -84,3 +85,10 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 5.6)
 script = ExtResource("4_door")
 target_zone = &"zone_home_meadow"
 target_spawn = &"spawn_from_cabin"
+
+[node name="Wardrobe" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.5, 0, -4.5)
+script = ExtResource("5_station")
+kind = &"WARDROBE"
+color = Color(0.5, 0.35, 0.25, 1)
+size = Vector3(1.2, 2.0, 0.6)

@@ -27,6 +27,16 @@ const DEFAULTS := {
 		"text_scale": 1.25,
 		"reduce_motion": false,
 		"tts_enabled": false,
+		"tts_rate": 1.0,
+	},
+	"audio": {
+		"master": 1.0,
+		"music": 0.8,
+		"effects": 1.0,
+	},
+	"video": {
+		"fullscreen": false,
+		"vsync": true,
 	},
 }
 

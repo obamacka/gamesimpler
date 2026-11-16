@@ -1,0 +1,212 @@
+{
+ "recipes": [
+  {
+   "id": "recipe_cotton_cloth",
+   "station": "TAILOR_BENCH",
+   "inputs": [
+    {
+     "item": "item_cotton",
+     "qty": 2
+    }
+   ],
+   "outputs": [
+    {
+     "item": "item_cotton_cloth",
+     "qty": 1
+    }
+   ],
+   "craft_time_sec": 2.0,
+   "required_job": "job_tailor",
+   "xp_reward": 10,
+   "unlock": "DEFAULT"
+  },
+  {
+   "id": "recipe_shirt_cotton",
+   "station": "TAILOR_BENCH",
+   "inputs": [
+    {
+     "item": "item_cotton_cloth",
+     "qty": 3
+    }
+   ],
+   "outputs": [
+    {
+     "item": "item_outfit_shirt_cotton",
+     "qty": 1
+    }
+   ],
+   "craft_time_sec": 3.0,
+   "required_job": "job_tailor",
+   "xp_reward": 20,
+   "unlock": "DEFAULT"
+  },
+  {
+   "id": "recipe_raincoat",
+   "station": "TAILOR_BENCH",
+   "inputs": [
+    {
+     "item": "item_cotton_cloth",
+     "qty": 4
+    }
+   ],
+   "outputs": [
+    {
+     "item": "item_outfit_raincoat",
+     "qty": 1
+    }
+   ],
+   "craft_time_sec": 3.0,
+   "required_job": "job_tailor",
+   "required_rank": 1,
+   "xp_reward": 30,
+   "unlock": "JOB_RANK"
+  },
+  {
+   "id": "recipe_petacc_bandana",
+   "station": "TAILOR_BENCH",
+   "inputs": [
+    {
+     "item": "item_cotton_cloth",
+     "qty": 1
+    }
+   ],
+   "outputs": [
+    {
+     "item": "item_petacc_bandana",
+     "qty": 1
+    }
+   ],
+   "craft_time_sec": 2.0,
+   "required_job": "job_tailor",
+   "xp_reward": 10,
+   "unlock": "DEFAULT"
+  },
+  {
+   "id": "recipe_petacc_beanie",
+   "station": "TAILOR_BENCH",
+   "inputs": [
+    {
+     "item": "item_cotton_cloth",
+     "qty": 2
+    }
+   ],
+   "outputs": [
+    {
+     "item": "item_petacc_beanie",
+     "qty": 1
+    }
+   ],
+   "craft_time_sec": 2.0,
+   "required_job": "job_tailor",
+   "xp_reward": 15,
+   "unlock": "DEFAULT"
+  },
+  {
+   "id": "recipe_piece_floor",
+   "station": "WORKBENCH",
+   "inputs": [
+    {
+     "item": "item_wood",
+     "qty": 2
+    }
+   ],
+   "outputs": [
+    {
+     "item": "item_piece_floor",
+     "qty": 1
+    }
+   ],
+   "craft_time_sec": 1.5,
+   "required_job": "job_builder",
+   "xp_reward": 5,
+   "unlock": "DEFAULT"
+  },
+  {
+   "id": "recipe_piece_wall",
+   "station": "WORKBENCH",
+   "inputs": [
+    {
+     "item": "item_wood",
+     "qty": 3
+    }
+   ],
+   "outputs": [
+    {
+     "item": "item_piece_wall",
+     "qty": 1
+    }
+   ],
+   "craft_time_sec": 1.5,
+   "required_job": "job_builder",
+   "xp_reward": 5,
+   "unlock": "DEFAULT"
+  },
+  {
+   "id": "recipe_piece_chair",
+   "station": "WORKBENCH",
+   "inputs": [
+    {
+     "item": "item_wood",
+     "qty": 2
+    }
+   ],
+   "outputs": [
+    {
+     "item": "item_piece_chair",
+     "qty": 1
+    }
+   ],
+   "craft_time_sec": 2.0,
+   "required_job": "job_builder",
+   "xp_reward": 8,
+   "unlock": "DEFAULT"
+  },
+  {
+   "id": "recipe_piece_lamp",
+   "station": "WORKBENCH",
+   "inputs": [
+    {
+     "item": "item_wood",
+     "qty": 1
+    },
+    {
+     "item": "item_copper_ore",
+     "qty": 1
+    }
+   ],
+   "outputs": [
+    {
+     "item": "item_piece_lamp",
+     "qty": 1
+    }
+   ],
+   "craft_time_sec": 2.0,
+   "coin_cost": 5,
+   "xp_reward": 8,
+   "unlock": "BLUEPRINT"
+  },
+  {
+   "id": "recipe_berry_tart",
+   "station": "HAND",
+   "inputs": [
+    {
+     "item": "item_apple",
+     "qty": 2
+    },
+    {
+     "item": "item_strawberry",
+     "qty": 1
+    }
+   ],
+   "outputs": [
+    {
+     "item": "item_berry_tart",
+     "qty": 1
+    }
+   ],
+   "craft_time_sec": 0.0,
+   "xp_reward": 0,
+   "unlock": "DEFAULT"
+  }
+ ]
+}

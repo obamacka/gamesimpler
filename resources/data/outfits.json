@@ -1,0 +1,113 @@
+{
+ "outfits": [
+  {
+   "id": "outfit_hat_straw",
+   "item_id": "item_outfit_hat_straw",
+   "slot": "HEAD",
+   "color": "#d8c070",
+   "dyeable": true,
+   "default_dye_id": "dye_sun",
+   "hide_body_regions": [
+    "HAIR"
+   ]
+  },
+  {
+   "id": "outfit_shirt_cotton",
+   "item_id": "item_outfit_shirt_cotton",
+   "slot": "TOP",
+   "color": "#f0f0f0",
+   "dyeable": true,
+   "default_dye_id": "dye_snow",
+   "hide_body_regions": [
+    "TORSO"
+   ]
+  },
+  {
+   "id": "outfit_raincoat",
+   "item_id": "item_outfit_raincoat",
+   "slot": "TOP",
+   "color": "#f0d040",
+   "dyeable": true,
+   "default_dye_id": "dye_sun",
+   "hide_body_regions": [
+    "TORSO",
+    "ARMS"
+   ]
+  },
+  {
+   "id": "outfit_overalls",
+   "item_id": "item_outfit_overalls",
+   "slot": "BOTTOM",
+   "color": "#4060a0",
+   "dyeable": true,
+   "default_dye_id": "dye_sky",
+   "hide_body_regions": [
+    "LEGS"
+   ]
+  },
+  {
+   "id": "outfit_boots_rain",
+   "item_id": "item_outfit_boots_rain",
+   "slot": "FEET",
+   "color": "#c03030",
+   "dyeable": true,
+   "default_dye_id": "dye_berry",
+   "hide_body_regions": [
+    "FEET"
+   ]
+  },
+  {
+   "id": "outfit_scarf",
+   "item_id": "item_outfit_scarf",
+   "slot": "ACCESSORY",
+   "color": "#80b060",
+   "dyeable": true,
+   "default_dye_id": "dye_moss",
+   "hide_body_regions": []
+  }
+ ],
+ "dyes": [
+  {
+   "id": "dye_moss",
+   "name_key": "Moss green",
+   "color": "#5f7f3a"
+  },
+  {
+   "id": "dye_sky",
+   "name_key": "Sky blue",
+   "color": "#6fa8dc"
+  },
+  {
+   "id": "dye_sun",
+   "name_key": "Sunny yellow",
+   "color": "#f1c232"
+  },
+  {
+   "id": "dye_berry",
+   "name_key": "Berry red",
+   "color": "#c0392b"
+  },
+  {
+   "id": "dye_snow",
+   "name_key": "Snow white",
+   "color": "#f4f4f4"
+  },
+  {
+   "id": "dye_coal",
+   "name_key": "Coal black",
+   "color": "#333333"
+  },
+  {
+   "id": "dye_plum",
+   "name_key": "Plum purple",
+   "color": "#8e44ad"
+  }
+ ],
+ "default_dyes": [
+  "dye_moss",
+  "dye_sky",
+  "dye_sun",
+  "dye_berry",
+  "dye_snow"
+ ]
+}

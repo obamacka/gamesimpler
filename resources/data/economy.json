@@ -1,0 +1,133 @@
+{
+ "economy": {
+  "sell_pct": 50,
+  "starting_coins": 150
+ },
+ "shops": [
+  {
+   "id": "shop_general",
+   "buy_pct": 100,
+   "sell_pct": 100,
+   "stock": [
+    {
+     "item": "item_seed_carrot",
+     "daily": 20
+    },
+    {
+     "item": "item_seed_sunflower",
+     "daily": 10
+    },
+    {
+     "item": "item_seed_pumpkin",
+     "daily": 6
+    },
+    {
+     "item": "item_seed_cotton",
+     "daily": 10
+    },
+    {
+     "item": "item_seed_strawberry",
+     "daily": 6
+    },
+    {
+     "item": "item_seed_tomato",
+     "daily": 6
+    },
+    {
+     "item": "item_sprinkler",
+     "daily": 2
+    },
+    {
+     "item": "item_honey_bun",
+     "daily": 5
+    }
+   ]
+  },
+  {
+   "id": "shop_builder",
+   "buy_pct": 100,
+   "sell_pct": 100,
+   "stock": [
+    {
+     "item": "item_hammer_basic",
+     "daily": -1
+    },
+    {
+     "item": "item_screwdriver_basic",
+     "daily": -1
+    },
+    {
+     "item": "item_wood",
+     "daily": 40
+    },
+    {
+     "item": "item_piece_floor",
+     "daily": 20
+    },
+    {
+     "item": "item_piece_wall",
+     "daily": 20
+    },
+    {
+     "item": "item_piece_wall_door",
+     "daily": 4
+    },
+    {
+     "item": "item_piece_window_wall",
+     "daily": 4
+    },
+    {
+     "item": "item_piece_roof",
+     "daily": 20
+    },
+    {
+     "item": "item_piece_fence",
+     "daily": 10
+    },
+    {
+     "item": "item_piece_chair",
+     "daily": 2
+    },
+    {
+     "item": "item_piece_table",
+     "daily": 2
+    },
+    {
+     "item": "item_piece_bed",
+     "daily": 1
+    },
+    {
+     "item": "item_piece_chest",
+     "daily": 2
+    }
+   ]
+  },
+  {
+   "id": "shop_tailor",
+   "buy_pct": 110,
+   "sell_pct": 100,
+   "stock": [
+    {
+     "item": "item_cotton_cloth",
+     "daily": 10
+    },
+    {
+     "item": "item_outfit_hat_straw",
+     "daily": 1
+    },
+    {
+     "item": "item_outfit_overalls",
+     "daily": 1
+    },
+    {
+     "item": "item_outfit_boots_rain",
+     "daily": 1
+    },
+    {
+     "item": "item_outfit_scarf",
+     "daily": 1
+    }
+   ]
+  }
+ ]
+}

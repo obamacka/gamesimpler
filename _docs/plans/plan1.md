@@ -300,36 +300,36 @@ Integration:
 **Spec:** 1.5, 1.8, 3.1, 3.2, 3.4 (jobs, shops, outfits, plots), 4.2 (Craft), 4.5 (menus), 5 (all), 3.8, 5.10.
 
 ### P4 resources
-- [ ] **P4.1** `EconomyConfig.tres`, `ShopDef`s (general store with seeds and the sprinkler, builder supply, tailor), cotton -> cotton cloth Tailor recipe, item `base_value`s, `RecipeDef`s (workbench, tailor bench, including pet accessory outputs used in Phase 5), `JobDef`s and `ContractDef`s (Builder blueprints, Tailor orders), `BlueprintDef`s and job-site protection volumes, `PlotDef`s with prices, `OutfitDef`s (placeholder meshes per slot), dye id list (palette content in Phase 6).
+- [x] **P4.1** `EconomyConfig.tres`, `ShopDef`s (general store with seeds and the sprinkler, builder supply, tailor), cotton -> cotton cloth Tailor recipe, item `base_value`s, `RecipeDef`s (workbench, tailor bench, including pet accessory outputs used in Phase 5), `JobDef`s and `ContractDef`s (Builder blueprints, Tailor orders), `BlueprintDef`s and job-site protection volumes, `PlotDef`s with prices, `OutfitDef`s (placeholder meshes per slot), dye id list (palette content in Phase 6).
 
 ### P4 scripts
-- [ ] **P4.2 `WalletModel`** (int coins, never negative) and `WalletService`.
-- [ ] **P4.3 `TransactionCoordinator`**: `try_buy`, `try_sell`, `try_buy_plot`, `try_craft`; validate, then mutate, then emit; failure injection seam for tests.
-- [ ] **P4.4 `EconomyService`**: pricing (buy rounded up, sell rounded down), daily restock registered in `DayRollover`.
-- [ ] **P4.5 Crafting:** `CraftModel`, `Craft` state (timed in world, cancel on move/duck, nothing consumed on cancel), crafting menu with missing-input display and handoff.
-- [ ] **P4.6 Jobs:** `JobModel` (ranks, XP thresholds), `JobService` (accept, submit, abandon; BUILD_BLUEPRINT completion from `piece_fastened` matching blueprint cells; DELIVER_ITEMS; CRAFT_ITEMS; pay through the coordinator; receipt and provided-materials mail via MailService; deadline extension on exhaustion).
-- [ ] **P4.7 Housing:** plot purchase via `PlotSign` and `house_purchase` dialog; deed grants build zone.
-- [ ] **P4.8 Outfits:** `OutfitModel` (slots, `hide_body_regions` mask, dye ids), Wardrobe interactable, `outfit_customizer` menu with SubViewport preview (WHEN_PAUSED turntable), dye picker by name + swatch.
-- [ ] **P4.9 Menus:** `inventory` (Backpack, Outfit, Jobs, Map placeholder; Pet and Collection tabs stubbed), `shop`, `job_board`, `crafting`, `house_purchase`, `pause_menu` (Resume, Go Home, Save/Load disabled until Phase 6, Settings, Quit), `go_home_confirm`, `mine_entrance_confirm`, `settings` (Controls with `rebind_capture`, Assist, Accessibility, Audio, Video), storage chest container.
-- [ ] **P4.10 MenuStack complete:** global keys (`pause_menu`, `ui_cancel`, `open_inventory`) via `_unhandled_input`; mouse mode handling; focus graph validator (debug); focus recovery on `gui_focus_changed(null)`; `ScrollContainer.follow_focus`; mouse hover moves focus.
-- [ ] **P4.11 Auto-pause triggers:** focus-out opens `pause_menu`; joypad loss adds `&"device_lost"` and shows `DeviceBanner`; reconnect releases.
-- [ ] **P4.12 Accessibility runtime:** text scale, reduce motion, palettes, prompt labels, TTS (`DisplayServer.tts_speak` for prompt verbs when enabled), hold durations.
-- [ ] **P4.13 Serialization:** Wallet, Economy stock, Jobs, Housing plots, Outfit equipment, Settings additions.
+- [x] **P4.2 `WalletModel`** (int coins, never negative) and `WalletService`.
+- [x] **P4.3 `TransactionCoordinator`**: `try_buy`, `try_sell`, `try_buy_plot`, `try_craft`; validate, then mutate, then emit; failure injection seam for tests.
+- [x] **P4.4 `EconomyService`**: pricing (buy rounded up, sell rounded down), daily restock registered in `DayRollover`.
+- [x] **P4.5 Crafting:** `CraftModel`, `Craft` state (timed in world, cancel on move/duck, nothing consumed on cancel), crafting menu with missing-input display and handoff.
+- [x] **P4.6 Jobs:** `JobModel` (ranks, XP thresholds), `JobService` (accept, submit, abandon; BUILD_BLUEPRINT completion from `piece_fastened` matching blueprint cells; DELIVER_ITEMS; CRAFT_ITEMS; pay through the coordinator; receipt and provided-materials mail via MailService; deadline extension on exhaustion).
+- [x] **P4.7 Housing:** plot purchase via `PlotSign` and `house_purchase` dialog; deed grants build zone.
+- [x] **P4.8 Outfits:** `OutfitModel` (slots, `hide_body_regions` mask, dye ids), Wardrobe interactable, `outfit_customizer` menu with SubViewport preview (WHEN_PAUSED turntable), dye picker by name + swatch.
+- [x] **P4.9 Menus:** `inventory` (Backpack, Outfit, Jobs, Map placeholder; Pet and Collection tabs stubbed), `shop`, `job_board`, `crafting`, `house_purchase`, `pause_menu` (Resume, Go Home, Save/Load disabled until Phase 6, Settings, Quit), `go_home_confirm`, `mine_entrance_confirm`, `settings` (Controls with `rebind_capture`, Assist, Accessibility, Audio, Video), storage chest container.
+- [x] **P4.10 MenuStack complete:** global keys (`pause_menu`, `ui_cancel`, `open_inventory`) via `_unhandled_input`; mouse mode handling; focus graph validator (debug); focus recovery on `gui_focus_changed(null)`; `ScrollContainer.follow_focus`; mouse hover moves focus.
+- [x] **P4.11 Auto-pause triggers:** focus-out opens `pause_menu`; joypad loss adds `&"device_lost"` and shows `DeviceBanner`; reconnect releases.
+- [x] **P4.12 Accessibility runtime:** text scale, reduce motion, palettes, prompt labels, TTS (`DisplayServer.tts_speak` for prompt verbs when enabled), hold durations.
+- [x] **P4.13 Serialization:** Wallet, Economy stock, Jobs, Housing plots, Outfit equipment, Settings additions.
 
 ### P4 tests
 Unit:
-- [ ] **P4.14** `economy/test_wallet_model.gd` (int only; debit refused below 0; credit/debit events), `economy/test_transaction_coordinator.gd` (each command all-or-nothing with failure injected at every step: no partial inventory or wallet change; buy needs coins and space; sell removes exactly; craft simulates removal before checking output space; plot purchase grants deed only with debit).
-- [ ] **P4.15** `economy/test_currency_accretion.gd`: a scripted sequence (sell ore, job pay, chest coins from Phase 2 pool, buy) yields the exact expected wallet total; rounding rules at boundaries; no floats in currency paths.
-- [ ] **P4.16** `economy/test_pricing.gd`, `crafting/test_craft_model.gd`, `jobs/test_job_model.gd` (XP thresholds, blueprint completion only when all pieces FASTENED, deadline extension), `outfit/test_outfit_model.gd`, `inventory/test_inventory_transactions.gd` (move, split, merge, container transfer, full container refusals), `save/test_phase4_round_trip.gd`.
+- [x] **P4.14** `economy/test_wallet_model.gd` (int only; debit refused below 0; credit/debit events), `economy/test_transaction_coordinator.gd` (each command all-or-nothing with failure injected at every step: no partial inventory or wallet change; buy needs coins and space; sell removes exactly; craft simulates removal before checking output space; plot purchase grants deed only with debit).
+- [x] **P4.15** `economy/test_currency_accretion.gd`: a scripted sequence (sell ore, job pay, chest coins from Phase 2 pool, buy) yields the exact expected wallet total; rounding rules at boundaries; no floats in currency paths.
+- [x] **P4.16** `economy/test_pricing.gd`, `crafting/test_craft_model.gd`, `jobs/test_job_model.gd` (XP thresholds, blueprint completion only when all pieces FASTENED, deadline extension), `outfit/test_outfit_model.gd`, `inventory/test_inventory_transactions.gd` (move, split, merge, container transfer, full container refusals), `save/test_phase4_round_trip.gd`.
 
 Integration:
-- [ ] **P4.17** `test_menu_pause_flow.gd`: pushing any menu emits `game_paused` exactly once and sets `get_tree().paused`; nested menus keep paused; popping the last emits `game_resumed` once; `pause_menu` handler opens/close_all; `ui_cancel` pops; HUD frozen while menus process; menu instances are `WHEN_PAUSED`; resume guard prevents the closing A press from jumping; focus restored to the previous control; push refused during transition; Go Home from pause menu works.
-- [ ] **P4.18** `test_auto_pause_triggers.gd`: `NOTIFICATION_APPLICATION_FOCUS_OUT` delivered to the handler opens `pause_menu`; joypad loss via the `InputService` handler adds `&"device_lost"`, shows the banner, and reconnect releases it.
-- [ ] **P4.19** `test_shop_and_craft.gd`: buy and sell through the shop menu controller methods; insufficient coins or space shows a reason and changes nothing; timed craft completes in world, cancel consumes nothing.
-- [ ] **P4.20** `test_job_contracts.gd`: Builder contract: accept, provided materials arrive by mail next day, build and fasten blueprint pieces, `contract_completed`, pay credited, receipt mail, XP; Tailor order: craft and deliver; abandon returns nothing lost.
-- [ ] **P4.21** `test_stamina_exhaustion.gd`: add spec case **B13** (deadline extension).
-- [ ] **P4.22** `test_wardrobe.gd`: equip changes slot mesh; dye id applied; preview animates while paused; cancel leaves equipment unchanged.
-- [ ] **P4.23** `test_settings_rebind.gd`: `rebind_capture` controller methods apply a new event, refuse a same-context conflict, refuse unbinding locked actions, and persist to `settings.cfg` in `user://test_tmp/`.
+- [x] **P4.17** `test_menu_pause_flow.gd`: pushing any menu emits `game_paused` exactly once and sets `get_tree().paused`; nested menus keep paused; popping the last emits `game_resumed` once; `pause_menu` handler opens/close_all; `ui_cancel` pops; HUD frozen while menus process; menu instances are `WHEN_PAUSED`; resume guard prevents the closing A press from jumping; focus restored to the previous control; push refused during transition; Go Home from pause menu works.
+- [x] **P4.18** `test_auto_pause_triggers.gd`: `NOTIFICATION_APPLICATION_FOCUS_OUT` delivered to the handler opens `pause_menu`; joypad loss via the `InputService` handler adds `&"device_lost"`, shows the banner, and reconnect releases it.
+- [x] **P4.19** `test_shop_and_craft.gd`: buy and sell through the shop menu controller methods; insufficient coins or space shows a reason and changes nothing; timed craft completes in world, cancel consumes nothing.
+- [x] **P4.20** `test_job_contracts.gd`: Builder contract: accept, provided materials arrive by mail next day, build and fasten blueprint pieces, `contract_completed`, pay credited, receipt mail, XP; Tailor order: craft and deliver; abandon returns nothing lost.
+- [x] **P4.21** `test_stamina_exhaustion.gd`: add spec case **B13** (deadline extension).
+- [x] **P4.22** `test_wardrobe.gd`: equip changes slot mesh; dye id applied; preview animates while paused; cancel leaves equipment unchanged.
+- [x] **P4.23** `test_settings_rebind.gd`: `rebind_capture` controller methods apply a new event, refuse a same-context conflict, refuse unbinding locked actions, and persist to `settings.cfg` in `user://test_tmp/`.
 
 ### P4 manual checklist
 - [ ] Every menu fully navigable by pad only, including settings and rebinding; no dead-end focus.

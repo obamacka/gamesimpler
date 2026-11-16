@@ -2,7 +2,7 @@
 
 | Field | Value |
 |---|---|
-| Spec | `_docs/specs/spec1.md` rev 3.6 |
+| Spec | `_docs/specs/spec1.md` rev 3.7 |
 | Plan | `_docs/plans/plan1.md` |
 | Active phase | Phases 3 to 5 started on owner request before the Phase 1, 2 and 2B gates passed (manual checklists open); Phase 0 hardware checks pending |
 | Last updated | 2026-11-16 |
@@ -36,7 +36,7 @@ Status values: `Not started`, `In progress`, `Blocked`, `Done`.
 | 2 | Mining, Foraging, Stamina Loop, Auto-Tool | In progress: all automated tasks done, manual checklist and min-spec performance check pending | |
 | 2B | Farming | In progress: all automated tasks done, manual checklist pending | |
 | 3 | Magnetic Grid Building, Screw/Hammer Mini-Games | In progress: automated tasks done except P3.8 icons; manual checklist pending | |
-| 4 | Economy, Jobs, Wardrobe UI, Game Pause | Not started | |
+| 4 | Economy, Jobs, Wardrobe UI, Game Pause | In progress: automated tasks done; manual checklist pending | |
 | 5 | NPCs, Mail, Pet Companion | Not started | |
 | 6 | Museum, Collection Book, Dye Painting, Save/Load | Not started | |
 
@@ -97,11 +97,11 @@ Status values: `Not started`, `In progress`, `Blocked`, `Done`.
 ### Phase 4
 | Task | Status | Date | Commit | Notes |
 |---|---|---|---|---|
-| P4.1 Resources | Not started | | | |
-| P4.2 to P4.13 Scripts | Not started | | | |
-| P4.14 to P4.16 Unit suites | Not started | | | |
-| P4.17 to P4.23 Integration suites | Not started | | | Suite B: B13 |
-| Manual checklist | Not started | | | |
+| P4.1 Resources | Done | 2026-11-16 | see Phase 4 commit | `economy.json` (3 shops, starting coins 150), `recipes.json` (10), `jobs.json` (2 jobs, 4 contracts, 1 blueprint), `outfits.json` (6 outfits, 7 dyes, 5 default dyes), `plot_meadow_east` (500 coins); outfits use placeholder boxes |
+| P4.2 to P4.13 Scripts | Done | 2026-11-16 | see Phase 4 commit | Coordinator with snapshot rollback and `fail_at` seam; EconomyService restock in rollover `restock` step (with job expiry); Craft state; JobService (blueprint auto-complete, craft progress, mail, B13); deeds via PlotSign; OutfitService and customizer with SubViewport turntable; 12 menus; MenuStack globals, focus recovery and debug focus check; focus-loss and pad-loss pause with DeviceBanner; Accessibility runtime (text scale, palette, reduce motion, prompt labels, TTS, master volume, fullscreen, vsync) |
+| P4.14 to P4.16 Unit suites | Done | 2026-11-16 | see Phase 4 commit | wallet 2, coordinator 7, accretion 2, pricing 3, craft 2, jobs 3, outfit 3, inventory transactions 4, phase 4 round trip 2, accessibility 5, scene/script load checks 2 |
+| P4.17 to P4.23 Integration suites | Done | 2026-11-16 | see Phase 4 commit | menu pause flow 8, auto-pause 2, shop and craft 5, job contracts 3, B13, wardrobe 3, settings rebind 4 |
+| Manual checklist | Not started | | | every menu by pad only with no dead-end focus; unplug/replug the pad mid-game |
 
 ### Phase 5
 | Task | Status | Date | Commit | Notes |
@@ -139,6 +139,7 @@ Status values: `Not started`, `In progress`, `Blocked`, `Done`.
 | 2026-11-16 | 24a5cfd | 0 | `ci/run_tests.sh` | 0 | 0 | 17 cases incl. voxel smoke |
 | 2026-11-16 | 93b088c | 2B | `ci/run_tests.sh` | 0 | 0 | 311 cases (Phases 0 to 2B) |
 | 2026-11-16 | 405aae6 | 3 | `ci/run_tests.sh` | 0 | 0 | 369 cases (Phases 0 to 3) |
+| 2026-11-16 | Phase 4 commit | 4 | `ci/run_tests.sh` | 0 | 0 | 430 cases (Phases 0 to 4) |
 
 ## Decisions
 | ID | Status | Value |
@@ -157,6 +158,8 @@ Status values: `Not started`, `In progress`, `Blocked`, `Done`.
 | 2026-11-16 | Phase 2 choices for owner review: JSON content authoring (spec 3 conventions updated); care-letter snack rule compares against the collapse day (spec 6.2 corrected, the old rule could never trigger); `player_woke` emitted just before the transition pause is released (spec 6.2 diagram updated to match Suite B); Bed and Mine Entrance act without the confirm dialog until Phase 3 adds menus; SafeGround uses the standing-capsule clearance as the "3 free voxels" check; prompt occlusion implemented in 5ac70f4 | owner review | Open |
 | 2026-11-16 | Phase 2B manual checklist (plan P2B) | team | Open |
 | 2026-11-16 | Plan 0 rule broken on owner request: Phases 3 to 5 started while the Phase 1, 2 and 2B gates (manual checklists, min-spec performance) are open. Rework risk if those checks find feel or performance problems | owner | Open |
+| 2026-11-16 | Bugs found and fixed in Phase 4: `Database.templates_in_pool` sorted StringNames by address, so care-letter pool order (and the seeded pick) could differ between runs (fixed with a text sort, test added); two zone `.tscn` files with 3-component Colors failed to load (new scene-load test). Neither reached a commit | team | Closed |
+| 2026-11-16 | Phase 4 choices for owner review: starting coins 150; contracts that miss their deadline end with no penalty at the next rollover; B13 extends contracts due on the collapse day by one day; buying a tool from a shop grants it to the ToolBelt; music and effects volumes are stored but no audio buses exist yet; NPC shopkeepers arrive in Phase 5 (stations are counters for now); the job site lives in Home Meadow (x 16..22, z 6..12) | owner review | Open |
 | 2026-11-16 | Bug found and fixed in 405aae6: `ui/hud/hud.gd` from 93b088c did not parse, so the HUD was missing in the playable build; no test loaded it. New `core/test_scripts_parse.gd` compiles every script | team | Closed |
 | 2026-11-16 | Phase 3 choices for owner review: occupancy per cell and layer (floor, body, wall faces) so thin walls, floors and furniture can share cells (spec 1.6 rev 3.6); furniture on whole cells (0.5 m sub-grid deferred); support needs one supported bottom cell, not all; furniture is FASTENED on placement; removal refused while anything rests on the piece; block removal instant for any placeable block in an owned plot; RB rotates clockwise; pieces have no per-piece scenes yet | owner review | Open |
 | 2026-11-16 | Phase 2B choices for owner review: seeds aimed at non-farmable grass/dirt show a blocked prompt instead of digging (spec 10.4 row added); wetness stored per soil cell so empty farmland can be watered (save shape in spec 3.5 updated, crop `stage`/`watered_day` no longer saved); harvest is X only per spec 10.4 (RT does nothing on a ripe crop); sprinkler is an item placed with RT while selected on owned plot soil until Phase 3; crop visuals are placeholder boxes; plots are flattened to the natural height at their center, which can leave a ledge at the border; no water voxels yet, so the well is the only refill source | owner review | Open |

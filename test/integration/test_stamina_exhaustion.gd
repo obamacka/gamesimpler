@@ -1,5 +1,5 @@
-# P2.30: Suite B (spec 8.4) cases B1 to B11 and B14 to B17. B12 (autosave content) is in
-# Phase 6, B13 (contract deadline) in Phase 4. Day 5, 14:00; home is the starter cabin fixture.
+# P2.30 / P4.21: Suite B (spec 8.4) cases B1 to B11 and B13 to B17. B12 (autosave content)
+# is in Phase 6. Day 5, 14:00; home is the starter cabin fixture.
 extends GdUnitTestSuite
 
 const ORDER_SIGNALS: Array[StringName] = [&"stamina_depleted", &"player_state_changed", &"sleep_transition_started",
@@ -175,6 +175,17 @@ func test_b11_owned_home_bed() -> void:
 	await _await_woke()
 	assert_str(SceneRouter.current_zone_id).is_equal(&"zone_wilderness")
 	assert_float(Vector2(h.player.global_position.x, h.player.global_position.z).distance_to(Vector2(20, 20))).is_less(0.1)
+
+
+func test_b13_contract_deadline_extension() -> void:
+	GameClock.model.set_time(2, 14 * 60)
+	h.session.jobs.accept_contract(&"contract_tailor_cloth")   # 3 days: due day 5
+	GameClock.model.set_time(5, 14 * 60)
+	h.session.stamina.spend(1000, &"test")
+	await _await_woke()
+	var a := h.session.jobs.find_active(&"contract_tailor_cloth")
+	assert_bool(a.is_empty()).override_failure_message("contract failed at the wake rollover").is_false()
+	assert_int(a["deadline_day"]).is_equal(6)
 
 
 func test_b14_depletion_while_airborne_waits_for_landing() -> void:

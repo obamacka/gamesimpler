@@ -6,7 +6,16 @@ var yes: Button
 var no: Button
 
 
+const TEXTS := {
+	&"go_home_confirm": "Go home to your bed? Nothing is lost.",
+	&"mine_entrance_confirm": "Enter the Deep Mine? It resets every morning.",
+}
+
+
 func build() -> void:
+	if not args.has("text") and TEXTS.has(menu_id):
+		args["text"] = TEXTS[menu_id]
+		args["default_yes"] = true
 	var p := MenuBase.panel(Vector2(420, 200))
 	add_child(p)
 	var v := VBoxContainer.new()

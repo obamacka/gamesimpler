@@ -2,8 +2,8 @@
 
 | Field | Value |
 |---|---|
-| Status | DRAFT rev 3.6, all decisions resolved |
-| Revision | rev 1: core systems. rev 2: kid-friendly, accessibility, forgiving logic, expression systems, integration tests. rev 3: D1 to D4 resolved (dig-anywhere blocky voxels, jump and double jump, context-aware interaction with dedicated critical states, crafting flow confirmed). rev 3.1: D16 to D19 confirmed. rev 3.2: D5 to D15 resolved (farming system added, pets on day 2, keep last tool), min-spec hardware, test command note. rev 3.3: D20 to D25 resolved (macOS min spec M1 16 GB; 30 fps on min spec, 60 fps on recommended spec). rev 3.4: D26 recommended spec. rev 3.5: Phase 2B farming details (farm events, save shape, extra 10.4 rows, Home Meadow). rev 3.6: Phase 3 build lattice layers, socket attach transforms, support rule, `build` save shape (`build_rev36` replaces the per-plot list) |
+| Status | DRAFT rev 3.7, all decisions resolved |
+| Revision | rev 1: core systems. rev 2: kid-friendly, accessibility, forgiving logic, expression systems, integration tests. rev 3: D1 to D4 resolved (dig-anywhere blocky voxels, jump and double jump, context-aware interaction with dedicated critical states, crafting flow confirmed). rev 3.1: D16 to D19 confirmed. rev 3.2: D5 to D15 resolved (farming system added, pets on day 2, keep last tool), min-spec hardware, test command note. rev 3.3: D20 to D25 resolved (macOS min spec M1 16 GB; 30 fps on min spec, 60 fps on recommended spec). rev 3.4: D26 recommended spec. rev 3.5: Phase 2B farming details (farm events, save shape, extra 10.4 rows, Home Meadow). rev 3.6: Phase 3 build lattice layers, socket attach transforms, support rule, `build` save shape (`build_rev36` replaces the per-plot list). rev 3.7: Phase 4 `jobs` save shape (ranks nested under `jobs.jobs`, contract origin_y); job sites are build zones and flattened; starting coins 150 |
 | Engine | Godot 4.7 stable (4.7.2 latest patch found, 2026-08-18), GDScript |
 | Physics | Jolt Physics (built-in module) |
 | Voxels | Zylann Voxel Tools 1.7, GDExtension edition (MIT), released 2026-08-20, targets Godot 4.5+ |
@@ -727,7 +727,7 @@ Rules:
       "accessories": { "HEAD": { "item_id": "petacc_beanie", "data": { "dye": "dye_sky" } }, "NECK": null, "BODY": null }
     }
   ],
-  "jobs": { "job_builder": { "rank": 2, "xp": 340 }, "job_tailor": { "rank": 0, "xp": 0 }, "active_contracts": [], "completed_contracts": [] },
+  "jobs": { "jobs": { "job_builder": { "rank": 2, "xp": 340 }, "job_tailor": { "rank": 0, "xp": 0 } }, "active_contracts": [ { "contract_id": "contract_builder_shed", "accepted_day": 12, "deadline_day": 15, "progress": 0, "origin_y": 5 } ], "completed_contracts": [] },
   "mail": { "next_mail_seq": 143, "inbox": [], "scheduled": [] },
   "npcs": { "npc_hilde": { "friendship": 220, "met": true, "gifted_day": 14, "flags": [] } },
   "shops": { "shop_general": { "stock_day": 14, "remaining": {} } }

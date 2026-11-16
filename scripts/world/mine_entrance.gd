@@ -1,4 +1,4 @@
-## Deep Mine entrance (spec D16). Phase 3 adds the confirm dialog.
+## Deep Mine entrance (spec D16): mine_entrance_confirm ("resets every morning"), then travel.
 class_name MineEntrance
 extends WorldObject
 
@@ -12,8 +12,14 @@ func _ready() -> void:
 
 
 func interaction_spec(_player: Node, _forage: bool, alt: bool) -> InteractionSpec:
-	return null if alt else InteractionSpec.new(&"MINE_ENTRANCE", 0.0)
+	if alt:
+		return null
+	var spec := InteractionSpec.new(&"MINE_ENTRANCE", 0.0)
+	if target_zone == &"zone_deep_mine":
+		spec.opens_menu = &"mine_entrance_confirm"
+	return spec
 
 
-func resolve_interaction(_spec: InteractionSpec, _player: Node) -> void:
-	SceneRouter.travel(target_zone, target_spawn)
+func resolve_interaction(spec: InteractionSpec, _player: Node) -> void:
+	if spec.opens_menu == &"" or spec.menu_result == &"yes":
+		SceneRouter.travel(target_zone, target_spawn)

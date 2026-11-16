@@ -45,3 +45,10 @@ func test_validation_catches_bad_reference() -> void:
 	var errors := Database.validate()
 	bad.drop = old
 	assert_bool(errors.any(func(e): return e.contains("loot_missing"))).is_true()
+
+
+func test_template_pool_order_is_alphabetical() -> void:
+	var ids: Array = Database.templates_in_pool(&"pool_care_exhausted").map(func(t): return String(t.id))
+	var sorted := ids.duplicate()
+	sorted.sort()
+	assert_array(ids).is_equal(sorted)

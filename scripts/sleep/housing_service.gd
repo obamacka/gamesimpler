@@ -6,6 +6,7 @@ extends Node
 var home_zone: StringName
 var home_bed_key: StringName
 var owned_plots: Array[StringName] = []
+var extra_plots: Callable = func(_z: StringName) -> Array: return []   # job sites (JobService)
 
 
 func _ready() -> void:
@@ -35,7 +36,8 @@ func owns(plot_id: StringName) -> bool:
 
 ## Owned PlotDefs in `zone_id` (all zones when empty).
 func owned_plot_defs(zone_id: StringName = &"") -> Array:
-	return Database.plots.values().filter(func(p): return owns(p.id) and (zone_id == &"" or p.zone_id == zone_id))
+	return Database.plots.values().filter(func(p): return owns(p.id) and (zone_id == &"" or p.zone_id == zone_id)) \
+		+ extra_plots.call(zone_id)
 
 
 func plot_at(zone_id: StringName, cell: Vector3i) -> PlotDef:

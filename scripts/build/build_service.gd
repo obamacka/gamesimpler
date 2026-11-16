@@ -140,6 +140,8 @@ func try_remove(uid: String) -> Result:
 		return Result.failure(NOT_OWN)
 	if not dependents(uid).is_empty():
 		return Result.failure(HAS_DEPENDENTS)
+	if session.storage.has_items(uid):
+		return Result.failure(&"not_empty")
 	var def := def_of(uid)
 	var z := StringName(inst["zone"])
 	for o in BuildGrid.occupancy(def, inst["cell"], inst["rot"]):

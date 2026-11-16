@@ -40,6 +40,7 @@ func _ready() -> void:
 		s.terrain.rules.add_volume(v.min_cell, v.max_cell, v.reason, v.allows_place)
 	s.farm.bind_zone(zone_id, self)
 	s.build.bind_zone(zone_id, self)
+	s.jobs.bind_zone(zone_id)
 	if spawn_chests:
 		for key in s.world_state.chests:
 			if StringName(s.world_state.chests[key]["zone"]) == zone_id:
@@ -98,6 +99,9 @@ func _make_terrain(s: GameSession) -> Node:
 				var a: Vector3i = p.min_cell - Vector3i(1, 0, 1)
 				var b: Vector3i = p.max_cell + Vector3i(2, 0, 2)
 				og.add_flat(Rect2i(a.x, a.z, b.x - a.x, b.z - a.z))
+		for bp in Database.blueprints.values():
+			if bp.zone_id == zone_id:   # job sites are level too
+				og.add_flat(Rect2i(bp.site_min.x, bp.site_min.z, bp.site_max.x - bp.site_min.x + 1, bp.site_max.z - bp.site_min.z + 1))
 		generator = og
 	var t := VoxelTerrain.new()
 	t.name = "VoxelTerrain"

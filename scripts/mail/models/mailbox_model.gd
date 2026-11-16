@@ -13,13 +13,20 @@ func schedule(tpl: MailTemplateDef, sent_day: int, deliver_day: int, params: Dic
 	next_seq += 1
 	scheduled.append({
 		"id": id, "template_id": String(tpl.id), "sender_id": String(tpl.sender_id), "kind": String(tpl.kind),
-		"subject_key": tpl.subject_key, "body_key": tpl.body_key, "params": params.duplicate(true),
+		"subject_key": tpl.subject_key, "body_key": tpl.body_key, "params": _without(params, "attachments"),
 		"sent_day": sent_day, "deliver_day": deliver_day,
 		"expires_day": 0 if tpl.expires_after_days == 0 else deliver_day + tpl.expires_after_days,
-		"attachments": tpl.attachments.duplicate(true), "read": false, "claimed": false, "archived": false,
+		"attachments": (params["attachments"] if params.has("attachments") else tpl.attachments).duplicate(true),
+		"read": false, "claimed": false, "archived": false,
 	})
 	scheduled[-1] = _ints([scheduled[-1]])[0]
 	return id
+
+
+static func _without(d: Dictionary, key: String) -> Dictionary:
+	var c := d.duplicate(true)
+	c.erase(key)
+	return c
 
 
 ## Moves every scheduled message with deliver_day <= day into the inbox (idempotent).

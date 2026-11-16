@@ -4,7 +4,7 @@
 |---|---|
 | Spec | `_docs/specs/spec1.md` rev 3.4 |
 | Plan | `_docs/plans/plan1.md` |
-| Active phase | Phase 0 (not started) |
+| Active phase | Phase 0 (in progress) |
 | Last updated | 2026-11-16 |
 
 ## How to update
@@ -18,11 +18,11 @@ Status values: `Not started`, `In progress`, `Blocked`, `Done`.
 ## Environment
 | Item | Status |
 |---|---|
-| Godot 4.7.x binary | Not installed in the cloud session container; local and CI installs pending (P0.1, P0.6) |
-| gdUnit4 v6.2.3 | Not installed (P0.2) |
-| Voxel Tools 1.7 GDExtension | Not installed (P0.8) |
+| Godot 4.7.x binary | 4.7.2.stable.official.ed1daf0bf (Linux, release SHA512 verified); used in the cloud session and CI |
+| gdUnit4 v6.2.3 | Installed in `addons/gdUnit4` (tag v6.2.3, commit f2e4f86) |
+| Voxel Tools 1.7 GDExtension | Fetched by `ci/fetch_voxel.sh` (tag v1.7x, SHA256 pinned); binaries gitignored |
 | Headless test command | CLAUDE.md (owner, 2026-11-16): `godot --headless --path . -s -d res://addons/gdUnit4/bin/GdUnitCmdTool.gd --ignoreHeadlessMode -a res://test`. Not yet run; P0.3 also tests the `--remote-debug tcp://127.0.0.1:0` variant (parse-error hang risk, spec 0.6 item 1) |
-| CI | Not configured (P0.6) |
+| CI | GitHub Actions `tests` workflow; run 1 passed (0abde5d) |
 | Min-spec hardware (Windows/Linux) | Intel Core i7-3770, 16 GB DDR3-1333, Nvidia GTX 1070 (spec 0.7) |
 | Min-spec hardware (macOS) | Base Apple M1, 16 GB RAM (D24) |
 | Performance target | 30 fps at 1920x1080 medium on min spec; 60 fps on recommended spec (D25) |
@@ -31,7 +31,7 @@ Status values: `Not started`, `In progress`, `Blocked`, `Done`.
 ## Phase overview
 | Phase | Title | Status | Gate commit |
 |---|---|---|---|
-| 0 | Bootstrap, Test Harness and Voxel Spike | Not started | |
+| 0 | Bootstrap, Test Harness and Voxel Spike | In progress | |
 | 1 | Core Engine, Gamepad Input, Camera, Tall Character FSM | Not started | |
 | 2 | Mining, Foraging, Stamina Loop, Auto-Tool | Not started | |
 | 2B | Farming | Not started | |
@@ -45,16 +45,16 @@ Status values: `Not started`, `In progress`, `Blocked`, `Done`.
 ### Phase 0
 | Task | Status | Date | Commit | Notes |
 |---|---|---|---|---|
-| P0.1 Project skeleton | Not started | | | |
-| P0.2 Install gdUnit4 v6.2.3 | Not started | | | |
-| P0.3 Prove headless command | Not started | | | |
+| P0.1 Project skeleton | Done | 2026-11-16 | df1a866 | Jolt, Forward+, layers, gdUnit4 plugin enabled |
+| P0.2 Install gdUnit4 v6.2.3 | Done | 2026-11-16 | df1a866 | addon's own tests excluded |
+| P0.3 Prove headless command | Done | 2026-11-16 | df1a866 | exit codes: pass 0, fail 100, no flag 103, parse error 105 with `--remote-debug`; CLAUDE.md command hangs at `debug>` on parse errors |
 | P0.4 Update CLAUDE.md test command | Done (owner) | 2026-11-16 | 3682356 | follow-up: `--remote-debug` flag if P0.3 shows a hang |
-| P0.5 Test helpers | Not started | | | |
-| P0.6 CI | Not started | | | |
+| P0.5 Test helpers | Done | 2026-11-16 | df1a866 | SignalRecorder, PhysicsWait, TestSession |
+| P0.6 CI | Done | 2026-11-16 | 0abde5d | run 1 green; voxel fetch added in 24a5cfd |
 | P0.7 Min-spec hardware | Done (owner) | 2026-11-16 | | Windows/Linux and macOS (M1 16 GB) defined |
-| P0.8 Voxel spike (a to k) | Not started | | | run on the min-spec machine; report: `_docs/reports/voxel_spike.md` |
-| P0.9 Export smoke | Not started | | | |
-| P0.10 Go / no-go record | Not started | | | |
+| P0.8 Voxel spike (a to k) | In progress | 2026-11-16 | 24a5cfd | a, c, e, f, g, h, i pass headless; b, d (frame budget), j, k need the four target machines |
+| P0.9 Export smoke | Blocked | | | needs export templates and the target machines |
+| P0.10 Go / no-go record | In progress | 2026-11-16 | 24a5cfd | provisional GO for GDExtension; final after hardware rows |
 
 ### Phase 1
 | Task | Status | Date | Commit | Notes |
@@ -124,7 +124,13 @@ Status values: `Not started`, `In progress`, `Blocked`, `Done`.
 ## Test run log
 | Date | Commit | Phase | Command | Exit code | Failures | Notes |
 |---|---|---|---|---|---|---|
-| | | | | | | no runs yet |
+| 2026-11-16 | df1a866 | 0 | CLAUDE.md command | 0 | 0 | P0.3 passing run, 4 cases |
+| 2026-11-16 | df1a866 | 0 | CLAUDE.md command + temp failing suite | 100 | 1 | P0.3 fail path (temp suite removed) |
+| 2026-11-16 | df1a866 | 0 | CLAUDE.md command + temp parse-error suite | 124 (timeout) | n/a | hangs at `debug>` |
+| 2026-11-16 | df1a866 | 0 | `--remote-debug tcp://127.0.0.1:0` variant + parse error | 105 | n/a | exits cleanly |
+| 2026-11-16 | df1a866 | 0 | `ci/run_tests.sh` | 0 | 0 | 11 cases |
+| 2026-11-16 | 0abde5d | 0 | CI run 1 | 0 | 0 | GitHub Actions |
+| 2026-11-16 | 24a5cfd | 0 | `ci/run_tests.sh` | 0 | 0 | 17 cases incl. voxel smoke |
 
 ## Decisions
 | ID | Status | Value |
@@ -139,8 +145,10 @@ Status values: `Not started`, `In progress`, `Blocked`, `Done`.
 | Date | Item | Owner | Status |
 |---|---|---|---|
 | 2026-11-15 | CLAUDE.md headless command does not match gdUnit4 v6.2.3 (spec 0.6 item 1) | owner | Closed 2026-11-16 (3682356) |
-| 2026-11-16 | `-d` without `--remote-debug tcp://127.0.0.1:0` may hang on GDScript parse errors | P0.3 | Open |
-| 2026-11-15 | Voxel GDExtension maturity, collision latency, headless behavior, SQLite copy safety unverified (spec 0.6 items 18, 19, 21, 22) | P0.8 | Open |
+| 2026-11-16 | Confirmed: the CLAUDE.md command hangs at `debug>` on GDScript parse errors; `--remote-debug tcp://127.0.0.1:0` fixes it (exit 105). `ci/run_tests.sh` uses the fix | owner approval to update CLAUDE.md | Open |
+| 2026-11-15 | Voxel GDExtension maturity, collision latency, headless behavior, SQLite copy safety unverified (spec 0.6 items 18, 19, 21, 22) | P0.8 | Partly closed 2026-11-16: headless, SQLite copy and container latency verified; hardware frame budget pending |
+| 2026-11-16 | Voxel binaries (65 MB desktop) kept out of git via fetch script; Git LFS is the alternative | owner | Open |
+| 2026-11-16 | Hardware runs of `spikes/voxel/voxel_benchmark.tscn` on the four target machines (P0.8 b, d, j, k; P0.9) | team | Open |
 | 2026-11-15 | Min-spec hardware undefined | owner, P0.7 | Closed 2026-11-16 (Windows/Linux and macOS) |
 | 2026-11-16 | Recommended spec for the 60 fps target undefined (D26) | owner | Closed 2026-11-16 |
 | 2026-11-16 | i7-3770 has no AVX2; Voxel Tools GDExtension instruction-set requirement unverified | P0.8 j | Open |

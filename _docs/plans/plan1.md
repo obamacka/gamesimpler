@@ -72,23 +72,23 @@ All decisions D1 to D26 are resolved (spec 0.4). No phase is blocked on a decisi
 **Depends on:** nothing.
 
 ### P0 tasks
-- [ ] **P0.1 Project skeleton.** Create `project.godot` for Godot 4.7.x: `physics/3d/physics_engine="Jolt Physics"`, `rendering/renderer/rendering_method="forward_plus"`, physics ticks 60, named 3D physics layers 1 to 9 (spec 1.7), window defaults. Create the folder layout in 0.2. Update `.gitignore` for `.godot/`, `user://` exports, spike outputs.
-- [ ] **P0.2 Install gdUnit4 v6.2.3** into `res://addons/gdUnit4/` from the `v6.2.3` release; enable the plugin; record the source URL and license in `res://addons/README.md`.
-- [ ] **P0.3 Prove the headless command.** Run the CLAUDE.md command and the spec 0.6 item 1 variant with `--remote-debug tcp://127.0.0.1:0` against: a passing suite, a failing suite, and a suite with a GDScript parse error. Record exit codes and whether any run hangs at a `debug>` prompt. Also record the exit code without `--ignoreHeadlessMode`. Write the verified command into `_docs/PROGRESS.md`.
+- [x] **P0.1 Project skeleton.** Create `project.godot` for Godot 4.7.x: `physics/3d/physics_engine="Jolt Physics"`, `rendering/renderer/rendering_method="forward_plus"`, physics ticks 60, named 3D physics layers 1 to 9 (spec 1.7), window defaults. Create the folder layout in 0.2. Update `.gitignore` for `.godot/`, `user://` exports, spike outputs.
+- [x] **P0.2 Install gdUnit4 v6.2.3** into `res://addons/gdUnit4/` from the `v6.2.3` release; enable the plugin; record the source URL and license in `res://addons/README.md`.
+- [x] **P0.3 Prove the headless command.** Run the CLAUDE.md command and the spec 0.6 item 1 variant with `--remote-debug tcp://127.0.0.1:0` against: a passing suite, a failing suite, and a suite with a GDScript parse error. Record exit codes and whether any run hangs at a `debug>` prompt. Also record the exit code without `--ignoreHeadlessMode`. Write the verified command into `_docs/PROGRESS.md`.
 - [x] **P0.4 Update CLAUDE.md test command.** Done by the owner on 2026-11-16 (commit `3682356`). Follow-up after P0.3: if the parse-error run hangs, propose adding `--remote-debug tcp://127.0.0.1:0` (owner approval required).
-- [ ] **P0.5 Test helpers.** `res://test/helpers/signal_recorder.gd` (records name, args, physics frame), `res://test/helpers/physics_wait.gd` (`await_physics_frames(n)`), `res://test/helpers/test_session.gd` (factory placeholder, filled per phase). Unit suite `res://test/unit/helpers/test_signal_recorder.gd`.
-- [ ] **P0.6 CI.** GitHub Actions workflow running the headless command on Linux with a pinned Godot 4.7.x binary; upload gdUnit4 reports. Optional Windows and macOS jobs for exports in P0.9.
+- [x] **P0.5 Test helpers.** `res://test/helpers/signal_recorder.gd` (records name, args, physics frame), `res://test/helpers/physics_wait.gd` (`await_physics_frames(n)`), `res://test/helpers/test_session.gd` (factory placeholder, filled per phase). Unit suite `res://test/unit/helpers/test_signal_recorder.gd`.
+- [x] **P0.6 CI.** GitHub Actions workflow running the headless command on Linux with a pinned Godot 4.7.x binary; upload gdUnit4 reports. Optional Windows and macOS jobs for exports in P0.9.
 - [x] **P0.7 Min-spec hardware.** Defined by the owner on 2026-11-16: Intel Core i7-3770, 16 GB DDR3-1333, Nvidia GTX 1070 (Windows/Linux); base Apple M1, 16 GB (macOS, D24). Target 30 fps at 1080p medium (D25).
 - [ ] **P0.8 Voxel spike** (in `res://spikes/voxel/`, not shipped). Install Voxel Tools 1.7 GDExtension into `res://addons/zylann.voxel/`. Run all measurements on both min-spec machines (spec 0.7). Verify and record numbers in `_docs/reports/voxel_spike.md`:
-  - [ ] a. Extension loads in the editor and in a headless run.
+  - [x] a. Extension loads in the editor and in a headless run.
   - [ ] b. `VoxelTerrain` + `VoxelMesherBlocky` + `VoxelBlockyLibrary` with 4 materials renders; data block size confirmed.
-  - [ ] c. Dig and place through `get_voxel_tool()` (`set_voxel`, `get_voxel`, `raycast`).
+  - [x] c. Dig and place through `get_voxel_tool()` (`set_voxel`, `get_voxel`, `raycast`).
   - [ ] d. Collision rebuild latency after single-voxel edits against the budget (<= 100 ms edit-to-collision, no frame > 33.3 ms during continuous digging) on min-spec hardware, with a Jolt `CharacterBody3D` standing and walking over edits.
-  - [ ] e. `VoxelStreamSQLite` save via `save_modified_blocks()` and `VoxelSaveCompletionTracker.is_complete()`, then reload.
-  - [ ] f. Copy the SQLite file after the tracker completes while the stream is attached; reload the copy in a fresh terrain and diff voxels (spec 0.6 item 22).
-  - [ ] g. `VoxelAStarGrid3D.find_path_async` for a pet-sized agent across dug terrain.
-  - [ ] h. Jolt `CharacterBody3D` physics works in a headless run (needed by Phase 1 integration suites).
-  - [ ] i. `@voxel_real` smoke suite `res://test/integration/test_voxel_smoke.gd` passes headless (or the report states why it needs a windowed job).
+  - [x] e. `VoxelStreamSQLite` save via `save_modified_blocks()` and `VoxelSaveCompletionTracker.is_complete()`, then reload.
+  - [x] f. Copy the SQLite file after the tracker completes while the stream is attached; reload the copy in a fresh terrain and diff voxels (spec 0.6 item 22).
+  - [x] g. `VoxelAStarGrid3D.find_path_async` for a pet-sized agent across dug terrain.
+  - [x] h. Jolt `CharacterBody3D` physics works in a headless run (needed by Phase 1 integration suites).
+  - [x] i. `@voxel_real` smoke suite `res://test/integration/test_voxel_smoke.gd` passes headless (or the report states why it needs a windowed job).
   - [ ] j. No illegal-instruction crash on the i7-3770 (no AVX2), in the editor or the exported build.
   - [ ] k. Frame rate at 1920x1080 medium with the target view distance while walking and digging: >= 30 fps on both min-spec machines and >= 60 fps on both recommended-spec machines (D25, D26); on the M1 confirm the Metal driver is active; voxel worker thread count chosen so at least 2 hardware threads stay free for main and physics.
 - [ ] **P0.9 Export smoke.** Export the spike for Windows x86_64, Linux x86_64, macOS (universal) with stock templates; each launches and digs. The macOS build is run on the base M1.

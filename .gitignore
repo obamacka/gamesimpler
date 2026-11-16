@@ -28,3 +28,6 @@ mono_crash.*.json
 /reports/
 /spikes/**/out/
 /build/
+
+# Voxel Tools binaries are fetched by ci/fetch_voxel.sh
+/addons/zylann.voxel/bin/

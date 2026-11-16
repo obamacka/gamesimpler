@@ -17,6 +17,9 @@
 [ext_resource type="Script" path="res://scripts/player/states/build_state.gd" id="15_build"]
 [ext_resource type="Script" path="res://scripts/player/states/sit_state.gd" id="16_sit"]
 [ext_resource type="Script" path="res://scripts/player/states/craft_state.gd" id="17_craft"]
+[ext_resource type="Script" path="res://scripts/player/states/talk_state.gd" id="18_talk"]
+[ext_resource type="Script" path="res://scripts/player/states/emote_state.gd" id="19_emote"]
+[ext_resource type="Script" path="res://scripts/player/states/play_instrument_state.gd" id="20_inst"]
 
 [sub_resource type="CapsuleShape3D" id="shape_standing"]
 radius = 0.35
@@ -184,3 +187,12 @@ script = ExtResource("16_sit")
 
 [node name="Craft" type="Node" parent="StateMachine"]
 script = ExtResource("17_craft")
+
+[node name="Talk" type="Node" parent="StateMachine"]
+script = ExtResource("18_talk")
+
+[node name="Emote" type="Node" parent="StateMachine"]
+script = ExtResource("19_emote")
+
+[node name="PlayInstrument" type="Node" parent="StateMachine"]
+script = ExtResource("20_inst")

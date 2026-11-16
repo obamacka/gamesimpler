@@ -2,8 +2,8 @@
 
 | Field | Value |
 |---|---|
-| Status | DRAFT rev 3.7, all decisions resolved |
-| Revision | rev 1: core systems. rev 2: kid-friendly, accessibility, forgiving logic, expression systems, integration tests. rev 3: D1 to D4 resolved (dig-anywhere blocky voxels, jump and double jump, context-aware interaction with dedicated critical states, crafting flow confirmed). rev 3.1: D16 to D19 confirmed. rev 3.2: D5 to D15 resolved (farming system added, pets on day 2, keep last tool), min-spec hardware, test command note. rev 3.3: D20 to D25 resolved (macOS min spec M1 16 GB; 30 fps on min spec, 60 fps on recommended spec). rev 3.4: D26 recommended spec. rev 3.5: Phase 2B farming details (farm events, save shape, extra 10.4 rows, Home Meadow). rev 3.6: Phase 3 build lattice layers, socket attach transforms, support rule, `build` save shape (`build_rev36` replaces the per-plot list). rev 3.7: Phase 4 `jobs` save shape (ranks nested under `jobs.jobs`, contract origin_y); job sites are build zones and flattened; starting coins 150 |
+| Status | DRAFT rev 3.8, all decisions resolved |
+| Revision | rev 1: core systems. rev 2: kid-friendly, accessibility, forgiving logic, expression systems, integration tests. rev 3: D1 to D4 resolved (dig-anywhere blocky voxels, jump and double jump, context-aware interaction with dedicated critical states, crafting flow confirmed). rev 3.1: D16 to D19 confirmed. rev 3.2: D5 to D15 resolved (farming system added, pets on day 2, keep last tool), min-spec hardware, test command note. rev 3.3: D20 to D25 resolved (macOS min spec M1 16 GB; 30 fps on min spec, 60 fps on recommended spec). rev 3.4: D26 recommended spec. rev 3.5: Phase 2B farming details (farm events, save shape, extra 10.4 rows, Home Meadow). rev 3.6: Phase 3 build lattice layers, socket attach transforms, support rule, `build` save shape (`build_rev36` replaces the per-plot list). rev 3.7: Phase 4 `jobs` save shape (ranks nested under `jobs.jobs`, contract origin_y); job sites are build zones and flattened; starting coins 150. rev 3.8: Phase 5 details (pet settles at 80% of follow_distance; never-expire mail kinds; mail prune after delivery; NPC straight steering where no navmesh is baked; generated instrument tones; care letters signed by the best friend) |
 | Engine | Godot 4.7 stable (4.7.2 latest patch found, 2026-08-18), GDScript |
 | Physics | Jolt Physics (built-in module) |
 | Voxels | Zylann Voxel Tools 1.7, GDExtension edition (MIT), released 2026-08-20, targets Godot 4.5+ |
@@ -614,6 +614,7 @@ Attachment types: `item`, `coins`, `unlock_recipe`, `unlock_dye`, `unlock_sticke
 
 Rules:
 - Ids are monotonic from `next_mail_seq` (deterministic).
+- Never-expire kinds (rev 3.8): CARE_PACKAGE, PACKAGE, RECEIPT, REWARD, CATALOG_ORDER. Others expire after `expires_after_days`; expired unclaimed attachments move to `mail.lost_and_found` (claimable all-or-nothing at the mailbox). The inbox is pruned to 60 after each delivery, removing only archived and claimed messages.
 - `deliver_due(day)` moves scheduled messages with `deliver_day <= day` into the inbox; idempotent.
 - Claim is all-or-nothing; full inventory leaves attachments in place with a "make room" pictogram.
 - `CARE_PACKAGE` and `REWARD` never expire (`expires_day = 0`). Other expired packages go to Lost and Found, never deleted.
@@ -1368,7 +1369,7 @@ Pet (CharacterBody3D, layer pet, mask world|build_pieces)
 +-- PetBrain (Node)              FSM in 4.6, logic in pure PetBrainModel
 ```
 - Player and pet never block each other (player mask excludes `pet`; pet mask excludes `player`).
-- Follow target is recomputed at 5 Hz; speed scales between walk and run with distance.
+- Follow target is recomputed at 5 Hz; speed scales between walk and run with distance. The pet settles at 80% of `follow_distance` (rev 3.8) so the Idle condition `dist < follow_distance` can be met.
 - Teleport on: distance > `teleport_distance` (20 m), no path for 2 s, or zone change (spawn next to player after load).
 - Build overlap: if a placed piece's footprint covers the pet, the pet is moved to the nearest free navmesh point (`NavigationServer3D` closest point query).
 - Navigation per 9.4: `VoxelAStarGrid3D` on voxel ground (the pet fits its 1x2 agent assumption and hops 1 voxel), navmesh in STATIC zones, teleport fallback. `pet_call` (D-pad right) makes the pet come to the player.

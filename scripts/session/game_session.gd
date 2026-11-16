@@ -24,6 +24,8 @@ var economy: EconomyService
 var jobs: JobService
 var outfit: OutfitService
 var storage: StorageService
+var npcs: NpcService
+var pets: PetService
 var hotbar := HotbarModel.new()
 var exhaustion := {"last_snack_day": 0, "count_total": 0}
 var zone_root: Node3D
@@ -56,6 +58,8 @@ func _build(world: IVoxelWorld) -> void:
 	jobs = _add(JobService.new(), "JobService")
 	outfit = _add(OutfitService.new(), "OutfitService")
 	storage = _add(StorageService.new(), "StorageService")
+	npcs = _add(NpcService.new(), "NpcService")
+	pets = _add(PetService.new(), "PetService")
 	terrain.setup(self, world)
 	world_state.setup(self)
 	mail.setup(self)
@@ -66,6 +70,9 @@ func _build(world: IVoxelWorld) -> void:
 	jobs.setup(self)
 	outfit.setup(self)
 	storage.setup(self)
+	npcs.setup(self)
+	pets.setup(self)
+	rollover.register(&"pet_reset", func(day): pets.daily_reset(day))
 	housing.extra_plots = func(z: StringName) -> Array: return jobs.site_plots(z)
 	rollover.register(&"restock", func(day):
 		economy.restock(day)
@@ -108,11 +115,18 @@ func new_game() -> void:
 	wallet.model.coins = int(Database.economy["starting_coins"])
 	for d in Database.default_dyes:
 		unlocks.model.grant(&"DYE", d)
+	for e in Database.default_emotes:
+		unlocks.model.grant(&"EMOTE", e)
+	for i in Database.default_instruments:
+		unlocks.model.grant(&"INSTRUMENT", i)
 	GameClock.model.set_morning(1)
 	var welcome: MailTemplateDef = Database.mail_templates.get(&"mail_tpl_welcome")
 	if welcome:
 		mail.schedule(welcome, 1)
 		mail.deliver_due(1)
+	var adoption: MailTemplateDef = Database.mail_templates.get(&"mail_tpl_pet_adoption")
+	if adoption:
+		mail.schedule(adoption, 2)   # D11: the pet arrives on day 2
 
 
 func day() -> int:
@@ -147,6 +161,8 @@ func to_dict() -> Dictionary:
 		"build": build.to_dict(),
 		"jobs": jobs.to_dict(),
 		"shops": economy.stock_to_dict(),
+		"npcs": npcs.model.to_dict(),
+		"pets": pets.to_dict(),
 	}
 
 
@@ -173,5 +189,7 @@ func from_dict(d: Dictionary) -> void:
 		economy.stock_from_dict(d["shops"])
 	outfit.model.from_dict(d.get("player", {}).get("outfit", {}))
 	storage.from_dict(d.get("inventory", {}).get("containers", {}))
+	npcs.model.from_dict(d.get("npcs", {}))
+	pets.from_dict(d.get("pets", []))
 	hotbar.from_dict({"hotbar_refs": d.get("inventory", {}).get("hotbar_refs", hotbar.refs),
 		"hotbar_index": d.get("player", {}).get("hotbar_index", 0)})

@@ -541,6 +541,51 @@
       "max_stack": 1,
       "base_value": 35,
       "has_instance_data": true
+    },
+    {
+      "id": "item_kibble",
+      "category": "PET_FOOD",
+      "max_stack": 50,
+      "base_value": 4,
+      "tags": [
+        "meaty"
+      ],
+      "food": {
+        "pet_happiness": 10
+      }
+    },
+    {
+      "id": "item_fish_treat",
+      "category": "PET_FOOD",
+      "max_stack": 50,
+      "base_value": 6,
+      "tags": [
+        "fishy"
+      ],
+      "food": {
+        "pet_happiness": 10
+      }
+    },
+    {
+      "id": "item_petacc_sweater",
+      "category": "PET_ACCESSORY",
+      "max_stack": 1,
+      "base_value": 45,
+      "has_instance_data": true
+    },
+    {
+      "id": "item_piece_pet_bed",
+      "category": "BUILD_PIECE",
+      "max_stack": 5,
+      "base_value": 30,
+      "piece_id": "piece_pet_bed"
+    },
+    {
+      "id": "item_piece_feed_bowl",
+      "category": "BUILD_PIECE",
+      "max_stack": 5,
+      "base_value": 15,
+      "piece_id": "piece_feed_bowl"
     }
   ]
 }

@@ -2,9 +2,9 @@
 
 | Field | Value |
 |---|---|
-| Spec | `_docs/specs/spec1.md` rev 3.7 |
+| Spec | `_docs/specs/spec1.md` rev 3.8 |
 | Plan | `_docs/plans/plan1.md` |
-| Active phase | Phases 3 to 5 started on owner request before the Phase 1, 2 and 2B gates passed (manual checklists open); Phase 0 hardware checks pending |
+| Active phase | Phases 3 to 5 automated work done (started on owner request before the Phase 1, 2 and 2B gates passed); manual checklists for Phases 1 to 5 and Phase 0 hardware checks pending; Phase 6 not started |
 | Last updated | 2026-11-16 |
 
 ## How to update
@@ -37,7 +37,7 @@ Status values: `Not started`, `In progress`, `Blocked`, `Done`.
 | 2B | Farming | In progress: all automated tasks done, manual checklist pending | |
 | 3 | Magnetic Grid Building, Screw/Hammer Mini-Games | In progress: automated tasks done except P3.8 icons; manual checklist pending | |
 | 4 | Economy, Jobs, Wardrobe UI, Game Pause | In progress: automated tasks done; manual checklist pending | |
-| 5 | NPCs, Mail, Pet Companion | Not started | |
+| 5 | NPCs, Mail, Pet Companion | In progress: automated tasks done; manual checklist pending | |
 | 6 | Museum, Collection Book, Dye Painting, Save/Load | Not started | |
 
 ## Task tracker
@@ -106,11 +106,11 @@ Status values: `Not started`, `In progress`, `Blocked`, `Done`.
 ### Phase 5
 | Task | Status | Date | Commit | Notes |
 |---|---|---|---|---|
-| P5.1 Resources | Not started | | | |
-| P5.2 to P5.13 Scripts | Not started | | | |
-| P5.14 to P5.17 Unit suites | Not started | | | |
-| P5.18 to P5.22 Integration suites | Not started | | | |
-| Manual checklist | Not started | | | |
+| P5.1 Resources | Done | 2026-11-16 | see Phase 5 commit | `npcs.json` (5 NPCs, friendship rules and letters), `pets.json` (dog, cat, 3 accessories, names, care config), `emotes.json` (8 emotes, 3 instruments), pet food, pet bed and feed bowl pieces, adoption / job offer / catalog / friendship mail |
+| P5.2 to P5.13 Scripts | Done | 2026-11-16 | see Phase 5 commit | NPC service and bodies with schedules, Talk with a 0.3 s camera two-shot, DialogueModel and dialogue / gift menus; mail complete (all attachment types, expiry to Lost and Found, cap and prune, catalog orders) and mail menu; PetBrainModel, PetService, Pet body with Skeleton3D and BoneAttachment3D slots, path providers (VoxelAStarGrid3D, navmesh, straight), adoption on day 2, pet_call, bowl self-feed, wheel with Emote and PlayInstrument; `claim_all` removed |
+| P5.14 to P5.17 Unit suites | Done | 2026-11-16 | see Phase 5 commit | pet brain 10, feeding 6, accessories 3, mailbox full 7, npc 3, dialogue 2, resolver npc/pet 3, wheel 2, phase 5 round trip 1 |
+| P5.18 to P5.22 Integration suites | Done | 2026-11-16 | see Phase 5 commit | pet follow 6, pet care 5, mail arrival 5, npc talk 2, emote and instrument 4 |
+| Manual checklist | Not started | | | pet through tunnels, dug terrain and town; TTS letter; claim package; adopt, name and dress the pet by pad |
 
 ### Phase 6
 | Task | Status | Date | Commit | Notes |
@@ -140,6 +140,7 @@ Status values: `Not started`, `In progress`, `Blocked`, `Done`.
 | 2026-11-16 | 93b088c | 2B | `ci/run_tests.sh` | 0 | 0 | 311 cases (Phases 0 to 2B) |
 | 2026-11-16 | 405aae6 | 3 | `ci/run_tests.sh` | 0 | 0 | 369 cases (Phases 0 to 3) |
 | 2026-11-16 | 8566596 | 4 | `ci/run_tests.sh` | 0 | 0 | 430 cases (Phases 0 to 4) |
+| 2026-11-16 | Phase 5 commit | 5 | `ci/run_tests.sh` | 0 | 0 | 489 cases (Phases 0 to 5) |
 
 ## Decisions
 | ID | Status | Value |
@@ -159,6 +160,8 @@ Status values: `Not started`, `In progress`, `Blocked`, `Done`.
 | 2026-11-16 | Phase 2B manual checklist (plan P2B) | team | Open |
 | 2026-11-16 | Plan 0 rule broken on owner request: Phases 3 to 5 started while the Phase 1, 2 and 2B gates (manual checklists, min-spec performance) are open. Rework risk if those checks find feel or performance problems | owner | Open |
 | 2026-11-16 | Bugs found and fixed in Phase 4: `Database.templates_in_pool` sorted StringNames by address, so care-letter pool order (and the seeded pick) could differ between runs (fixed with a text sort, test added); two zone `.tscn` files with 3-component Colors failed to load (new scene-load test). Neither reached a commit | team | Closed |
+| 2026-11-16 | Phase 5 choices for owner review: no navmesh is baked yet, so NPCs steer straight between schedule markers inside protected town volumes and the pet uses a straight line in the cabin (VoxelAStarGrid3D on voxel ground); instrument notes are generated tones (no samples); NPC and pet visuals are placeholder boxes with a real Skeleton3D and BoneAttachment3D slots; friendship: gifts loved 80 / liked 45 / neutral 20 / disliked 0, first talk per day 5, first wave per day 1, letters at 200 and 400; the pet settles at 80% of follow distance; care letters are signed by the best friend; the sweater fits dogs only (exercises the species check) | owner review | Open |
+| 2026-11-16 | Bugs found and fixed in Phase 5 work: deferred grab_focus on rebuilt or closed menus (engine errors in every menu test, also in the real game); the pet parked exactly at follow_distance so Idle could never trigger; inbox prune ran before the day's delivery; float drift in pet timers | team | Closed |
 | 2026-11-16 | Phase 4 choices for owner review: starting coins 150; contracts that miss their deadline end with no penalty at the next rollover; B13 extends contracts due on the collapse day by one day; buying a tool from a shop grants it to the ToolBelt; music and effects volumes are stored but no audio buses exist yet; NPC shopkeepers arrive in Phase 5 (stations are counters for now); the job site lives in Home Meadow (x 16..22, z 6..12) | owner review | Open |
 | 2026-11-16 | Bug found and fixed in 405aae6: `ui/hud/hud.gd` from 93b088c did not parse, so the HUD was missing in the playable build; no test loaded it. New `core/test_scripts_parse.gd` compiles every script | team | Closed |
 | 2026-11-16 | Phase 3 choices for owner review: occupancy per cell and layer (floor, body, wall faces) so thin walls, floors and furniture can share cells (spec 1.6 rev 3.6); furniture on whole cells (0.5 m sub-grid deferred); support needs one supported bottom cell, not all; furniture is FASTENED on placement; removal refused while anything rests on the piece; block removal instant for any placeable block in an owned plot; RB rotates clockwise; pieces have no per-piece scenes yet | owner review | Open |

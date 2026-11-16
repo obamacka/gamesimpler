@@ -1,0 +1,77 @@
+{
+ "emotes": [
+  {
+   "id": "emote_wave",
+   "duration_sec": 1.5,
+   "pet_reaction": "wag",
+   "npc_reaction": "wave"
+  },
+  {
+   "id": "emote_dance",
+   "duration_sec": 3.0,
+   "pet_reaction": "spin",
+   "npc_reaction": "clap"
+  },
+  {
+   "id": "emote_cheer",
+   "duration_sec": 2.0,
+   "pet_reaction": "jump",
+   "npc_reaction": "cheer"
+  },
+  {
+   "id": "emote_clap",
+   "duration_sec": 1.5,
+   "pet_reaction": "wag",
+   "npc_reaction": "smile"
+  },
+  {
+   "id": "emote_heart",
+   "duration_sec": 2.0,
+   "pet_reaction": "nuzzle",
+   "npc_reaction": "heart"
+  },
+  {
+   "id": "emote_sleepy",
+   "duration_sec": 2.5,
+   "pet_reaction": "yawn",
+   "npc_reaction": "yawn"
+  },
+  {
+   "id": "emote_laugh",
+   "duration_sec": 2.0,
+   "pet_reaction": "wag",
+   "npc_reaction": "laugh"
+  },
+  {
+   "id": "emote_point",
+   "duration_sec": 1.5,
+   "pet_reaction": "look",
+   "npc_reaction": "look"
+  }
+ ],
+ "default_emotes": [
+  "emote_wave",
+  "emote_dance",
+  "emote_cheer"
+ ],
+ "instruments": [
+  {
+   "id": "inst_flute",
+   "base_hz": 523.25,
+   "wave": "sine"
+  },
+  {
+   "id": "inst_drum",
+   "base_hz": 110.0,
+   "wave": "noise"
+  },
+  {
+   "id": "inst_ukulele",
+   "base_hz": 392.0,
+   "wave": "pluck"
+  }
+ ],
+ "default_instruments": [
+  "inst_flute"
+ ]
+}

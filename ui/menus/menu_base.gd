@@ -29,6 +29,17 @@ func close(value: Variant = null) -> void:
 		MenuStack.instance.pop()
 
 
+## Deferred focus that tolerates the control being rebuilt or closed before it runs.
+static func focus_later(c: Control) -> void:
+	if c == null:
+		return
+	var ref: WeakRef = weakref(c)
+	(func():
+		var x = ref.get_ref()
+		if x and x.is_inside_tree() and x.is_visible_in_tree():
+			x.grab_focus()).call_deferred()
+
+
 static func make_button(text: String, color: Color = Color(0.85, 0.85, 0.85)) -> Button:
 	var b := Button.new()
 	b.text = text

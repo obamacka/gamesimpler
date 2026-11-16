@@ -9,7 +9,8 @@ const VERBS := {
 	&"MAILBOX": "Open mail", &"MINE_ENTRANCE": "Enter", &"TALK": "Talk", &"GIFT": "Gift",
 	&"HARVEST": "Harvest", &"REFILL": "Refill", &"SHOP": "Shop", &"JOB_BOARD": "Jobs", &"WORKBENCH": "Craft",
 	&"TAILOR_BENCH": "Sew", &"WARDROBE": "Change clothes", &"PLOT_SIGN": "Look", &"SIT": "Sit", &"TOGGLE": "Switch",
-	&"STORAGE": "Open", &"SET_HOME": "Set home",
+	&"STORAGE": "Open", &"SET_HOME": "Set home", &"PET_PAT": "Pat",
+	&"PET_FEED": "Feed", &"PET_DRESS": "Dress up", &"FEED_BOWL": "Fill bowl",
 }
 ## Farm rows for RT (spec 10.4), keyed by target_kind.
 const FARM_TEXT := {

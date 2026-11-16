@@ -40,6 +40,9 @@ var _farm_aim: Dictionary = {}    # this tick's farm action (spec 10.4) or {}
 var _farm_pos := Vector3.ZERO
 var build_ctl: BuildController
 var pending_craft: Dictionary = {}
+var pending_talk: Node3D
+var pending_emote: StringName = &""
+var pending_instrument: StringName = &""
 var hidden_body_regions: Array[StringName] = []
 var build_active := false
 var _target: Dictionary = {}     # current tool target: {"kind": &"voxel", "cell"} or {"kind": &"zone", "node"}
@@ -310,6 +313,13 @@ func _build_phase2_context(f: InputFrame, delta: float) -> void:
 	s.terrain.rules.player_cells = [feet + Vector3i.UP, feet + Vector3i(0, 2, 0), feet + Vector3i(0, 3, 0)]
 
 	_handle_hotbar(f, s)
+	c.pending_emote = pending_emote != &""
+	c.pending_instrument = pending_instrument != &""
+	if machine.current_id in PlayerTransitionTable.GROUNDED and is_on_floor():
+		if f.pet_call_pressed:
+			EventBus.pet_called.emit()
+		if f.wheel_pressed and machine.current_id in [PlayerTransitionTable.IDLE, PlayerTransitionTable.WALK]:
+			open_wheel()
 	tool_selector.tick(delta, current_state().locks_tool())
 	var aim := tool_selector.last_aim
 	var best := tool_selector.best()
@@ -450,6 +460,30 @@ func refresh_outfit() -> void:
 		mi.mesh = bm
 		mi.position = Vector3(0, OUTFIT_BOXES[slot][1], 0)
 	hidden_body_regions = s.outfit.model.hidden_regions()
+
+
+## D-pad left (spec 4.8): the wheel menu pauses; its choice is applied when it closes.
+func open_wheel() -> void:
+	if MenuStack.instance == null:
+		return
+	MenuStack.instance.push(&"wheel", {"on_close": apply_wheel_choice})
+
+
+func apply_wheel_choice(choice: Variant) -> void:
+	if not (choice is Dictionary):
+		return
+	match choice.get("kind", &""):
+		&"emote":
+			pending_emote = choice["id"]
+		&"instrument":
+			pending_instrument = choice["id"]
+		&"tool":
+			tool_selector.manual_select(choice["id"])
+
+
+## Sitting or asleep (the pet may Nap, spec 4.6).
+func is_resting() -> bool:
+	return machine.current_id in [PlayerTransitionTable.SIT, PlayerTransitionTable.SLEEP]
 
 
 func build_place_active() -> bool:

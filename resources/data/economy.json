@@ -40,6 +40,22 @@
     {
      "item": "item_honey_bun",
      "daily": 5
+    },
+    {
+     "item": "item_kibble",
+     "daily": 10
+    },
+    {
+     "item": "item_fish_treat",
+     "daily": 10
+    },
+    {
+     "item": "item_piece_pet_bed",
+     "daily": 1
+    },
+    {
+     "item": "item_piece_feed_bowl",
+     "daily": 1
     }
    ]
   },

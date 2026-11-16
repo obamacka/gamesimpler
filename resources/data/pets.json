@@ -1,0 +1,123 @@
+{
+ "species": [
+  {
+   "id": "pet_dog",
+   "walk_speed": 3.0,
+   "run_speed": 6.5,
+   "follow_distance": 2.5,
+   "teleport_distance": 20.0,
+   "idle_after": 2.0,
+   "wander_after": 6.0,
+   "wander_radius": 4.0,
+   "accessory_bones": {
+    "HEAD": "head",
+    "NECK": "neck",
+    "BODY": "body"
+   },
+   "favorite_food_tags": [
+    "meaty"
+   ],
+   "variants": [
+    "#c8a070",
+    "#5a4030",
+    "#f0e8e0"
+   ],
+   "size": [
+    0.5,
+    0.6,
+    0.9
+   ]
+  },
+  {
+   "id": "pet_cat",
+   "walk_speed": 3.2,
+   "run_speed": 6.8,
+   "follow_distance": 2.0,
+   "teleport_distance": 20.0,
+   "idle_after": 2.0,
+   "wander_after": 6.0,
+   "wander_radius": 3.0,
+   "accessory_bones": {
+    "HEAD": "head",
+    "NECK": "neck",
+    "BODY": "body"
+   },
+   "favorite_food_tags": [
+    "fishy"
+   ],
+   "variants": [
+    "#e09040",
+    "#404040",
+    "#f0f0f0"
+   ],
+   "size": [
+    0.35,
+    0.45,
+    0.7
+   ]
+  }
+ ],
+ "accessories": [
+  {
+   "item_id": "item_petacc_bandana",
+   "slot": "NECK",
+   "species": [
+    "pet_dog",
+    "pet_cat"
+   ],
+   "dyeable": true,
+   "default_dye_id": "dye_berry",
+   "color": "#c03030"
+  },
+  {
+   "item_id": "item_petacc_beanie",
+   "slot": "HEAD",
+   "species": [
+    "pet_dog",
+    "pet_cat"
+   ],
+   "dyeable": true,
+   "default_dye_id": "dye_sky",
+   "color": "#4070c0"
+  },
+  {
+   "item_id": "item_petacc_sweater",
+   "slot": "BODY",
+   "species": [
+    "pet_dog"
+   ],
+   "dyeable": true,
+   "default_dye_id": "dye_moss",
+   "color": "#508040"
+  }
+ ],
+ "names": [
+  "Biscuit",
+  "Pepper",
+  "Maple",
+  "Sunny",
+  "Pickle",
+  "Mochi"
+ ],
+ "config": {
+  "happiness_start": 70,
+  "happiness_floor": 40,
+  "drift_target": 60,
+  "drift_step": 5,
+  "pat_bonus": 5,
+  "pat_repeat": 1,
+  "find_threshold": 80,
+  "find_items": [
+   "item_apple",
+   "item_quartz",
+   "item_seed_carrot"
+  ],
+  "react_seconds": 1.5,
+  "eat_seconds": 2.0,
+  "call_teleport_distance": 10.0,
+  "call_path_timeout": 1.0,
+  "path_timeout": 2.0,
+  "nap_bed_distance": 10.0,
+  "emote_react_radius": 8.0
+ }
+}

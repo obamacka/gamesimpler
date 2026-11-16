@@ -22,6 +22,12 @@ const MENUS := {
 	&"house_purchase": "res://ui/menus/house_purchase.gd",
 	&"outfit_customizer": "res://ui/menus/outfit_customizer.gd",
 	&"storage": "res://ui/menus/storage_menu.gd",
+	&"dialogue": "res://ui/menus/dialogue_menu.gd",
+	&"gift_picker": "res://ui/menus/gift_picker.gd",
+	&"mail": "res://ui/menus/mail_menu.gd",
+	&"pet_adoption": "res://ui/menus/pet_adoption.gd",
+	&"pet_wardrobe": "res://ui/menus/pet_wardrobe.gd",
+	&"wheel": "res://ui/menus/wheel_menu.gd",
 }
 
 var registry: Dictionary = MENUS.duplicate()
@@ -97,7 +103,7 @@ func push(menu_id: StringName, args: Dictionary = {}) -> MenuBase:
 	m.build()
 	var f := m.initial_focus()
 	if f:
-		f.grab_focus.call_deferred()
+		MenuBase.focus_later(f)
 	if OS.is_debug_build():
 		for prob in m.focus_problems():
 			push_warning("MenuStack: %s has an unfocusable button %s" % [menu_id, prob])
@@ -125,7 +131,7 @@ func pop() -> void:
 	else:
 		top().visible = true
 		if is_instance_valid(restore) and restore is Control:
-			(restore as Control).grab_focus.call_deferred()
+			MenuBase.focus_later(restore as Control)
 	if cb.is_valid():
 		cb.call(res)
 

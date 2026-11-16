@@ -1,0 +1,227 @@
+{
+ "npcs": [
+  {
+   "id": "npc_hilde",
+   "name_key": "Hilde",
+   "color": "#c06080",
+   "shop_id": "shop_general",
+   "gift_prefs": {
+    "loved": [
+     "item_berry_tart",
+     "item_sunflower"
+    ],
+    "liked": [
+     "item_apple",
+     "item_strawberry",
+     "item_carrot"
+    ],
+    "disliked": [
+     "item_stone",
+     "item_dirt"
+    ]
+   },
+   "schedule": [
+    {
+     "from": 360,
+     "marker": "npc_hilde_shop"
+    },
+    {
+     "from": 1080,
+     "marker": "npc_hilde_home"
+    }
+   ],
+   "dialogue": {
+    "greeting": [
+     "Good morning, dear!",
+     "Hello again!",
+     "There you are, my favorite customer!"
+    ],
+    "chat": [
+     "Carrots grow fast when you water them.",
+     "Have you seen the sunflowers?",
+     "My cat loves sunny windows."
+    ]
+   }
+  },
+  {
+   "id": "npc_foreman",
+   "name_key": "Bram",
+   "color": "#a06030",
+   "shop_id": "shop_builder",
+   "job_id": "job_builder",
+   "gift_prefs": {
+    "loved": [
+     "item_iron_ore"
+    ],
+    "liked": [
+     "item_wood",
+     "item_copper_ore"
+    ],
+    "disliked": [
+     "item_cotton"
+    ]
+   },
+   "schedule": [
+    {
+     "from": 360,
+     "marker": "npc_foreman_shop"
+    },
+    {
+     "from": 1020,
+     "marker": "npc_foreman_home"
+    }
+   ],
+   "dialogue": {
+    "greeting": [
+     "Ready to build?",
+     "Hammer in hand, I see!",
+     "Good to see you."
+    ],
+    "chat": [
+     "Nails need two good hits.",
+     "Walls hold roofs, floors hold chairs.",
+     "A good fence makes a good neighbor."
+    ]
+   }
+  },
+  {
+   "id": "npc_tailor",
+   "name_key": "Lin",
+   "color": "#8060c0",
+   "shop_id": "shop_tailor",
+   "job_id": "job_tailor",
+   "gift_prefs": {
+    "loved": [
+     "item_cotton_cloth"
+    ],
+    "liked": [
+     "item_cotton",
+     "item_amethyst"
+    ],
+    "disliked": [
+     "item_clay"
+    ]
+   },
+   "schedule": [
+    {
+     "from": 360,
+     "marker": "npc_tailor_shop"
+    },
+    {
+     "from": 1080,
+     "marker": "npc_tailor_home"
+    }
+   ],
+   "dialogue": {
+    "greeting": [
+     "Oh, what a lovely outfit!",
+     "Hello, hello!",
+     "Need something stitched?"
+    ],
+    "chat": [
+     "Cotton becomes cloth at my bench.",
+     "Pets look sweet in bandanas.",
+     "Colors make everyone smile."
+    ]
+   }
+  },
+  {
+   "id": "npc_neighbor",
+   "name_key": "Pip",
+   "color": "#50a060",
+   "gift_prefs": {
+    "loved": [
+     "item_honey_bun"
+    ],
+    "liked": [
+     "item_apple",
+     "item_tomato"
+    ],
+    "disliked": [
+     "item_sand"
+    ]
+   },
+   "schedule": [
+    {
+     "from": 360,
+     "marker": "npc_neighbor_garden"
+    },
+    {
+     "from": 720,
+     "marker": "npc_neighbor_bench"
+    },
+    {
+     "from": 1080,
+     "marker": "npc_neighbor_home"
+    }
+   ],
+   "dialogue": {
+    "greeting": [
+     "Hi neighbor!",
+     "Nice day, isn't it?",
+     "Hello friend!"
+    ],
+    "chat": [
+     "I sent you a snack when you were tired.",
+     "Did you hear the birds this morning?",
+     "Wave at me any time!"
+    ]
+   }
+  },
+  {
+   "id": "npc_curator",
+   "name_key": "Ada",
+   "color": "#406080",
+   "is_curator": true,
+   "gift_prefs": {
+    "loved": [
+     "item_amethyst",
+     "item_quartz"
+    ],
+    "liked": [
+     "item_geode"
+    ],
+    "disliked": [
+     "item_dirt"
+    ]
+   },
+   "schedule": [
+    {
+     "from": 360,
+     "marker": "npc_curator_desk"
+    }
+   ],
+   "dialogue": {
+    "greeting": [
+     "Welcome, explorer!",
+     "Found anything shiny?",
+     "Hello!"
+    ],
+    "chat": [
+     "The museum opens soon.",
+     "Geodes hide crystals inside.",
+     "Every find has a story."
+    ]
+   }
+  }
+ ],
+ "friendship": {
+  "gift_loved": 80,
+  "gift_liked": 45,
+  "gift_neutral": 20,
+  "gift_disliked": 0,
+  "talk_daily": 5,
+  "wave_daily": 1,
+  "max": 1000,
+  "letters": [
+   {
+    "threshold": 200,
+    "template": "mail_tpl_friend_heart2"
+   },
+   {
+    "threshold": 400,
+    "template": "mail_tpl_friend_heart4"
+   }
+  ]
+ }
+}

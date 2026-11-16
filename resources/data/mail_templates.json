@@ -98,6 +98,70 @@
       "subject_key": "Job done!",
       "body_key": "Thank you for your great work.",
       "attachments": []
+    },
+    {
+      "id": "mail_tpl_pet_adoption",
+      "sender_id": "npc_neighbor",
+      "kind": "PACKAGE",
+      "subject_key": "A friend for you!",
+      "body_key": "A little one needs a home. Will you look after it?",
+      "attachments": [
+        {
+          "type": "pet_adoption"
+        }
+      ]
+    },
+    {
+      "id": "mail_tpl_job_offer_tailor",
+      "sender_id": "npc_tailor",
+      "kind": "JOB_OFFER",
+      "subject_key": "Can you help me?",
+      "body_key": "I need some bandanas sewn.",
+      "expires_after_days": 5,
+      "attachments": [
+        {
+          "type": "contract",
+          "contract_id": "contract_tailor_bandanas"
+        }
+      ]
+    },
+    {
+      "id": "mail_tpl_catalog_order",
+      "sender_id": "system",
+      "kind": "CATALOG_ORDER",
+      "subject_key": "Your order arrived",
+      "body_key": "Thank you for shopping by mail!",
+      "attachments": []
+    },
+    {
+      "id": "mail_tpl_friend_heart2",
+      "sender_id": "system",
+      "kind": "LETTER",
+      "subject_key": "From your friend",
+      "body_key": "I'm so glad we are friends! Here is a new move to share.",
+      "attachments": [
+        {
+          "type": "unlock_emote",
+          "id": "emote_clap"
+        }
+      ]
+    },
+    {
+      "id": "mail_tpl_friend_heart4",
+      "sender_id": "system",
+      "kind": "REWARD",
+      "subject_key": "Best friends!",
+      "body_key": "You are the best. Please take this.",
+      "attachments": [
+        {
+          "type": "unlock_emote",
+          "id": "emote_heart"
+        },
+        {
+          "type": "coins",
+          "amount": 50
+        }
+      ]
     }
   ]
 }

@@ -96,6 +96,21 @@ signal contract_failed(contract_id: StringName)
 signal job_rank_up(job_id: StringName, rank: int)
 signal outfit_changed(slot: StringName)
 
+# NPCs, pet, expression (spec 1.8, 7)
+signal npc_gifted(npc_id: StringName, item_id: StringName, pref: StringName, gain: int)
+signal friendship_changed(npc_id: StringName, value: int)
+signal pet_adopted(species_id: StringName, pet_name: String)
+signal pet_fed(item_id: StringName, gain: int)
+signal pet_happiness_changed(value: int)
+signal pet_accessory_changed(slot: StringName)
+signal pet_state_changed(from: StringName, to: StringName)
+signal pet_found_item(item_id: StringName)
+signal pet_called
+signal player_emoted(emote_id: StringName, at: Vector3)
+signal note_played(instrument_id: StringName, note: int)
+signal mail_read(id: String)
+signal pet_adoption_claimed
+
 # Menus (spec 5.3)
 signal menu_opened(menu_id: StringName)
 signal menu_closed(menu_id: StringName)

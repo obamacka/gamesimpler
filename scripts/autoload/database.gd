@@ -26,6 +26,16 @@ var outfits: Dictionary = {}         # StringName -> OutfitDef
 var dyes: Dictionary = {}            # StringName -> DyeDef
 var default_dyes: Array[StringName] = []
 var economy: Dictionary = {"sell_pct": 50, "starting_coins": 0}
+var npcs: Dictionary = {}            # StringName -> NpcDef
+var friendship: Dictionary = {}
+var pet_species: Dictionary = {}     # StringName -> PetSpeciesDef
+var pet_accessories: Dictionary = {} # item id -> PetAccessoryDef
+var pet_names: Array[String] = []
+var pet_config: Dictionary = {}
+var emotes: Dictionary = {}          # StringName -> EmoteDef
+var default_emotes: Array[StringName] = []
+var instruments: Dictionary = {}     # StringName -> InstrumentDef
+var default_instruments: Array[StringName] = []
 var farm := FarmConfig.new()
 var stamina := StaminaConfig.new()
 var discovery := DiscoveryConfig.new()
@@ -49,6 +59,7 @@ func load_all(dir: String) -> void:
 	treasure_tables.clear(); fruit_trees.clear(); timber_trees.clear(); zones.clear(); mail_templates.clear()
 	crops.clear(); plots.clear(); pieces.clear()
 	recipes.clear(); shops.clear(); jobs.clear(); contracts.clear(); blueprints.clear(); outfits.clear(); dyes.clear()
+	npcs.clear(); pet_species.clear(); pet_accessories.clear(); emotes.clear(); instruments.clear()
 	var items_json := _read(dir.path_join("items.json"))
 	for d in items_json.get("items", []):
 		var it := _item(d)
@@ -105,6 +116,7 @@ func load_all(dir: String) -> void:
 		var p := _piece(d)
 		pieces[p.id] = p
 	_load_phase4(dir)
+	_load_phase5(dir)
 	var home: Dictionary = world.get("home", {})
 	home_zone = StringName(home.get("zone_id", "zone_starter_cabin"))
 	home_bed_key = StringName(home.get("bed_key", "bed_01"))
@@ -279,6 +291,7 @@ func validate() -> Array[String]:
 		if items[id].category == &"OUTFIT" and not outfits.has(items[id].outfit_id):
 			errors.append("outfit item %s wears unknown outfit" % id)
 	errors.append_array(_validate_phase4())
+	errors.append_array(_validate_phase5())
 	return errors
 
 
@@ -423,6 +436,111 @@ func _load_phase4(dir: String) -> void:
 		y.id = StringName(d["id"]); y.name_key = d.get("name_key", ""); y.color = Color.html(d.get("color", "#ffffff"))
 		dyes[y.id] = y
 	default_dyes.assign((oo.get("default_dyes", []) as Array).map(func(v): return StringName(v)))
+
+
+func _load_phase5(dir: String) -> void:
+	var nn := _read(dir.path_join("npcs.json"))
+	for d in nn.get("npcs", []):
+		var n := NpcDef.new()
+		n.id = StringName(d["id"]); n.name_key = d.get("name_key", ""); n.color = Color.html(d.get("color", "#ffffff"))
+		n.shop_id = StringName(d.get("shop_id", "")); n.job_id = StringName(d.get("job_id", "")); n.is_curator = bool(d.get("is_curator", false))
+		var prefs := {}
+		for k in d.get("gift_prefs", {}):
+			prefs[k] = (d["gift_prefs"][k] as Array).map(func(v): return StringName(v))
+		n.gift_prefs = prefs
+		n.schedule = (d.get("schedule", []) as Array).map(func(e): return {"from": int(e["from"]), "marker": StringName(e["marker"])})
+		n.dialogue = d.get("dialogue", {})
+		npcs[n.id] = n
+	friendship = nn.get("friendship", {})
+	for k in friendship:
+		if friendship[k] is float:
+			friendship[k] = int(friendship[k])
+	friendship["letters"] = (friendship.get("letters", []) as Array).map(func(e): return {"threshold": int(e["threshold"]), "template": StringName(e["template"])})
+	var pp := _read(dir.path_join("pets.json"))
+	for d in pp.get("species", []):
+		var sp := PetSpeciesDef.new()
+		sp.id = StringName(d["id"])
+		for k in ["walk_speed", "run_speed", "follow_distance", "teleport_distance", "idle_after", "wander_after", "wander_radius"]:
+			sp.set(k, float(d.get(k, sp.get(k))))
+		sp.accessory_bones = d.get("accessory_bones", sp.accessory_bones)
+		sp.favorite_food_tags.assign((d.get("favorite_food_tags", []) as Array).map(func(v): return StringName(v)))
+		sp.variants.assign((d.get("variants", []) as Array).map(func(v): return Color.html(v)))
+		sp.size = _v3(d.get("size", [0.5, 0.6, 0.9]))
+		pet_species[sp.id] = sp
+	for d in pp.get("accessories", []):
+		var a := PetAccessoryDef.new()
+		a.item_id = StringName(d["item_id"]); a.slot = StringName(d["slot"]); a.dyeable = bool(d.get("dyeable", true))
+		a.species.assign((d.get("species", []) as Array).map(func(v): return StringName(v)))
+		a.default_dye_id = StringName(d.get("default_dye_id", "")); a.color = Color.html(d.get("color", "#ffffff"))
+		pet_accessories[a.item_id] = a
+	pet_names.assign(pp.get("names", []))
+	pet_config = pp.get("config", {})
+	var ee := _read(dir.path_join("emotes.json"))
+	for d in ee.get("emotes", []):
+		var e := EmoteDef.new()
+		e.id = StringName(d["id"]); e.duration_sec = float(d.get("duration_sec", 1.5))
+		e.pet_reaction = StringName(d.get("pet_reaction", "")); e.npc_reaction = StringName(d.get("npc_reaction", ""))
+		emotes[e.id] = e
+	default_emotes.assign((ee.get("default_emotes", []) as Array).map(func(v): return StringName(v)))
+	for d in ee.get("instruments", []):
+		var i := InstrumentDef.new()
+		i.id = StringName(d["id"]); i.base_hz = float(d.get("base_hz", 440.0)); i.wave = StringName(d.get("wave", "sine"))
+		instruments[i.id] = i
+	default_instruments.assign((ee.get("default_instruments", []) as Array).map(func(v): return StringName(v)))
+
+
+func _validate_phase5() -> Array[String]:
+	var errors: Array[String] = []
+	for id in npcs:
+		var n: NpcDef = npcs[id]
+		if n.shop_id != &"" and not shops.has(n.shop_id):
+			errors.append("npc %s has unknown shop" % id)
+		if n.job_id != &"" and not jobs.has(n.job_id):
+			errors.append("npc %s has unknown job" % id)
+		for k in n.gift_prefs:
+			for it in n.gift_prefs[k]:
+				if not items.has(it):
+					errors.append("npc %s prefers unknown item %s" % [id, it])
+		if n.schedule.is_empty():
+			errors.append("npc %s has no schedule" % id)
+	for l in friendship.get("letters", []):
+		if not mail_templates.has(l["template"]):
+			errors.append("friendship letter %s unknown" % l["template"])
+	for id in pet_accessories:
+		var a: PetAccessoryDef = pet_accessories[id]
+		if not items.has(id) or items[id].category != &"PET_ACCESSORY":
+			errors.append("pet accessory %s has no PET_ACCESSORY item" % id)
+		if not (a.slot in PetAccessoryDef.SLOTS):
+			errors.append("pet accessory %s has unknown slot" % id)
+		if a.species.is_empty():
+			errors.append("pet accessory %s fits no species" % id)
+		for sp in a.species:
+			if not pet_species.has(sp):
+				errors.append("pet accessory %s names unknown species %s" % [id, sp])
+	for id in items:
+		if items[id].category == &"PET_ACCESSORY" and not pet_accessories.has(id):
+			errors.append("PET_ACCESSORY item %s has no accessory definition" % id)
+		if items[id].category == &"PET_FOOD" and items[id].food == null:
+			errors.append("PET_FOOD %s has no food data" % id)
+	for sp in pet_species.values():
+		if sp.variants.size() != 3:
+			errors.append("pet species %s needs 3 color variants" % sp.id)
+	for e in default_emotes + default_instruments:
+		if not emotes.has(e) and not instruments.has(e):
+			errors.append("default unlock %s unknown" % e)
+	for id in mail_templates:
+		for a in mail_templates[id].attachments:
+			match a.get("type", ""):
+				"contract":
+					if not contracts.has(StringName(a.get("contract_id", ""))):
+						errors.append("mail %s attaches unknown contract" % id)
+				"unlock_emote":
+					if not emotes.has(StringName(a.get("id", ""))):
+						errors.append("mail %s unlocks unknown emote" % id)
+				"unlock_dye":
+					if not dyes.has(StringName(a.get("id", ""))):
+						errors.append("mail %s unlocks unknown dye" % id)
+	return errors
 
 
 func _v3(a: Array) -> Vector3:

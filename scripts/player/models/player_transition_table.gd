@@ -16,6 +16,9 @@ const INTERACT := &"interact"
 const BUILD := &"build"
 const SIT := &"sit"
 const CRAFT := &"craft"
+const TALK := &"talk"
+const EMOTE := &"emote"
+const PLAY_INSTRUMENT := &"playinstrument"
 
 const MOVE_THRESHOLD := 0.2
 const SOFT_LAND_HEIGHT := 4.0
@@ -78,6 +81,12 @@ static func next(state: StringName, f: InputFrame, c: PlayerContext) -> Transiti
 		return _sit(f, c)
 	if state == CRAFT:
 		return _craft(f, c)
+	if state == TALK:
+		return Transition.new(IDLE) if c.talk_done else Transition.new()
+	if state == EMOTE:
+		return Transition.new(_moving_state(c)) if c.emote_done or c.move_len > MOVE_THRESHOLD else Transition.new()
+	if state == PLAY_INSTRUMENT:
+		return Transition.new(_moving_state(c)) if c.move_len > MOVE_THRESHOLD or f.wheel_pressed else Transition.new()
 	return Transition.new()
 
 
@@ -93,6 +102,12 @@ static func _grounded(state: StringName, f: InputFrame, c: PlayerContext) -> Tra
 	# Left the floor without jumping: stay grounded during coyote time, then fall.
 	if not c.on_floor and c.coyote_left <= 0.0:
 		return Transition.new(FALL)
+
+	# Wheel choices (spec 4.8): emote from Idle/Walk, instrument from Idle/Walk.
+	if c.pending_emote and (state == IDLE or state == WALK):
+		return Transition.new(EMOTE)
+	if c.pending_instrument and (state == IDLE or state == WALK):
+		return Transition.new(PLAY_INSTRUMENT)
 
 	# Build mode (spec 4.2): only inside an owned plot or job site.
 	if f.build_toggle_pressed and state != DUCK and state != RUN:

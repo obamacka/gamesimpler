@@ -1,4 +1,4 @@
-## Mailbox. Phase 2: X claims all letters (temporary, replaced by the mail menu in P5.13).
+## Mailbox: X opens the mail menu (spec 4.7, P5.13).
 class_name Mailbox
 extends WorldObject
 
@@ -14,8 +14,12 @@ func unread() -> int:
 
 
 func interaction_spec(_player: Node, _forage: bool, alt: bool) -> InteractionSpec:
-	return null if alt else InteractionSpec.new(&"MAILBOX", 0.3)
+	if alt:
+		return null
+	var spec := InteractionSpec.new(&"MAILBOX", 0.3)
+	spec.opens_menu = &"mail"
+	return spec
 
 
 func resolve_interaction(_spec: InteractionSpec, _player: Node) -> void:
-	session().mail.claim_all()
+	pass

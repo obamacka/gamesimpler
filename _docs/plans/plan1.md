@@ -344,35 +344,35 @@ Integration:
 **Spec:** 3.3, 3.4 (NPC, pet, emote, instrument), 3.6, 4.5 (Talk), 4.6, 4.7, 4.8, 7.1, 7.4, 9.4.
 
 ### P5 resources
-- [ ] **P5.1** `NpcDef`s (curator, Hilde, neighbor, builder foreman, tailor), `DialogueDef` resources, gift preferences, schedules within STATIC zones; full `MailTemplateDef` set (job offers, receipts, catalog orders, pet adoption, rewards, friendship letters); `PetSpeciesDef` dog and cat (scenes with accessory bones), `PetAccessoryDef`s with per-species meshes, pet food items; `EmoteDef`s (8) and `InstrumentDef`s (flute, drum, ukulele with 8 notes).
+- [x] **P5.1** `NpcDef`s (curator, Hilde, neighbor, builder foreman, tailor), `DialogueDef` resources, gift preferences, schedules within STATIC zones; full `MailTemplateDef` set (job offers, receipts, catalog orders, pet adoption, rewards, friendship letters); `PetSpeciesDef` dog and cat (scenes with accessory bones), `PetAccessoryDef`s with per-species meshes, pet food items; `EmoteDef`s (8) and `InstrumentDef`s (flute, drum, ukulele with 8 notes).
 
 ### P5 scripts
-- [ ] **P5.2 NPCs:** `NpcModel` (friendship, met, daily gift, flags), `NpcService`, `npc.tscn` with `NavigationAgent3D` on STATIC navmesh, schedule runner; care-letter sender switches to highest-friendship NPC.
-- [ ] **P5.3 `Talk` state** (NPC lock, camera two-shot, dialogue push), `DialogueModel` (Greeting, Choices, Chat, JobTalk, Shop), `dialogue` menu showing the A advance glyph; `gift_picker` menu via Y.
-- [ ] **P5.4 Mail complete:** all attachment types (`item`, `coins`, `unlock_*`, `contract`, `pet_adoption`), expiry to Lost and Found, inbox cap and prune, catalog orders (debit now, deliver next day).
-- [ ] **P5.5 Mail UI:** `mail` menu (InboxList, Reading with illustration first, Claim, ClaimResult, Archive), unread badge, TTS read-aloud when enabled.
-- [ ] **P5.6 Pet core:** `PetBrainModel` (Follow, Idle, Wander, Teleport, React, Eat, GoToBowl, Nap, Call; thresholds from `PetSpeciesDef`), `PetService` (adopt, pat, `try_feed`, happiness drift and floor 40, daily reset in `DayRollover`, daily find at >= 80), `pet.tscn` (layer pet, no player collision).
-- [ ] **P5.7 Pet pathing:** `IPetPathProvider` with `VoxelPathProvider` (`VoxelAStarGrid3D` over a 32x16x32 region re-centered every 8 m), `NavmeshPathProvider` (STATIC zones), `FakePathProvider` (tests); teleport fallback; nudge when a placed piece covers the pet.
-- [ ] **P5.8 Pet accessories:** `PetAccessoryModel` (slot validation, species mesh availability, swap returns the old item, full-inventory refusal), mounting meshes under species `BoneAttachment3D`s, dye via instance shader parameter, `pet_wardrobe` menu with preview.
-- [ ] **P5.9 Adoption flow:** letter with `pet_adoption` scheduled at new-game creation for day 2 (D11), species/variant/name picker menu, `pet_call` (D-pad right).
-- [ ] **P5.10 Pet furniture:** PET_BED (Nap target) and FEED_BOWL (1-slot storage, self-feed during rollover) pieces.
-- [ ] **P5.11 Expression:** `wheel` menu (angle-to-slot, pages Emotes, Instruments, Tools calling `ToolAutoSelector.manual_select`), `Emote` state with pet and NPC reactions (first wave per NPC per day +1 friendship), `PlayInstrument` state with `note_1..8`.
-- [ ] **P5.12 Serialization:** Npc state, Pet state, full Mailbox, unlocked emotes and instruments.
-- [ ] **P5.13 Remove the Phase 2 temporary mailbox `claim_all`** in favor of the mail menu.
+- [x] **P5.2 NPCs:** `NpcModel` (friendship, met, daily gift, flags), `NpcService`, `npc.tscn` with `NavigationAgent3D` on STATIC navmesh, schedule runner; care-letter sender switches to highest-friendship NPC.
+- [x] **P5.3 `Talk` state** (NPC lock, camera two-shot, dialogue push), `DialogueModel` (Greeting, Choices, Chat, JobTalk, Shop), `dialogue` menu showing the A advance glyph; `gift_picker` menu via Y.
+- [x] **P5.4 Mail complete:** all attachment types (`item`, `coins`, `unlock_*`, `contract`, `pet_adoption`), expiry to Lost and Found, inbox cap and prune, catalog orders (debit now, deliver next day).
+- [x] **P5.5 Mail UI:** `mail` menu (InboxList, Reading with illustration first, Claim, ClaimResult, Archive), unread badge, TTS read-aloud when enabled.
+- [x] **P5.6 Pet core:** `PetBrainModel` (Follow, Idle, Wander, Teleport, React, Eat, GoToBowl, Nap, Call; thresholds from `PetSpeciesDef`), `PetService` (adopt, pat, `try_feed`, happiness drift and floor 40, daily reset in `DayRollover`, daily find at >= 80), `pet.tscn` (layer pet, no player collision).
+- [x] **P5.7 Pet pathing:** `IPetPathProvider` with `VoxelPathProvider` (`VoxelAStarGrid3D` over a 32x16x32 region re-centered every 8 m), `NavmeshPathProvider` (STATIC zones), `FakePathProvider` (tests); teleport fallback; nudge when a placed piece covers the pet.
+- [x] **P5.8 Pet accessories:** `PetAccessoryModel` (slot validation, species mesh availability, swap returns the old item, full-inventory refusal), mounting meshes under species `BoneAttachment3D`s, dye via instance shader parameter, `pet_wardrobe` menu with preview.
+- [x] **P5.9 Adoption flow:** letter with `pet_adoption` scheduled at new-game creation for day 2 (D11), species/variant/name picker menu, `pet_call` (D-pad right).
+- [x] **P5.10 Pet furniture:** PET_BED (Nap target) and FEED_BOWL (1-slot storage, self-feed during rollover) pieces.
+- [x] **P5.11 Expression:** `wheel` menu (angle-to-slot, pages Emotes, Instruments, Tools calling `ToolAutoSelector.manual_select`), `Emote` state with pet and NPC reactions (first wave per NPC per day +1 friendship), `PlayInstrument` state with `note_1..8`.
+- [x] **P5.12 Serialization:** Npc state, Pet state, full Mailbox, unlocked emotes and instruments.
+- [x] **P5.13 Remove the Phase 2 temporary mailbox `claim_all`** in favor of the mail menu.
 
 ### P5 tests
 Unit:
-- [ ] **P5.14** `pet/test_pet_brain_model.gd`: every transition of spec 4.6 at its threshold boundary (idle after 2 s within follow distance, wander after 6 s, follow on player move or > 6 m, teleport at > 20 m or 2 s without path or zone change, react on emote/pat, eat on feed, go-to-bowl when food and not fed, nap near pet bed while player sits or sleeps, call -> teleport if no path in 1 s or > 10 m).
-- [ ] **P5.15** `pet/test_pet_feeding.gd`: only PET_FOOD or favorite-tagged FOOD accepted; favorite doubles; first feed of day sets `fed_day`, later feeds half effect; clamp 100; daily drift toward 60; never below 40; nothing removed on refusal.
-- [ ] **P5.16** `pet/test_pet_accessory_model.gd`: valid slot per item; species without a mesh refused; swap returns previous item; full inventory refusal leaves both unchanged; dye data preserved.
-- [ ] **P5.17** `mail/test_mailbox_model_full.gd` (all attachment types, all-or-nothing with mixed attachments, expiry to Lost and Found, never-expire kinds, prune only archived and claimed, monotonic ids across save round-trip), `npc/test_npc_model.gd` (friendship, gift once per day, preferences), `npc/test_dialogue_model.gd`, `interaction/test_interaction_resolver_npc_pet.gd` (X/Y specs for NPC, curator, pet incl. Feed vs Dress Up rule), `ui/test_wheel_model.gd` (angle to slot, dead zone, release on neutral cancels), `save/test_phase5_round_trip.gd`.
+- [x] **P5.14** `pet/test_pet_brain_model.gd`: every transition of spec 4.6 at its threshold boundary (idle after 2 s within follow distance, wander after 6 s, follow on player move or > 6 m, teleport at > 20 m or 2 s without path or zone change, react on emote/pat, eat on feed, go-to-bowl when food and not fed, nap near pet bed while player sits or sleeps, call -> teleport if no path in 1 s or > 10 m).
+- [x] **P5.15** `pet/test_pet_feeding.gd`: only PET_FOOD or favorite-tagged FOOD accepted; favorite doubles; first feed of day sets `fed_day`, later feeds half effect; clamp 100; daily drift toward 60; never below 40; nothing removed on refusal.
+- [x] **P5.16** `pet/test_pet_accessory_model.gd`: valid slot per item; species without a mesh refused; swap returns previous item; full inventory refusal leaves both unchanged; dye data preserved.
+- [x] **P5.17** `mail/test_mailbox_model_full.gd` (all attachment types, all-or-nothing with mixed attachments, expiry to Lost and Found, never-expire kinds, prune only archived and claimed, monotonic ids across save round-trip), `npc/test_npc_model.gd` (friendship, gift once per day, preferences), `npc/test_dialogue_model.gd`, `interaction/test_interaction_resolver_npc_pet.gd` (X/Y specs for NPC, curator, pet incl. Feed vs Dress Up rule), `ui/test_wheel_model.gd` (angle to slot, dead zone, release on neutral cancels), `save/test_phase5_round_trip.gd`.
 
 Integration:
-- [ ] **P5.18** `test_pet_follow.gd` (with `FakePathProvider`): Follow keeps follow distance; Idle and Wander timings; teleport when > 20 m and on zone change; never blocks the player (move through each other); nudged off a newly placed piece; `pet_call`.
-- [ ] **P5.19** `test_pet_care.gd`: X pats (once-per-day bonus), Y feeds when food is owned and not fed today, otherwise opens Dress Up; feeding emits `pet_fed` and changes happiness; bowl self-feed at rollover; equipping an accessory creates the mesh under the correct `BoneAttachment3D` for dog and for cat, removes on unequip, and survives `to_dict/from_dict`.
-- [ ] **P5.20** `test_mail_arrival.gd`: scheduled mail appears only after `deliver_due` for its day, in id order; `mail_delivered` emitted once with all ids; catalog order arrives next day; job offer contract attachment works with JobService; adoption letter is not in the inbox on day 1, arrives on day 2, and creates the pet; claim with full inventory changes nothing.
-- [ ] **P5.21** `test_npc_talk.gd`: Talk locks the NPC, pushes dialogue (paused), close returns to Idle and resumes the NPC; Y gift once per day changes friendship by preference.
-- [ ] **P5.22** `test_emote_instrument.gd`: wheel selection enters Emote, pet reacts within 8 m, NPC reacts within 6 m; instrument mode plays notes for each note action and exits on move.
+- [x] **P5.18** `test_pet_follow.gd` (with `FakePathProvider`): Follow keeps follow distance; Idle and Wander timings; teleport when > 20 m and on zone change; never blocks the player (move through each other); nudged off a newly placed piece; `pet_call`.
+- [x] **P5.19** `test_pet_care.gd`: X pats (once-per-day bonus), Y feeds when food is owned and not fed today, otherwise opens Dress Up; feeding emits `pet_fed` and changes happiness; bowl self-feed at rollover; equipping an accessory creates the mesh under the correct `BoneAttachment3D` for dog and for cat, removes on unequip, and survives `to_dict/from_dict`.
+- [x] **P5.20** `test_mail_arrival.gd`: scheduled mail appears only after `deliver_due` for its day, in id order; `mail_delivered` emitted once with all ids; catalog order arrives next day; job offer contract attachment works with JobService; adoption letter is not in the inbox on day 1, arrives on day 2, and creates the pet; claim with full inventory changes nothing.
+- [x] **P5.21** `test_npc_talk.gd`: Talk locks the NPC, pushes dialogue (paused), close returns to Idle and resumes the NPC; Y gift once per day changes friendship by preference.
+- [x] **P5.22** `test_emote_instrument.gd`: wheel selection enters Emote, pet reacts within 8 m, NPC reacts within 6 m; instrument mode plays notes for each note action and exits on move.
 
 ### P5 manual checklist
 - [ ] Pet follows through tunnels, across dug terrain and into town; never gets lost.

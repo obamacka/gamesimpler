@@ -31,3 +31,8 @@ var in_build_zone := false
 var build_active := false
 var build_fastening := false
 var craft_done := false
+# Phase 5: Talk, Emote, PlayInstrument
+var talk_done := false
+var emote_done := false
+var pending_emote := false
+var pending_instrument := false

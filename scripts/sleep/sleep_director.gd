@@ -44,7 +44,11 @@ func _schedule_care_letter(reason: StringName, new_day: int) -> void:
 	var tpl := CareLetterModel.pick(Database.templates_in_pool(pool), session.rng)
 	if tpl == null:
 		return
-	session.mail.schedule(tpl, new_day, {"reason": String(reason)})
+	var params := {"reason": String(reason)}
+	var friend := session.npcs.best_friend()
+	if friend != &"":
+		params["sender_id"] = String(friend)   # spec P5.2: the closest friend sends the care letter
+	session.mail.schedule(tpl, new_day, params)
 	if tpl.has_snack:
 		session.exhaustion["last_snack_day"] = new_day
 

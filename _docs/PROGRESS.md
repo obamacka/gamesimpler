@@ -2,10 +2,10 @@
 
 | Field | Value |
 |---|---|
-| Spec | `_docs/specs/spec1.md` rev 3.1 |
+| Spec | `_docs/specs/spec1.md` rev 3.2 |
 | Plan | `_docs/plans/plan1.md` |
 | Active phase | Phase 0 (not started) |
-| Last updated | 2026-11-15 |
+| Last updated | 2026-11-16 |
 
 ## How to update
 1. After finishing a task, tick it in `plan1.md` and in the phase table below, with the date and commit SHA.
@@ -21,9 +21,11 @@ Status values: `Not started`, `In progress`, `Blocked`, `Done`.
 | Godot 4.7.x binary | Not installed in the cloud session container; local and CI installs pending (P0.1, P0.6) |
 | gdUnit4 v6.2.3 | Not installed (P0.2) |
 | Voxel Tools 1.7 GDExtension | Not installed (P0.8) |
-| Verified headless test command | Pending P0.3. Proposed: `godot --headless --path . -s -d res://addons/gdUnit4/bin/GdUnitCmdTool.gd --ignoreHeadlessMode -a res://test` |
+| Headless test command | CLAUDE.md (owner, 2026-11-16): `godot --headless --path . -s -d res://addons/gdUnit4/bin/GdUnitCmdTool.gd --ignoreHeadlessMode -a res://test`. Not yet run; P0.3 also tests the `--remote-debug tcp://127.0.0.1:0` variant (parse-error hang risk, spec 0.6 item 1) |
 | CI | Not configured (P0.6) |
-| Min-spec hardware | Owner to define (P0.7) |
+| Min-spec hardware (Windows/Linux) | Intel Core i7-3770, 16 GB DDR3-1333, Nvidia GTX 1070 (spec 0.7) |
+| Min-spec hardware (macOS) | Open (D24) |
+| Performance target | 60 fps at 1920x1080 medium on min spec (D25, proposed) |
 
 ## Phase overview
 | Phase | Title | Status | Gate commit |
@@ -31,6 +33,7 @@ Status values: `Not started`, `In progress`, `Blocked`, `Done`.
 | 0 | Bootstrap, Test Harness and Voxel Spike | Not started | |
 | 1 | Core Engine, Gamepad Input, Camera, Tall Character FSM | Not started | |
 | 2 | Mining, Foraging, Stamina Loop, Auto-Tool | Not started | |
+| 2B | Farming | Not started | |
 | 3 | Magnetic Grid Building, Screw/Hammer Mini-Games | Not started | |
 | 4 | Economy, Jobs, Wardrobe UI, Game Pause | Not started | |
 | 5 | NPCs, Mail, Pet Companion | Not started | |
@@ -44,11 +47,11 @@ Status values: `Not started`, `In progress`, `Blocked`, `Done`.
 | P0.1 Project skeleton | Not started | | | |
 | P0.2 Install gdUnit4 v6.2.3 | Not started | | | |
 | P0.3 Prove headless command | Not started | | | |
-| P0.4 Update CLAUDE.md test command | Not started | | | needs owner approval |
+| P0.4 Update CLAUDE.md test command | Done (owner) | 2026-11-16 | 3682356 | follow-up: `--remote-debug` flag if P0.3 shows a hang |
 | P0.5 Test helpers | Not started | | | |
 | P0.6 CI | Not started | | | |
-| P0.7 Min-spec hardware | Not started | | | owner input |
-| P0.8 Voxel spike (a to i) | Not started | | | report: `_docs/reports/voxel_spike.md` |
+| P0.7 Min-spec hardware | Done (owner) | 2026-11-16 | | Windows/Linux defined; macOS open (D24) |
+| P0.8 Voxel spike (a to k) | Not started | | | run on the min-spec machine; report: `_docs/reports/voxel_spike.md` |
 | P0.9 Export smoke | Not started | | | |
 | P0.10 Go / no-go record | Not started | | | |
 
@@ -71,6 +74,15 @@ Status values: `Not started`, `In progress`, `Blocked`, `Done`.
 | P2.23 to P2.28 Unit suites | Not started | | | |
 | P2.29 to P2.33 Integration suites | Not started | | | Suite A: A1 to A7, A11 to A22. Suite B: B1 to B11, B14 to B17 |
 | Manual checklist | Not started | | | |
+
+### Phase 2B
+| Task | Status | Date | Commit | Notes |
+|---|---|---|---|---|
+| P2B.1 to P2B.2 Resources and zone | Not started | | | |
+| P2B.3 to P2B.11 Scripts | Not started | | | |
+| P2B.12 to P2B.14 Unit suites | Not started | | | |
+| P2B.15 to P2B.16 Integration suites | Not started | | | Suite F: F1 to F16 |
+| Manual checklist and performance check | Not started | | | |
 
 ### Phase 3
 | Task | Status | Date | Commit | Notes |
@@ -118,11 +130,14 @@ Status values: `Not started`, `In progress`, `Blocked`, `Done`.
 |---|---|---|
 | D1 to D4 | Resolved (spec rev 3) | blocky 1 m voxels, protected zones, Voxel Tools GDExtension; jump + double jump, A jump, X/Y interact; criteria-based dedicated states; timed Craft in world |
 | D16 to D19 | Resolved (spec rev 3.1, 2026-11-15) | overworld digs permanent and Deep Mine regenerates daily; dug blocks placeable; auto-jump on by default; Go Home in pause menu |
-| D5 to D15 | Open, spec defaults assumed | see `plan1.md` 0.5 for the phase each one blocks |
+| D5 to D15 | Resolved (spec rev 3.2, 2026-11-16) | upfront coins; 20-minute days; 3 slots + autosave on sleep; apple trees not choppable; **farming system added**; free starter cabin; **pet on day 2**; dyes are unlocks; Forward+; TTS default off; **keep last tool** |
+| D20 to D25 | Open, spec defaults assumed | seasons, weather, farmable area, crop death, macOS min spec, performance target; see `plan1.md` 0.5 |
 
 ## Blockers and open issues
 | Date | Item | Owner | Status |
 |---|---|---|---|
-| 2026-11-15 | CLAUDE.md headless command does not match gdUnit4 v6.2.3 (spec 0.6 item 1) | owner approval at P0.4 | Open |
+| 2026-11-15 | CLAUDE.md headless command does not match gdUnit4 v6.2.3 (spec 0.6 item 1) | owner | Closed 2026-11-16 (3682356) |
+| 2026-11-16 | `-d` without `--remote-debug tcp://127.0.0.1:0` may hang on GDScript parse errors | P0.3 | Open |
 | 2026-11-15 | Voxel GDExtension maturity, collision latency, headless behavior, SQLite copy safety unverified (spec 0.6 items 18, 19, 21, 22) | P0.8 | Open |
-| 2026-11-15 | Min-spec hardware undefined | owner, P0.7 | Open |
+| 2026-11-15 | Min-spec hardware undefined | owner, P0.7 | Closed 2026-11-16 (Windows/Linux); macOS open as D24 |
+| 2026-11-16 | i7-3770 has no AVX2; Voxel Tools GDExtension instruction-set requirement unverified | P0.8 j | Open |

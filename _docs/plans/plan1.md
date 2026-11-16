@@ -2,7 +2,7 @@
 
 | Field | Value |
 |---|---|
-| Implements | `_docs/specs/spec1.md` rev 3 |
+| Implements | `_docs/specs/spec1.md` rev 3.2 |
 | Status | DRAFT, not started |
 | Tracking | `_docs/PROGRESS.md` (update after every completed task, per CLAUDE.md) |
 | Engine / libs | Godot 4.7.x, Jolt, gdUnit4 v6.2.3, Voxel Tools 1.7 GDExtension |
@@ -22,7 +22,7 @@
 ```
 res://scripts/autoload/      EventBus, Database, Settings, InputService, PauseManager, GameClock, SaveService, SceneRouter
 res://scripts/core/          shared value types (Result, InputFrame), base classes (State, StateMachine)
-res://scripts/<domain>/      player, input, terrain, tools, interaction, stamina, sleep, inventory, build,
+res://scripts/<domain>/      player, input, terrain, farm, tools, interaction, stamina, sleep, inventory, build,
                              economy, jobs, housing, outfit, mail, npc, pet, museum, decor, save
                              models/   pure RefCounted logic (unit-tested)
                              services/ GameSession-owned Nodes
@@ -43,6 +43,7 @@ res://spikes/                Phase 0 spikes, excluded from export
 - [ ] Pause-safety lint suite passes (P1.24).
 - [ ] `Database` integrity suite passes for every resource type introduced so far.
 - [ ] Manual gamepad pass on the phase's checklist with an Xbox-layout pad and a DualShock 4 or DualSense, plus keyboard/mouse.
+- [ ] Phases 2, 2B, 3, 5, 6: performance check on the min-spec machine (spec 0.7: i7-3770, 16 GB DDR3-1333, GTX 1070) against the D25 target and the voxel budget; numbers logged in `_docs/PROGRESS.md`.
 - [ ] `_docs/PROGRESS.md` updated: tasks ticked, test run logged with commit SHA, open issues recorded.
 - [ ] Commit with a meaningful message.
 
@@ -58,21 +59,16 @@ res://spikes/                Phase 0 spikes, excluded from export
 5. **Spec features not named in your list are assigned here:** PromptOverlay and Deep Mine (Phase 2); block placement, furniture Sit/Toggle/Bed and Set Home (Phase 3); settings, rebinding UI, accessibility, TTS, Go Home button (Phase 4); Talk state, emote and instrument wheel (Phase 5); stamps and decor undo (Phase 6, with painting).
 6. **Spec suites are split across phases where they depend on later systems:** Suite A cases A8 to A10 (hammer/screwdriver on loose pieces) run in Phase 3; Suite B case B13 (contract deadline) in Phase 4 and B12 (autosave content) in Phase 6.
 7. **"Pickaxe vs axe/picker via interaction volumes":** per spec rev 3, axe and fruit picker are selected by target volumes (`ToolTargetZone`), while pickaxe and shovel are selected by aiming at voxels (dig-anywhere terrain has no per-block volumes). Phase 2 tests both paths.
+8. **Added Phase 2B (Farming)** for D9, between Phases 2 and 3, so your phase numbers stay unchanged. It needs Phase 2 terrain, tools, stamina and day rollover; seeds in shops come in Phase 4 and crop donations in Phase 6.
 
 ### 0.5 Decision gates
-Spec defaults are used unless the owner overrides before the listed phase starts. Changing a decision after its phase costs rework.
+D1 to D19 are resolved (spec 0.4). Remaining open decisions use spec defaults until the owner confirms them before the listed phase.
 
 | Decision | Default assumed | Needed by |
 |---|---|---|
-| D13 renderer | Forward+ | Phase 0 (project settings) |
-| D18 auto-jump default | **Confirmed**: on | Phase 1 |
-| D6 day length, D7 save model, D8 apple trees not choppable, D10 starter cabin, D15 auto-tool revert | spec defaults | Phase 2 |
-| D16 Deep Mine regenerates daily, D19 Go Home | **Confirmed** | Phase 2 |
-| D17 place blocks back | **Confirmed**: yes | Phase 3 |
-| D5 house purchase upfront, D14 TTS setting | spec defaults | Phase 4 |
-| D9 crops = foraged produce, D11 one pet | spec defaults | Phase 5 (D9 also affects Phase 6 museum content) |
-| D12 dyes are unlocks | Yes | Phase 6 (outfit dye in Phase 4 uses dye ids either way) |
-| Min-spec hardware for the voxel budget | owner to define | Phase 0 (P0.7) |
+| D25 performance target | 60 fps at 1920x1080, medium preset, on min spec | Phase 0 (spike pass/fail) |
+| D24 macOS min spec | owner to define | Phase 0 (P0.9 macOS export check) |
+| D20 seasons, D21 weather, D22 farmable area, D23 no crop death | none, none, owned plots + starter garden, crops never die | Phase 2B |
 
 ---
 
@@ -84,12 +80,12 @@ Spec defaults are used unless the owner overrides before the listed phase starts
 ### P0 tasks
 - [ ] **P0.1 Project skeleton.** Create `project.godot` for Godot 4.7.x: `physics/3d/physics_engine="Jolt Physics"`, `rendering/renderer/rendering_method="forward_plus"`, physics ticks 60, named 3D physics layers 1 to 9 (spec 1.7), window defaults. Create the folder layout in 0.2. Update `.gitignore` for `.godot/`, `user://` exports, spike outputs.
 - [ ] **P0.2 Install gdUnit4 v6.2.3** into `res://addons/gdUnit4/` from the `v6.2.3` release; enable the plugin; record the source URL and license in `res://addons/README.md`.
-- [ ] **P0.3 Prove the headless command.** Run the spec 0.6 item 1 command against a passing smoke suite and a deliberately failing one. Record exact command, exit codes for pass, fail, and headless-without-flag. Write the verified command into `_docs/PROGRESS.md`.
-- [ ] **P0.4 Update CLAUDE.md test command** with the verified command (owner approval required; CLAUDE.md is project policy).
+- [ ] **P0.3 Prove the headless command.** Run the CLAUDE.md command and the spec 0.6 item 1 variant with `--remote-debug tcp://127.0.0.1:0` against: a passing suite, a failing suite, and a suite with a GDScript parse error. Record exit codes and whether any run hangs at a `debug>` prompt. Also record the exit code without `--ignoreHeadlessMode`. Write the verified command into `_docs/PROGRESS.md`.
+- [x] **P0.4 Update CLAUDE.md test command.** Done by the owner on 2026-11-16 (commit `3682356`). Follow-up after P0.3: if the parse-error run hangs, propose adding `--remote-debug tcp://127.0.0.1:0` (owner approval required).
 - [ ] **P0.5 Test helpers.** `res://test/helpers/signal_recorder.gd` (records name, args, physics frame), `res://test/helpers/physics_wait.gd` (`await_physics_frames(n)`), `res://test/helpers/test_session.gd` (factory placeholder, filled per phase). Unit suite `res://test/unit/helpers/test_signal_recorder.gd`.
 - [ ] **P0.6 CI.** GitHub Actions workflow running the headless command on Linux with a pinned Godot 4.7.x binary; upload gdUnit4 reports. Optional Windows and macOS jobs for exports in P0.9.
-- [ ] **P0.7 Min-spec hardware.** Owner defines the low-end target (CPU, GPU, RAM) used for the voxel performance budget.
-- [ ] **P0.8 Voxel spike** (in `res://spikes/voxel/`, not shipped). Install Voxel Tools 1.7 GDExtension into `res://addons/zylann.voxel/`. Verify and record numbers in `_docs/reports/voxel_spike.md`:
+- [x] **P0.7 Min-spec hardware.** Defined by the owner on 2026-11-16: Intel Core i7-3770, 16 GB DDR3-1333, Nvidia GTX 1070 (spec 0.7). macOS min spec still open (D24).
+- [ ] **P0.8 Voxel spike** (in `res://spikes/voxel/`, not shipped). Install Voxel Tools 1.7 GDExtension into `res://addons/zylann.voxel/`. Run all measurements on the min-spec machine (spec 0.7). Verify and record numbers in `_docs/reports/voxel_spike.md`:
   - [ ] a. Extension loads in the editor and in a headless run.
   - [ ] b. `VoxelTerrain` + `VoxelMesherBlocky` + `VoxelBlockyLibrary` with 4 materials renders; data block size confirmed.
   - [ ] c. Dig and place through `get_voxel_tool()` (`set_voxel`, `get_voxel`, `raycast`).
@@ -99,6 +95,8 @@ Spec defaults are used unless the owner overrides before the listed phase starts
   - [ ] g. `VoxelAStarGrid3D.find_path_async` for a pet-sized agent across dug terrain.
   - [ ] h. Jolt `CharacterBody3D` physics works in a headless run (needed by Phase 1 integration suites).
   - [ ] i. `@voxel_real` smoke suite `res://test/integration/test_voxel_smoke.gd` passes headless (or the report states why it needs a windowed job).
+  - [ ] j. No illegal-instruction crash on the i7-3770 (no AVX2), in the editor or the exported build.
+  - [ ] k. Frame rate at 1920x1080 with the target view distance while walking and digging (D25); voxel worker thread count chosen so at least 2 hardware threads stay free for main and physics.
 - [ ] **P0.9 Export smoke.** Export the spike for Windows x86_64, Linux x86_64, macOS (universal) with stock templates; each launches and digs.
 - [ ] **P0.10 Go / no-go record.** In `_docs/reports/voxel_spike.md`: GDExtension go, or fallback to module edition (custom editor, templates, CI change), and/or `VoxelBoxMover` for player collision (spec 9.5), and/or per-save `database_path` (spec 9.6). Update spec 0.6 and 9 if anything changed.
 
@@ -202,7 +200,7 @@ Integration (`res://test/integration/`):
 ### P2 tests
 Unit (`res://test/unit/`):
 - [ ] **P2.23** `terrain/test_fake_voxel_world.gd` (DDA hits, `prev_cell`, max distance, axis-aligned and diagonal rays), `terrain/test_terrain_rules.gd` (P1 to P7 each with pass and fail, order of evaluation, bedrock), `terrain/test_voxel_dig_model.gd` (hits per material and tool, multiplier, drops, partial damage reset).
-- [ ] **P2.24** `tools/test_tool_selection_model.gd`: aim beats zone; priority then distance then stable key; debounce 0.15 s; zone hysteresis +0.5 m; voxel aim hysteresis 0.3 s; action locks per state; airborne not locked; manual override 10 s or until no candidates; missing tool; tier too low; revert after 1.0 s; disabled setting; `toolbelt/test_toolbelt_model.gd`.
+- [ ] **P2.24** `tools/test_tool_selection_model.gd`: aim beats zone; priority then distance then stable key; debounce 0.15 s; zone hysteresis +0.5 m; voxel aim hysteresis 0.3 s; action locks per state; airborne not locked; manual override 10 s or until no candidates; missing tool; tier too low; keep last tool by default (D15) and revert after 1.0 s only with `auto_tool_revert`; disabled setting; `toolbelt/test_toolbelt_model.gd`.
 - [ ] **P2.25** `stamina/test_stamina_model.gd` (clamp at 0, never negative, `depleted_now` only on the > 0 -> 0 edge, last action lands, threshold events once per day, refill to max incl. bonus).
 - [ ] **P2.26** `discovery/test_discovery_model.gd` (geode pity forcing, chest reveal adjacency, chest pity, unique unlock draw, exhausted pool -> coins, determinism for a fixed seed).
 - [ ] **P2.27** `sleep/test_day_rollover.gd` (step order 1 to 7 with spies; unregistered steps skipped), `mail/test_mailbox_model.gd` (Phase 2 scope: ids, schedule, deliver idempotence, claim all-or-nothing, care package never expires, snack-once-per-day rule), `inventory/test_inventory_model.gd` (stacking, instance data, overflow), `interaction/test_interaction_resolver.gd` (scoring and aim override for Phase 2 kinds), `player/test_mine_subfsm.gd`.
@@ -219,6 +217,42 @@ Integration (`res://test/integration/`):
 - [ ] Dig, place nothing yet, forage and chop with pad and KB/M; prompts show correct glyphs and pictograms; auto-tool feels stable at zone edges.
 - [ ] Exhaust in Wilderness and in Deep Mine; wake at home; mailbox badge glows; claim the snack.
 - [ ] Performance: continuous digging meets the P0 budget on min-spec hardware.
+
+---
+
+## Phase 2B: Farming (D9)
+
+**Goal:** till, plant, water, grow and harvest crops on owned plots and the starter garden, with sprinklers, auto-tool farm rules and the day-1 seed letter.
+**Depends on:** Phase 2 gate.
+**Spec:** 10, 2.6 (farm rules), 2.8 (farm prompts), 3.1 (SEED), 3.5 (`farm`), 6.1, 6.2 (rollover step 4), 9.3 P3, 8.5.1 (Suite F).
+
+### P2B resources
+- [ ] **P2B.1** `CropDef`s (carrot, sunflower, pumpkin, cotton, strawberry, tomato) with stage meshes; SEED items and PRODUCE harvest items; `FarmConfig.tres`; `mat_farmland` material and library model; HOE and WATERING_CAN tool items; `piece_sprinkler` (`BuildPieceDef` with `farm_effect = SPRINKLER`); well scene; `mail_tpl_welcome` with starter seeds.
+- [ ] **P2B.2** Home Meadow zone: protected starter cabin exterior, owned `plot_starter_garden` (8x8), well; starter cabin interior stays STATIC.
+
+### P2B scripts
+- [ ] **P2B.3 `FarmModel`** (pure): farmable-cell rule (D22), till, plant, water (no-op if already watered today), growth at rollover (watered `day - 1` or sprinkler), stage mapping, harvest with seeded yield and seed return, regrow, no death (D23), can capacity and refill.
+- [ ] **P2B.4 `FarmService`**: commands and events per spec 1.8; registers `daily_growth` as `DayRollover` step 4; computes growth for every zone in data.
+- [ ] **P2B.5 Farm views:** `CropView` scene per crop cell, `SoilOverlay` MultiMesh for wet cells, rebuilt from data on zone load.
+- [ ] **P2B.6 Tool rules:** extend `ToolSelectionModel` with the spec 10.4 table (hotbar SEED selection decides till vs dig); HOE and WATERING_CAN in the starter ToolBelt.
+- [ ] **P2B.7 Interactions:** TILL, PLANT, WATER (repeat while RT held), REFILL, HARVEST kinds in the context `Interact` state; PromptOverlay farm rows; HUD watering-can level.
+- [ ] **P2B.8 Protection and occupancy:** planted crops add P3 support protection and occupy their cell for blocks and pieces.
+- [ ] **P2B.9 Sprinkler effect:** placing `piece_sprinkler` uses a minimal placement command now (full Build mode arrives in Phase 3, which then takes over sprinkler placement).
+- [ ] **P2B.10 New-game kit:** welcome letter scheduled for day 1 with seeds; starter tools.
+- [ ] **P2B.11 Serialization:** `farm` section (tilled, crops, watering can).
+
+### P2B tests
+Unit:
+- [ ] **P2B.12** `farm/test_farm_model.gd`: farmable rule (owned plot, starter garden, outside, protected, not top-exposed, < 2 free cells above); till sets farmland; plant needs farmland and a SEED; growth only when watered the previous day or sprinkler-covered; same-day plant and water counts; stage boundaries per `days_per_stage`; unwatered for many days keeps stage and never dies; ripe stays ripe; harvest yield and seed return deterministic for a seed; regrow returns to `regrow_stage`; watering twice spends water once; can empty and refill.
+- [ ] **P2B.13** `tools/test_tool_selection_farm.gd`: spec 10.4 table row by row, including SEED vs non-SEED selection on the same soil and the empty-can badge.
+- [ ] **P2B.14** `sleep/test_day_rollover.gd` extended: farm growth is step 4, after terrain reset and before mail; `save/test_farm_round_trip.gd`; `data/test_database_integrity.gd` extended for crops and seeds.
+
+Integration:
+- [ ] **P2B.15** `test_farming.gd`: spec 8.5.1 Suite F cases **F1 to F16**.
+- [ ] **P2B.16** `test_auto_tool_selection.gd`: re-run in full to confirm farm rules did not change cases A1 to A22.
+
+### P2B manual checklist
+- [ ] Plant, water and harvest with pad only; prompts make the hoe vs shovel choice obvious; a 6-year-old-readable picture guide in the welcome letter.
 
 ---
 
@@ -271,7 +305,7 @@ Integration:
 **Spec:** 1.5, 1.8, 3.1, 3.2, 3.4 (jobs, shops, outfits, plots), 4.2 (Craft), 4.5 (menus), 5 (all), 3.8, 5.10.
 
 ### P4 resources
-- [ ] **P4.1** `EconomyConfig.tres`, `ShopDef`s (general store, builder supply, tailor), item `base_value`s, `RecipeDef`s (workbench, tailor bench, including pet accessory outputs used in Phase 5), `JobDef`s and `ContractDef`s (Builder blueprints, Tailor orders), `BlueprintDef`s and job-site protection volumes, `PlotDef`s with prices, `OutfitDef`s (placeholder meshes per slot), dye id list (palette content in Phase 6).
+- [ ] **P4.1** `EconomyConfig.tres`, `ShopDef`s (general store with seeds and the sprinkler, builder supply, tailor), cotton -> cotton cloth Tailor recipe, item `base_value`s, `RecipeDef`s (workbench, tailor bench, including pet accessory outputs used in Phase 5), `JobDef`s and `ContractDef`s (Builder blueprints, Tailor orders), `BlueprintDef`s and job-site protection volumes, `PlotDef`s with prices, `OutfitDef`s (placeholder meshes per slot), dye id list (palette content in Phase 6).
 
 ### P4 scripts
 - [ ] **P4.2 `WalletModel`** (int coins, never negative) and `WalletService`.
@@ -325,7 +359,7 @@ Integration:
 - [ ] **P5.6 Pet core:** `PetBrainModel` (Follow, Idle, Wander, Teleport, React, Eat, GoToBowl, Nap, Call; thresholds from `PetSpeciesDef`), `PetService` (adopt, pat, `try_feed`, happiness drift and floor 40, daily reset in `DayRollover`, daily find at >= 80), `pet.tscn` (layer pet, no player collision).
 - [ ] **P5.7 Pet pathing:** `IPetPathProvider` with `VoxelPathProvider` (`VoxelAStarGrid3D` over a 32x16x32 region re-centered every 8 m), `NavmeshPathProvider` (STATIC zones), `FakePathProvider` (tests); teleport fallback; nudge when a placed piece covers the pet.
 - [ ] **P5.8 Pet accessories:** `PetAccessoryModel` (slot validation, species mesh availability, swap returns the old item, full-inventory refusal), mounting meshes under species `BoneAttachment3D`s, dye via instance shader parameter, `pet_wardrobe` menu with preview.
-- [ ] **P5.9 Adoption flow:** day-1 letter with `pet_adoption`, species/variant/name picker menu, `pet_call` (D-pad right).
+- [ ] **P5.9 Adoption flow:** letter with `pet_adoption` scheduled at new-game creation for day 2 (D11), species/variant/name picker menu, `pet_call` (D-pad right).
 - [ ] **P5.10 Pet furniture:** PET_BED (Nap target) and FEED_BOWL (1-slot storage, self-feed during rollover) pieces.
 - [ ] **P5.11 Expression:** `wheel` menu (angle-to-slot, pages Emotes, Instruments, Tools calling `ToolAutoSelector.manual_select`), `Emote` state with pet and NPC reactions (first wave per NPC per day +1 friendship), `PlayInstrument` state with `note_1..8`.
 - [ ] **P5.12 Serialization:** Npc state, Pet state, full Mailbox, unlocked emotes and instruments.
@@ -341,7 +375,7 @@ Unit:
 Integration:
 - [ ] **P5.18** `test_pet_follow.gd` (with `FakePathProvider`): Follow keeps follow distance; Idle and Wander timings; teleport when > 20 m and on zone change; never blocks the player (move through each other); nudged off a newly placed piece; `pet_call`.
 - [ ] **P5.19** `test_pet_care.gd`: X pats (once-per-day bonus), Y feeds when food is owned and not fed today, otherwise opens Dress Up; feeding emits `pet_fed` and changes happiness; bowl self-feed at rollover; equipping an accessory creates the mesh under the correct `BoneAttachment3D` for dog and for cat, removes on unequip, and survives `to_dict/from_dict`.
-- [ ] **P5.20** `test_mail_arrival.gd`: scheduled mail appears only after `deliver_due` for its day, in id order; `mail_delivered` emitted once with all ids; catalog order arrives next day; job offer contract attachment works with JobService; adoption letter creates the pet; claim with full inventory changes nothing.
+- [ ] **P5.20** `test_mail_arrival.gd`: scheduled mail appears only after `deliver_due` for its day, in id order; `mail_delivered` emitted once with all ids; catalog order arrives next day; job offer contract attachment works with JobService; adoption letter is not in the inbox on day 1, arrives on day 2, and creates the pet; claim with full inventory changes nothing.
 - [ ] **P5.21** `test_npc_talk.gd`: Talk locks the NPC, pushes dialogue (paused), close returns to Idle and resumes the NPC; Y gift once per day changes friendship by preference.
 - [ ] **P5.22** `test_emote_instrument.gd`: wheel selection enters Emote, pet reacts within 8 m, NPC reacts within 6 m; instrument mode plays notes for each note action and exits on move.
 
@@ -358,7 +392,7 @@ Integration:
 **Spec:** 3.5, 3.7, 3.9, 6.5, 7.2, 9.6, 8.5.
 
 ### P6 resources
-- [ ] **P6.1** `CollectionEntryDef` on all minerals, fabrics and produce; `MuseumDef` (cases, trophies, rewards); `DyeDef` palette with names and patterns; `StickerDef`s; `PaintRegionDef`s on paintable pieces and a piece shader with `instance uniform` per region; `GeodeDef`s; reward mail templates.
+- [ ] **P6.1** `CollectionEntryDef` on all minerals, fabrics and produce (farmed crops and foraged produce); `MuseumDef` (cases, trophies, rewards); `DyeDef` palette with names and patterns; `StickerDef`s; `PaintRegionDef`s on paintable pieces and a piece shader with `instance uniform` per region; `GeodeDef`s; reward mail templates.
 
 ### P6 scripts
 - [ ] **P6.2 Collection:** `CollectionModel`/`CollectionService` (discover on `item_added`, once per id).
@@ -424,3 +458,5 @@ Integration:
 | 8.4 Suite B | 2, 4 (B13), 6 (B12) |
 | 8.5 Suite C | 6 |
 | 9 voxel terrain | 0 (spike), 2 (gameplay), 5 (pet pathing), 6 (persistence) |
+| 10 farming, 8.5.1 Suite F | 2B (system), 4 (seeds in shops, cotton recipe), 6 (crop donations) |
+| 0.7 min-spec hardware | 0 (spike), performance checks at the 2, 2B, 3, 5, 6 gates |

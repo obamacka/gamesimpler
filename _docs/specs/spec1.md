@@ -2,8 +2,8 @@
 
 | Field | Value |
 |---|---|
-| Status | DRAFT rev 3, pending review of Section 0.5 (Open Decisions) |
-| Revision | rev 1: core systems. rev 2: kid-friendly, accessibility, forgiving logic, expression systems, integration tests. rev 3: D1 to D4 resolved (dig-anywhere blocky voxels, jump and double jump, context-aware interaction with dedicated critical states, crafting flow confirmed). rev 3.1: D16 to D19 confirmed |
+| Status | DRAFT rev 3.2, pending review of Section 0.5 (Open Decisions D20 to D25) |
+| Revision | rev 1: core systems. rev 2: kid-friendly, accessibility, forgiving logic, expression systems, integration tests. rev 3: D1 to D4 resolved (dig-anywhere blocky voxels, jump and double jump, context-aware interaction with dedicated critical states, crafting flow confirmed). rev 3.1: D16 to D19 confirmed. rev 3.2: D5 to D15 resolved (farming system added, pets on day 2, keep last tool), min-spec hardware, test command note |
 | Engine | Godot 4.7 stable (4.7.2 latest patch found, 2026-08-18), GDScript |
 | Physics | Jolt Physics (built-in module) |
 | Voxels | Zylann Voxel Tools 1.7, GDExtension edition (MIT), released 2026-08-20, targets Godot 4.5+ |
@@ -12,7 +12,7 @@
 | Targets | Windows x86_64, Linux x86_64, macOS (x86_64 and arm64) |
 | Audience | Kids and families; single player, offline |
 
-Section map: 0 scope and decisions, 1 architecture, 2 input and automation, 3 data structures, 4 FSMs, 5 UI and pause, 6 forgiving game logic, 7 expression systems, 8 testing, 9 voxel terrain.
+Section map: 0 scope and decisions, 1 architecture, 2 input and automation, 3 data structures, 4 FSMs, 5 UI and pause, 6 forgiving game logic, 7 expression systems, 8 testing, 9 voxel terrain, 10 farming.
 
 ---
 
@@ -25,12 +25,13 @@ Section map: 0 scope and decisions, 1 architecture, 2 input and automation, 3 da
 - NPCs: dialogue, gifting, job and shop access, Museum curator.
 - Mail: letters and packages with attachments, including exhaustion care packages.
 - Stamina instead of health. No damage, no hazards, no fail state.
+- **Farming**: till soil, plant seeds, water, grow over in-game days, harvest; sprinklers; crops feed the economy, the Tailor (cotton) and the Museum.
 - Museum and Collection Book.
 - Pet companion with feeding and accessories.
 - Painting and stamping placed objects, interactive furniture, emote and instrument wheel.
 - Gamepad-primary input with keyboard/mouse secondary; every menu pauses the game.
 
-Out of scope for v1: multiplayer or any network feature, farming (see D9), smooth (Transvoxel) terrain, gravity or collapse simulation for voxels or buildings, Steam Input-specific handling, mobile/web, localization beyond key-based strings.
+Out of scope for v1: multiplayer or any network feature, seasons and weather (D20, D21), smooth (Transvoxel) terrain, gravity or collapse simulation for voxels or buildings, Steam Input-specific handling, mobile/web, localization beyond key-based strings.
 
 ### 0.2 Design pillars (kid-friendly rules, apply to every system)
 | ID | Rule | Enforcement |
@@ -87,25 +88,33 @@ Godot facts verified against `godotengine/godot` tag `4.7-stable` class referenc
 | D17 | **Dug blocks can be placed back**: natural blocks drop as `BLOCK` items and are placed on the 1 m grid with the Build Place tool | 2.7, 4.4, 9.3 |
 | D18 | **Auto-jump onto 1-voxel ledges is on by default**; setting to disable | 4.2, 4.2.1, 5.10 |
 | D19 | **Go Home button in the pause menu**: fade home at no cost and no time skip, so a child can never be stuck | 5.8, 6.3 |
+| D5 | **House plots are bought with upfront coins** (no financing) | 1.8, 4.5 |
+| D6 | **20 real minutes per in-game day**, 06:00 to 02:00, forced sleep at 02:00 | 6.2 |
+| D7 | **3 manual save slots + autosave on every sleep** (bed, late night, exhaustion) | 3.5, 6.2, 9.6 |
+| D8 | **Apple trees cannot be chopped.** Fruit trees use the FRUIT_PICKER; separate timber trees and fallen logs use the AXE | 2.6, 4.3 |
+| D9 | **Add a farming system**: tilling, planting, watering, growth over days, harvesting, sprinklers. Museum "crops" are farmed crops plus foraged produce | 10, 2.6, 3, 6.2, 6.5, 8.5.1 (Suite F) |
+| D10 | **Free starter cabin** with bed and mailbox, plus a small owned starter garden plot next to it | 9.2, 10.2 |
+| D11 | **Pet arrives by letter on day 2** (day 1 brings a welcome letter with starter seeds) | 7.1, 10.7 |
+| D12 | **Dyes are unlocks**, never consumed | 7.2 |
+| D13 | **Forward+ renderer** | 0.3, 0.7, 7.2 |
+| D14 | **TTS with OS voices, setting default off** | 2.8, 5.10 |
+| D15 | **Keep the last tool** when no targets remain; `auto_tool_revert` setting (default off) restores the 1.0 s revert | 2.6, 8.3 A13 |
 
-### 0.5 Open decisions (owner confirmation needed before plan1)
+### 0.5 Open decisions (owner confirmation needed)
+New questions raised by D9 (farming) and the min-spec hardware. Defaults are used until confirmed.
+
 | ID | Question | Proposed default | Alternative |
 |---|---|---|---|
-| D5 | House purchase | Upfront coins | Mortgage by mail |
-| D6 | Day length | 20 real minutes, 06:00 to 02:00 | Any |
-| D7 | Saving | 3 manual slots + autosave on every sleep (bed, late night, exhaustion) | Save anywhere |
-| D8 | "Axe/picker for trees": can apple trees be chopped? | **No.** Fruit trees use the `FRUIT_PICKER` and are never destroyable. A separate `timber_tree` and `fallen_log` use the `AXE` for wood. | Single tree type; axe chops apple trees |
-| D9 | "Crops" for museum donation, but farming is not in scope | v1 crops = **foraged produce** category `PRODUCE` | Add a farming system (new spec) |
-| D10 | "Wake at home" before the player owns a house | Free **starter cabin** (bed + mailbox). Any owned bed can be set as Home. | Wake at inn |
-| D11 | Pets | One pet in v1, dog or cat, delivered by letter on day 1 | Multiple pets |
-| D12 | Dyes | Dye is an **unlock**, never consumed | Consumable dye items |
-| D13 | Renderer | **Forward+** (Decals for stamps) | Compatibility renderer with mesh-projected stamp quads |
-| D14 | Read-aloud (TTS) | Setting, default off; uses OS voices | Recorded VO; none |
-| D15 | Auto-tool after no targets | Revert to empty hands after 1.0 s | Keep last tool |
+| D20 | Seasons for crops | **None in v1**: every crop grows all year | Seasons with crop sets per season (adds a calendar and crop death at season change, which conflicts with K1) |
+| D21 | Weather (rain waters crops) | **None in v1**: watering by can and sprinklers only | Rain days that auto-water |
+| D22 | Where can the player farm? | **Owned plots and the starter garden only** (tilling elsewhere is refused with a pictogram) | Anywhere outside protection volumes |
+| D23 | What happens to unwatered or neglected crops? | **Nothing bad**: unwatered crops do not grow that day; crops never wilt, die or rot (K1) | Wilting after N dry days |
+| D24 | macOS minimum spec (the given min spec is a Windows/Linux PC with an Nvidia GPU) | **Owner to define**, e.g. an Apple Silicon M1 Mac with 8 GB | Drop macOS from v1 targets |
+| D25 | Performance target on min spec | **60 fps at 1920x1080**, medium preset, plus the voxel budget in 9.5 | 30 fps; or 60 fps at a lower resolution |
 
 ### 0.6 Known issues and risks raised
-1. **CLAUDE.md test command is wrong for gdUnit4 v6.2.3.** The entry script is `res://addons/gdUnit4/bin/GdUnitCmdTool.gd`; headless runs exit with `RETURN_ERROR_HEADLESS_NOT_SUPPORTED` unless `--ignoreHeadlessMode` is passed; tests are selected with `-a`. Proposed (verify in plan1 task 1):
-   `godot --headless --path . -s -d res://addons/gdUnit4/bin/GdUnitCmdTool.gd --ignoreHeadlessMode -a res://test`
+1. **Test command.** The owner updated CLAUDE.md (2026-11-16) to `godot --headless --path . -s -d res://addons/gdUnit4/bin/GdUnitCmdTool.gd --ignoreHeadlessMode -a res://test`. Remaining risk: with `-d` and no remote debugger, a GDScript parse error drops Godot into its interactive `debug>` prompt and the run never exits (a hung CI job instead of a failure). gdUnit4 v6.2.3's own `runtest.sh` passes `--remote-debug tcp://127.0.0.1:0` for exactly this reason (comment in that script). Recommended command, to verify in plan1 P0.3 and then propose for CLAUDE.md:
+   `godot --headless --path . -s -d --remote-debug tcp://127.0.0.1:0 res://addons/gdUnit4/bin/GdUnitCmdTool.gd --ignoreHeadlessMode -a res://test`
 2. **Headless tests cannot drive UI via InputEvents.** Integration tests assert on signals and direct calls.
 3. **gdUnit4 4.7 support is implicit.** v6.1.0 declares 4.6.x; v6.2.3 fixes a "fresh Godot 4.7 editor" issue. Smoke test first.
 4. **Pause ownership.** Only `PauseManager` writes `get_tree().paused`, with ref-counted reasons.
@@ -130,6 +139,26 @@ Godot facts verified against `godotengine/godot` tag `4.7-stable` class referenc
 23. **Tall player on a 1 m grid.** The 2.1 m standing height needs 3 free voxels; 2-voxel tunnels force Duck; jumps need headroom. Level generation and auto-jump checks use these numbers.
 24. **Kids digging deep pits.** A double jump clears 2 voxels; deeper pits need stairs. Digging the voxel directly under your feet is blocked (9.3 P6), and Go Home (D19) guarantees escape.
 25. **Floating trees and structures.** Support voxels under fruit trees, interactables, placed pieces and spawn points are protected (9.3 P3, P4).
+26. **Farming makes soil targets ambiguous.** Aiming at grass could mean dig (shovel) or till (hoe). Rule: the selected hotbar item decides; seeds selected means till-and-plant, otherwise dig (10.4). Tilling without seeds needs a manual HOE pick on the wheel.
+27. **Crops in unloaded zones.** Growth is computed in `FarmService` data at rollover, never by scene nodes, so crops grow while the player is elsewhere. Crop visuals and the wet-soil overlay are rebuilt from data on zone load.
+28. **Min spec is CPU-bound.** The i7-3770 (4 cores, 8 threads, 2012, no AVX2) is far weaker relative to the GTX 1070. Voxel meshing threads, Jolt and GDScript compete for 8 hardware threads; the voxel spike and all performance budgets are measured on this CPU. A Voxel Tools GDExtension requirement for AVX2 was not found in its docs or build files, but this is unverified until the spike runs on the i7-3770.
+29. **No macOS min spec yet** (D24). The given hardware does not exist as a Mac.
+
+### 0.7 Target hardware (minimum spec, Windows and Linux)
+| Component | Minimum |
+|---|---|
+| CPU | Intel Core i7-3770 (Ivy Bridge, 4 cores / 8 threads, 3.4 GHz; SSE4.2 and AVX, no AVX2) |
+| RAM | 16 GB DDR3-1333 |
+| GPU | Nvidia GeForce GTX 1070 (8 GB, Vulkan capable) |
+| macOS | not yet defined (D24) |
+
+| Fact or target | Consequence |
+|---|---|
+| Godot 4.5 and 4.6 system requirements list an x86_64 CPU with SSE4.2 for the 64-bit editor and exports. The i7-3770 has SSE4.2. | Official x86_64 builds run on min spec. Re-check the 4.7 page when godotengine.org is reachable. |
+| Forward+ uses Vulkan on Windows and Linux; the GTX 1070 supports Vulkan. | D13 Forward+ is viable on min spec. |
+| Performance target (D25 default): 60 fps at 1920x1080, medium preset. | Measured on min spec in the Phase 0 spike and at every phase gate that adds heavy systems (2, 3, 5, 6). |
+| Voxel budget (9.5): edit-to-collision <= 100 ms, no frame > 20 ms while digging. | Measured on the i7-3770. |
+| Worker threads: leave at least 2 hardware threads for the main and physics threads. | Voxel Tools thread count is capped accordingly (spike confirms the setting). |
 
 ---
 
@@ -183,6 +212,7 @@ Main (Node)                                   PAUSABLE
 |   +-- NpcService                            friendship, schedules
 |   +-- BuildService                          pieces, fastening, paint, stamps, furniture state, block placement
 |   +-- TerrainService                        dig/place commands, protection rules, voxel drops (9)
+|   +-- FarmService                           tilled cells, crops, watering, growth, sprinklers (10)
 |   +-- WorldStateService                     fruit trees, timber trees, chests, respawns
 |   +-- StaminaService                        stamina, regen, depletion edge
 |   +-- SleepDirector                         ALWAYS: bed / late-night / exhaustion transitions
@@ -202,6 +232,7 @@ Main (Node)                                   PAUSABLE
 |   |       +-- StaticTown (Node3D)           hand-built meshes inside protected volumes
 |   |       +-- NavigationRegion3D            protected areas only (NPCs)
 |   |       +-- FruitTrees, TimberTrees, FallenLogs
+|   |       +-- Farm (Node3D)                 CropView instances, SoilOverlay (MultiMesh wet soil), Wells
 |   |       +-- Interactables                 Mailbox, ShopCounter, JobBoard, Workbench,
 |   |       |                                 TailorBench, Wardrobe, PetWardrobe, PlotSign,
 |   |       |                                 Bed, DonationDesk, DisplayCase, TrophyPedestal,
@@ -296,6 +327,7 @@ Services do not reference each other, except `TransactionCoordinator` (Economy),
 | Jobs | `accept_contract`, `submit_contract` | `contract_completed`, `job_rank_up` |
 | Mail | `schedule`, `deliver_due(day)`, `claim_attachments` | `mail_delivered`, `mail_claimed` |
 | Build | `try_place`, `fasten_step`, `try_remove`, `try_place_block`, `try_paint`, `try_stamp`, `undo_decor`, `toggle_furniture` | `piece_placed`, `piece_fastened`, `block_placed`, `piece_painted`, `piece_stamped`, `furniture_toggled` |
+| Farm | `try_till(cell)`, `try_plant(cell, seed_item_id)`, `try_water(cell)`, `try_harvest(cell)`, `refill_can()`, `daily_growth(day)` | `soil_tilled`, `crop_planted`, `crop_watered`, `crop_grew(cell, stage)`, `crop_harvested(cell, crop_id, qty)` |
 | Terrain | `hit_voxel(cell, tool_type)`, `can_dig(cell) -> Result`, `can_place(cell) -> Result`, `daily_reset(day)` | `voxel_damaged(cell, hits_left)`, `voxel_dug(cell, material_id)`, `voxel_placed(cell, material_id)` |
 | WorldState | `harvest_tree`, `chop_tree`, `open_chest` | `tree_harvested`, `tree_chopped`, `chest_opened` |
 | Stamina | `spend(amount, reason)`, `restore(amount, reason)`, `refill()` | `stamina_changed`, `stamina_low(level)`, `stamina_depleted` |
@@ -388,10 +420,10 @@ KB/M in Build: rotate R / Shift+R or mouse wheel; Build tools 1 / 2 / 3; undo Z;
 ### 2.6 Auto-tool context switching
 Tools live in the **ToolBelt**, not in inventory slots. Acquiring a `TOOL` item grants it to the belt. For each `ToolType`, the highest owned tier is the active instance.
 
-`ToolType`: `PICKAXE, SHOVEL, AXE, FRUIT_PICKER, HAMMER, SCREWDRIVER, PAINTBRUSH, STAMP`. Starter kit: SHOVEL, PICKAXE (tier 1), FRUIT_PICKER.
+`ToolType`: `PICKAXE, SHOVEL, AXE, FRUIT_PICKER, HOE, WATERING_CAN, HAMMER, SCREWDRIVER, PAINTBRUSH, STAMP`. Starter kit: SHOVEL, PICKAXE (tier 1), FRUIT_PICKER, HOE, WATERING_CAN.
 
 Two target sources:
-1. **Voxel targets (aim-based).** `IVoxelWorld.raycast(camera_origin, camera_forward, 4.5)` returns the first solid voxel within reach. Required tool = that material's `preferred_tool` (SHOVEL for soft materials, PICKAXE for hard). A voxel failing `TerrainService.can_dig` yields no tool and a lock prompt with the reason pictogram.
+1. **Voxel targets (aim-based).** `IVoxelWorld.raycast(camera_origin, camera_forward, 4.5)` returns the first solid voxel within reach. Required tool = that material's `preferred_tool` (SHOVEL for soft materials, PICKAXE for hard), **unless a farm rule applies first** (10.4: seeds selected on farmable soil -> HOE; unwatered farmland -> WATERING_CAN; aimed water or well -> WATERING_CAN refill). A voxel failing `TerrainService.can_dig` yields no tool and a lock prompt with the reason pictogram.
 2. **Zone targets (proximity-based).** `ToolTargetZone` (Area3D, layer `tool_zones`):
 
 | Target | `required_tool` | Enter radius | Priority | Active when |
@@ -413,11 +445,11 @@ PAINTBRUSH and STAMP are selected by the Build tool cycle, not by targets.
 6. **Manual override**: choosing a tool on the wheel suspends auto-select until no candidates remain or 10 s pass.
 7. **Missing tool**: equipment unchanged; prompt shows the required tool pictogram with a lock badge (`prompt_changed(target, &"missing_tool", tool_type)`).
 8. **Tier too low** (pickaxe vs hardness): tool equips; tier-lock badge; using it shows a friendly toast, no stamina spent, voxel unchanged.
-9. **No candidates** for 1.0 s: unequip to empty hands (D15).
+9. **No candidates**: keep the current tool (D15). If `Settings.auto_tool_revert` is on (default off), unequip to empty hands after 1.0 s with no candidates.
 10. **Setting off** (`auto_tool = false`): selector inert; wheel Tools page is the only way to equip.
 11. **Paused**: selector does not tick (PAUSABLE).
 
-Emitted by ToolBelt: `tool_equipped(tool_type, item_id, &"auto" | &"manual")`, `tool_unequipped(&"auto" | &"manual")`. `ToolAutoSelector` also emits `EventBus.tool_auto_selected(tool_type, target_kind, reason)`, with `target_kind` in `&"voxel_soft" | &"voxel_hard" | &"timber" | &"fruit_tree" | &"loose_piece"` and `reason` in `&"zone_enter" | &"aim_change" | &"lock_released"`.
+Emitted by ToolBelt: `tool_equipped(tool_type, item_id, &"auto" | &"manual")`, `tool_unequipped(&"auto" | &"manual")`. `ToolAutoSelector` also emits `EventBus.tool_auto_selected(tool_type, target_kind, reason)`, with `target_kind` in `&"voxel_soft" | &"voxel_hard" | &"timber" | &"fruit_tree" | &"loose_piece" | &"till" | &"water" | &"refill"` and `reason` in `&"zone_enter" | &"aim_change" | &"lock_released"`.
 
 ### 2.7 Magnetic grid and snap assist
 **Ghost placement**
@@ -481,6 +513,11 @@ Invalid reasons with pictograms: `occupied`, `no_support`, `outside_plot`, `over
 | Curator NPC | Talk | Donate (donation menu) | none |
 | Pet | Pat | Feed if pet food owned and not fed today, else Dress Up | none |
 | Apple tree | Pick | none | FRUIT_PICKER |
+| Farmable soil, seeds selected | none | none | HOE (till and plant in one action) |
+| Empty farmland, seeds selected | none | none | seed icon (plant) |
+| Crop or farmland not watered today | none | none | WATERING_CAN |
+| Ripe crop | Harvest | none | none |
+| Well or water | Refill can | none | WATERING_CAN |
 | Diggable voxel | none | none | SHOVEL or PICKAXE (material icon) |
 | Non-diggable voxel | none | none | lock pictogram with reason (no glyph) |
 | Treasure chest | Open | none | none |
@@ -504,7 +541,7 @@ Conventions: `StringName` ids, lowercase snake_case, never renamed after ship. P
 |---|---|---|
 | `id` | StringName | `item_` prefix |
 | `name_key`, `desc_key` | String | translation keys |
-| `category` | enum | `RESOURCE, BLOCK, MINERAL, FABRIC, PRODUCE, FOOD, PET_FOOD, TOOL, BUILD_PIECE, FURNITURE, OUTFIT, PET_ACCESSORY, GEODE, KEY_ITEM` |
+| `category` | enum | `RESOURCE, BLOCK, SEED, MINERAL, FABRIC, PRODUCE, FOOD, PET_FOOD, TOOL, BUILD_PIECE, FURNITURE, OUTFIT, PET_ACCESSORY, GEODE, KEY_ITEM` |
 | `icon` | Texture2D | 128x128, must read clearly at 48 px |
 | `max_stack` | int | 1..999; 1 if `has_instance_data` |
 | `base_value` | int | coins >= 0 |
@@ -513,6 +550,7 @@ Conventions: `StringName` ids, lowercase snake_case, never renamed after ship. P
 | `has_instance_data` | bool | dyed outfits/accessories |
 | `tool` | ToolData | if TOOL |
 | `block` | BlockData | if BLOCK: `material_id: StringName` (the `VoxelMaterialDef` it places) |
+| `seed` | SeedData | if SEED: `crop_id: StringName` |
 | `food` | FoodData | if FOOD or PET_FOOD: `stamina_restore: int`, `pet_happiness: int` |
 | `build_piece` | BuildPieceDef | if BUILD_PIECE/FURNITURE |
 | `outfit` | OutfitDef | if OUTFIT |
@@ -578,10 +616,12 @@ Rules:
 | `SnapSocket` | `position: Vector3`, `normal: Vector3`, `provides_tags`, `accepts_tags` |
 | `PaintRegionDef` | `region_id {PRIMARY, SECONDARY, TRIM}`, `shader_param: StringName` (instance uniform name), `default_dye_id` |
 | `FurnitureInteractionDef` | `kind {SIT, SLEEP, TOGGLE, PET_BED, FEED_BOWL, STORAGE, INSTRUMENT}`, `seat_markers: Array[NodePath]`, `toggle_states: int` (2 = on/off), `toggle_target: NodePath`, `stamina_regen_per_sec: float` (SIT), `instrument_id` (INSTRUMENT) |
-| `VoxelMaterialDef` | `id` (`mat_dirt`, `mat_stone`, `mat_copper_ore`, `mat_geode_rock`, `mat_chest_block`, `mat_bedrock`, ...), `voxel_id: int` (model index in the `VoxelBlockyLibrary`), `hardness_tier: int`, `hits: int` (with the preferred tool), `wrong_tool_hits_multiplier: int` (default 2), `preferred_tool {SHOVEL, PICKAXE}`, `drop: LootTableDef` (natural blocks drop their own `BLOCK` item), `discovery: DiscoveryTableDef` (optional), `special {NONE, GEODE, CHEST, BEDROCK}`, `placeable: bool`, `stamina_cost: int` |
+| `VoxelMaterialDef` | `id` (`mat_dirt`, `mat_grass`, `mat_farmland`, `mat_stone`, `mat_copper_ore`, `mat_geode_rock`, `mat_chest_block`, `mat_bedrock`, ...), `voxel_id: int` (model index in the `VoxelBlockyLibrary`), `hardness_tier: int`, `hits: int` (with the preferred tool), `wrong_tool_hits_multiplier: int` (default 2), `preferred_tool {SHOVEL, PICKAXE}`, `drop: LootTableDef` (natural blocks drop their own `BLOCK` item), `discovery: DiscoveryTableDef` (optional), `special {NONE, GEODE, CHEST, BEDROCK}`, `placeable: bool`, `stamina_cost: int` |
 | `ProtectionVolume` (authored node, data in `ProtectionVolumeDef`) | `id` (`prot_*`), `aabb_cells: AABB` (grid aligned), `reason {TOWN, BUILDING, MUSEUM, ROAD, JOB_SITE, SPAWN}`, `allows_place: bool` |
 | `TerrainZoneDef` | `id` (`zone_*`), `kind {OVERWORLD, DEEP_MINE, STATIC}`, `generator_script`, `seed_mode {FIXED, PER_DAY}`, `bounds_cells: AABB` (bedrock at `min.y`), `persist_edits: bool`, `stream_db_key` |
 | `JumpConfig` | gravity, jump and double-jump velocities, coyote, buffer, air control, max fall speed (1.4) |
+| `CropDef` | see 10.3 |
+| `FarmConfig` | see 10.3 |
 | `LootTableDef` | `entries: Array[{item_id or "coins", min, max, weight}]`, `rolls`, `guaranteed` |
 | `DiscoveryTableDef` | `geode_chance_pct`, `geode_item_ids` (weighted), `chest_chance_pct`, `chest_table: TreasureTableDef`, `geode_pity: int`, `chest_pity: int` |
 | `TreasureTableDef` | `entries: Array[{kind {BLUEPRINT, DYE, STICKER, COINS, ITEM}, id_pool: Array[StringName], weight, coins_min, coins_max}]` |
@@ -654,6 +694,11 @@ Rules:
     "chests": { "zone_wilderness/chest_0003": { "cell": [4, 2, 9], "table": "loot_chest_overworld", "opened": false } }
   },
   "discovery": { "pity": { "geode": 3, "chest": 11 } },
+  "farm": {
+    "tilled": { "zone_plot_starter": ["2,0,3", "3,0,3"] },
+    "crops": { "zone_plot_starter/2,1,3": { "crop_id": "crop_carrot", "stage": 2, "growth_days": 2, "watered_day": 14, "planted_day": 12, "harvests": 0 } },
+    "watering_can": { "water": 14 }
+  },
   "museum": {
     "donated": { "item_quartz": 9, "item_cotton_cloth": 12 },
     "cases_unlocked": ["case_minerals_common"],
@@ -701,7 +746,7 @@ See `pets[]` in 3.5. Rules: `happiness` int 0..100 with floor 40 (K1/K7: never s
 | `hint_key` | String | silhouette hint for undiscovered entry |
 | `sort_order` | int | book ordering |
 
-Collection key is the `item_id`. Instance data (e.g. dye on a fabric) is ignored: a dyed and an undyed cotton cloth are the same entry.
+Collection key is the `item_id`. Instance data (e.g. dye on a fabric) is ignored: a dyed and an undyed cotton cloth are the same entry. `PRODUCE` covers farmed crops (10) and foraged produce (apples, berries, mushrooms, flowers).
 
 `MuseumDef` (`res://resources/museum/museum.tres`):
 - `cases: Array[DisplayCaseDef]`: `id`, `category`, `unlock_rule {COUNT, SET_COMPLETE}`, `count`, `set_id`, `scene`, `slot_markers` (one per entry it displays).
@@ -722,6 +767,7 @@ Sections: `[input]` (rebinds as plain dicts, `run_mode`, `duck_mode`, `fasten_mo
 - Every `DiscoveryTableDef` pool is non-empty; every unlock id in treasure pools exists.
 - Every `PetAccessoryDef` has a mesh for every species, or the item is flagged species-specific.
 - Every `DyeDef` has a `name_key`.
+- Every SEED item references an existing `CropDef`; every `CropDef` has a seed item, a harvest item with a `collection` entry (`PRODUCE`), and stage meshes matching `stages`; regrow stage < final stage.
 - At least one `mail_tpl_care_*` template exists with a `CARE_PACKAGE` kind and one without a snack for repeat exhaustion.
 - Every `VoxelMaterialDef.voxel_id` exists in the `VoxelBlockyLibrary` and is unique; every library model used by generation has a `VoxelMaterialDef`.
 - Every placeable material has a `BLOCK` item and vice versa.
@@ -936,6 +982,7 @@ Rev 3 changes to Build:
 | Play instrument | x | x | | | | `PlayInstrument` |
 | Emote | | | | | | thin `Emote` state (deliberate exception: locks the 1.5 to 3 s animation so pet and NPC reactions play out) |
 | Forage apple tree, pickup, toggle lamp/radio, open chest, pet pat/feed | | | | | | context `Interact` |
+| Farming: till, plant, water, refill, harvest | | | | | | context `Interact` (single-shot tool or X actions; water repeats while RT is held, like hold-to-dig) |
 | Mailbox, shop, job board, benches, wardrobe, pet wardrobe, plot sign, donation desk, gift, set home | | | | | | context `Interact` (each opens a menu that owns its flow) |
 | Enter Deep Mine | | | | x | | context `Interact`, handing off to `SceneRouter` (its transition pause covers C4) |
 
@@ -961,6 +1008,11 @@ stateDiagram-v2
 | Kind | Perform | Menu | Resolve / Handoff |
 |---|---|---|---|
 | FORAGE | pick anim 1.2 s | none | fruit added (overflow drops), stamina -1, regrow timer |
+| TILL | hoe swing 0.5 s | none | `FarmService.try_till`, then `try_plant` with the selected seed; stamina -1 |
+| PLANT | kneel 0.4 s | none | `FarmService.try_plant` |
+| WATER | pour 0.4 s, repeats while held | none | `FarmService.try_water` on the aimed cell, then the next aimed unwatered cell |
+| REFILL | dip 0.6 s | none | `FarmService.refill_can` |
+| HARVEST | pull 0.6 s | none | `FarmService.try_harvest` (overflow drops) |
 | PICKUP | bend 0.4 s | none | item added |
 | TOGGLE | press 0.3 s | none | `BuildService.toggle_furniture` |
 | CHEST | open 1.0 s | `chest_reveal` | treasure granted (6.4) |
@@ -1129,6 +1181,7 @@ As rev 1: `FOCUS_ALL` on interactive controls, explicit neighbors in grids, mous
 | `run_mode`, `duck_mode` | toggle | toggle / hold |
 | `fasten_mode` | press (hammer) | press / hold |
 | `auto_tool` | on | on / off |
+| `auto_tool_revert` | off (D15) | on / off |
 | `snap_strength` | High | Low / Normal / High |
 | `color_palette` | DEFAULT (green/red) | DEFAULT / BLUE_ORANGE / HIGH_CONTRAST |
 | `prompt_labels` | on | on / off |
@@ -1149,7 +1202,7 @@ As rev 1: `FOCUS_ALL` on interactive controls, explicit neighbors in grids, mous
 |---|---|
 | `base_max` | 100 |
 | `max_bonus_cap` | 50 (from trophies) |
-| Costs | dig soft voxel 1 per hit, dig hard voxel 2 per hit, chop 2 per hit, hammer hit 1, screw complete 1, forage 1; walking, running, jumping, double jumping, ducking, placing, painting, stamping, crafting, talking: 0 |
+| Costs | dig soft voxel 1 per hit, dig hard voxel 2 per hit, chop 2 per hit, hammer hit 1, screw complete 1, forage 1, till 1; planting, watering, harvesting, walking, running, jumping, double jumping, ducking, placing, painting, stamping, crafting, talking: 0 |
 | Regen while sitting | 1 per 2 s |
 | Food | `FoodData.stamina_restore` |
 | Low thresholds | 25% (yawn anim, HUD pulse), 10% (stronger hint, `quick_eat` prompt if food owned) |
@@ -1217,10 +1270,11 @@ Care letter rules:
 1. Set clock (day, 06:00).
 2. `WorldStateService.respawn_due(day)`.
 3. `TerrainService.daily_reset(day)` (clear `terrain.damaged`; set the Deep Mine seed for `day`).
-4. `EconomyService.restock(day)`.
-5. `PetService.daily_reset(day)` (fed/pat flags evaluated, happiness drift toward 60, floor 40).
-6. `MailService.deliver_due(day)`.
-7. Emit `EventBus.day_started(day)`.
+4. `FarmService.daily_growth(day)` (sprinklers water first, then every crop watered on `day - 1` grows one day; 10.5).
+5. `EconomyService.restock(day)`.
+6. `PetService.daily_reset(day)` (fed/pat flags evaluated, happiness drift toward 60, floor 40).
+7. `MailService.deliver_due(day)`.
+8. Emit `EventBus.day_started(day)`.
 
 No loss guarantees (K1): inventory, wallet, tools, placed pieces (loose ones stay loose), pet, and contracts are unchanged by exhaustion, except the added snack. Contracts with deadlines are not failed by exhaustion; deadlines extend by one day if the deadline was today.
 
@@ -1285,7 +1339,8 @@ State updates are synchronous within the call, so a second call in the same fram
 ## 7. Kid-Friendly Expression Systems
 
 ### 7.1 Pet care and customization
-**Adoption**: day 1 letter (`pet_adoption` attachment) opens a species and name picker (dog or cat, 3 color variants, name from preset list or on-screen keyboard). D11.
+**Adoption**: a letter scheduled at new-game creation with `deliver_day = 2` (`pet_adoption` attachment) opens a species and name picker (dog or cat, 3 color variants, name from preset list or on-screen keyboard). Day 1 brings the welcome letter with starter seeds instead (10.7). D11.
+- The pet never tramples crops and never digs farmland.
 
 **Node**:
 ```
@@ -1413,7 +1468,7 @@ Fixture `auto_tool_fixture.tscn` with `FakeVoxelWorld`: flat `mat_dirt` floor at
 | A10 | Loose-piece zones ignored outside Build | exit Build, stay near wall | no HAMMER emission |
 | A11 | Aim beats zone | stand in fruit-tree zone, aim at dirt | SHOVEL |
 | A12 | Zone priority, then distance | stand in AXE and FRUIT_PICKER overlap with no aim; then test equal-priority zones | priority decides first; nearer zone decides on equal priority |
-| A13 | No candidates, revert | remove aim and leave zones; await 59 physics frames, then 2 more | no `tool_unequipped` at frame 59; `tool_unequipped(&"auto")` by frame 61 |
+| A13 | No candidates, keep tool (D15) | remove aim and leave zones; await 120 physics frames; then set `auto_tool_revert = true`, repeat with 59 then 2 more frames | default: tool still equipped, no `tool_unequipped`; with revert on: no `tool_unequipped` at frame 59, `tool_unequipped(&"auto")` by frame 61 |
 | A14 | Debounce | alternate aim between stone and dirt every 4 frames for 24 frames | at most one `tool_auto_selected` |
 | A15 | Voxel aim hysteresis | aim leaves stone for 10 frames, then returns | no switch, no unequip |
 | A16 | Action lock | start Mine on stone, change aim to dirt during Windup | no switch until Mine exits; then SHOVEL with `&"lock_released"` |
@@ -1470,6 +1525,28 @@ Fixture `museum_fixture.tscn`: Museum zone with one case `case_test_minerals` (C
 | C16 | Mineral from voxel ore | dig a `mat_quartz_ore` voxel in `FakeVoxelWorld` | `item_quartz` added; `entry_discovered(&"item_quartz")` once; donatable |
 | C17 | Geode-sourced mineral | open a geode on a fixed seed with undiscovered bias | result is an undiscovered mineral; discovered once |
 
+### 8.5.1 Suite F: farming (`test/integration/test_farming.gd`)
+Fixture `farming_fixture.tscn` with `FakeVoxelWorld`: owned starter garden plot (8x8) of `mat_grass` on `mat_dirt`; a protection volume next to it; a well; player with HOE, WATERING_CAN (capacity 20), SHOVEL; inventory with 5 `seed_carrot` and 2 `seed_strawberry`; one `piece_sprinkler` available; day 3, 08:00.
+
+| # | Case | Steps | Assertions |
+|---|---|---|---|
+| F1 | Till and plant | select carrot seeds, aim grass in plot, inject `use_pressed` | `soil_tilled` then `crop_planted`; voxel is `mat_farmland`; 1 seed consumed; stamina -1 |
+| F2 | Till refused outside farmable area | same outside the plot and inside the protection volume | refused with `&"not_farmable"` / `&"protected"`; nothing consumed; no stamina |
+| F3 | No seed selected digs | deselect seeds, aim grass | SHOVEL equipped; digging proceeds; no till |
+| F4 | Water | aim the crop with the can | `crop_watered`; can water 19; watering the same crop again today does not spend water |
+| F5 | Growth at rollover | run `DayRollover` to day 4 | watered crop `growth_days` +1; `crop_grew` emitted if a stage boundary is crossed |
+| F6 | Unwatered does not grow and never dies | skip watering, roll over 5 days | stage unchanged; crop still present; no wilt state |
+| F7 | Harvest ripe crop | grow carrot to final stage, X | `crop_harvested(cell, crop_carrot, qty)`; produce in inventory; cell becomes empty farmland; seed return follows the seeded RNG |
+| F8 | Regrow crop | harvest ripe strawberry | crop returns to `regrow_stage`; `harvests` +1 |
+| F9 | Refill | aim the well with an empty can | can full; `target_kind = &"refill"` |
+| F10 | Sprinkler | place sprinkler; roll over without watering | its 8 neighbor crops count as watered and grow |
+| F11 | Unloaded zone grows | leave the garden zone, roll over, return | growth applied; crop views rebuilt at correct stages |
+| F12 | Protection while planted | try to dig the farmland under a crop; try to place a block on the crop cell | `&"supports_object"`; `&"occupied"` |
+| F13 | Auto-tool farm rules | aim grass with seeds, farmland unwatered, ripe crop, well | HOE, WATERING_CAN, no tool (X Harvest prompt), WATERING_CAN refill |
+| F14 | Exhaustion while farming | stamina 1, till | tilled and planted; then Sleep(exhausted); the crop watered before depletion grows at the wake rollover |
+| F15 | Collection and museum | harvest a carrot on a fresh session | `entry_discovered(&"item_carrot")` once; donatable as PRODUCE |
+| F16 | Serialization | `to_dict`/`from_dict` round-trip of `farm` | equal; all ints are `TYPE_INT` after a JSON string round-trip |
+
 ### 8.6 Definition of done
 For any task: unit and integration suites pass in a headless run (command in 0.6 item 1) with exit code 0, and `_docs/PROGRESS.md` is updated per CLAUDE.md. `@voxel_real` is required only after the plan1 spike passes.
 
@@ -1490,7 +1567,7 @@ For any task: unit and integration suites pass in a headless run (command in 0.6
 ### 9.2 Zones
 | Kind | Terrain | Edits persist | Notes |
 |---|---|---|---|
-| OVERWORLD (Wilderness, Orchard, Plots, town outskirts) | VoxelTerrain, fixed seed | yes (slot DB) | ore sparse and finite; buildings and roads covered by protection volumes |
+| OVERWORLD (Wilderness, Orchard, Home Meadow, Plots, town outskirts) | VoxelTerrain, fixed seed | yes (slot DB) | ore sparse and finite; buildings and roads covered by protection volumes; Home Meadow holds the protected starter cabin and the owned starter garden plot |
 | DEEP_MINE | VoxelTerrain, seed = hash(save_seed, day) | no (memory only, discarded at rollover) | renewable ore, geodes, chests; 3-voxel main tunnels, 2-voxel crawlspaces (Duck) to treasure pockets |
 | STATIC (Town core, Museum, Starter Cabin interior) | hand-built meshes, no VoxelTerrain | n/a | baked navmesh for NPCs |
 
@@ -1500,7 +1577,7 @@ For any task: unit and integration suites pass in a headless run (command in 0.6
 |---|---|---|
 | P1 | Cell inside a `ProtectionVolume` (dig always refused; place refused unless `allows_place`) | `&"protected"` |
 | P2 | Cell is bedrock or below `bounds_cells.min.y` | `&"bedrock"` |
-| P3 | Cell supports a fruit tree, timber tree, interactable, NPC spawn, or pet bed: the cell directly below the object's base and its 8 horizontal neighbors | `&"supports_object"` |
+| P3 | Cell supports a fruit tree, timber tree, interactable, NPC spawn, pet bed or planted crop: the cell directly below the object's base and its 8 horizontal neighbors (for crops: the farmland cell only) | `&"supports_object"` |
 | P4 | Cell is directly below any build-piece footprint cell | `&"supports_building"` |
 | P5 | Cell is inside an active job-site blueprint area | `&"job_site"` |
 | P6 | Dig: the cell directly under the player's feet. Place: a cell inside the player or pet capsule | `&"under_player"`, `&"inside_player"`, `&"inside_pet"` |
@@ -1536,3 +1613,57 @@ Protection volumes are authored in zone scenes; P3 to P5 are computed at runtime
 - `IVoxelWorld` with `FakeVoxelWorld` (dictionary + DDA raycast) for unit and integration tests.
 - `TerrainService.new(world: IVoxelWorld, inventory, discovery, occupancy, rules)` constructor injection.
 - `@voxel_real` smoke suite (8.2 item 11).
+
+---
+
+## 10. Farming (D9)
+
+### 10.1 Loop
+Till soil with the HOE, plant seeds, water with the WATERING_CAN (or sprinklers), crops grow one day per watered day at rollover, harvest with X when ripe. Produce sells, cooks into food later, feeds the Tailor (cotton) and is donated to the Museum. No seasons (D20), no weather (D21), no crop death (D23).
+
+### 10.2 Where
+- Farmable cells (D22): top-exposed `mat_grass` or `mat_dirt` inside an owned plot or the starter garden plot (`plot_starter_garden`, 8x8, owned from the start next to the starter cabin), with at least 2 free cells above and not inside a protection volume.
+- Tilling sets the voxel to `mat_farmland` (dug normally with the SHOVEL; drops a dirt BLOCK). Farmland never reverts on its own.
+- Wetness is not a voxel edit: a per-zone `SoilOverlay` (MultiMesh) darkens watered cells, rebuilt from `FarmService` data.
+
+### 10.3 Data
+| Resource | Key fields |
+|---|---|
+| `CropDef` | `id` (`crop_*`), `seed_item_id`, `harvest_item_id` (PRODUCE with collection entry), `stages: int` (3 to 5), `days_per_stage: Array[int]`, `regrow_stage: int` (-1 = single harvest), `yield_min/max`, `seed_return_pct`, `stage_meshes: Array[Mesh]`, `ripe_glow: bool` |
+| `FarmConfig` | `can_capacity` (20), `can_refill_sources` (well, water voxels), `sprinkler_radius` (1 = 3x3 minus center), `till_stamina` (1) |
+| Sprinkler | `BuildPieceDef` `piece_sprinkler` (furniture grid, `fastener = NONE`) with `farm_effect = SPRINKLER`; unlocked by shop purchase or blueprint chest |
+
+v1 crops: carrot (3 stages, 3 days), sunflower (4 stages, 4 days), pumpkin (5 stages, 6 days), cotton (4 stages, 5 days; harvest feeds Tailor fabric recipes), strawberry (regrow), tomato (regrow).
+
+### 10.4 Tool rules (extends 2.6)
+Evaluated before the plain voxel rule, for the aimed cell within reach:
+| Aimed target | Hotbar selection | Tool / action | `target_kind` |
+|---|---|---|---|
+| Farmable soil | SEED | HOE: till then plant in one action | `&"till"` |
+| Empty farmland | SEED | no tool: plant | `&"plant"` |
+| Farmland or crop not watered today | any | WATERING_CAN | `&"water"` |
+| Well, water voxel | any | WATERING_CAN refill (X or RT) | `&"refill"` |
+| Ripe crop | any | no tool; X Harvest | none |
+| Farmable soil | not SEED | normal voxel rule (SHOVEL dig) | `&"voxel_soft"` |
+Tilling without seeds: choose HOE on the wheel Tools page (manual override, 2.6 rule 6). An empty can on an unwatered target shows the can with an empty badge and a refill hint.
+
+### 10.5 Growth rules (`FarmModel`, pure)
+- A crop grows one day at rollover to `day` if `watered_day == day - 1` or a sprinkler covers it. Planting and watering on the same day counts.
+- `growth_days` maps to `stage` through `days_per_stage`. Final stage = ripe (glow when `ripe_glow`, prompt X Harvest).
+- Unwatered crops keep their stage. Crops never wilt, die or rot. Ripe crops stay ripe indefinitely.
+- Harvest: yield rolled with the seeded `loot` stream; seed returned with `seed_return_pct`; single-harvest crops leave empty farmland; regrow crops go to `regrow_stage`.
+- Watering an already-watered crop today is a no-op and spends no water.
+- All growth is computed in data at rollover for every zone, loaded or not.
+
+### 10.6 Interactions with other systems
+- Protection: farmland under a planted crop is protected (9.3 P3); crop cells count as occupied for blocks and build pieces.
+- Pet: never tramples or digs crops.
+- Economy (Phase 4 plan): seeds in the general store; produce sells at `base_value`; cotton is a Tailor input.
+- Museum: crops are `PRODUCE` collection entries.
+- Stamina: till 1; plant, water, harvest 0.
+- Exhaustion: no farm state is lost; the wake rollover applies growth for crops watered the day before.
+
+### 10.7 New-game farming kit
+- Starter ToolBelt includes HOE and WATERING_CAN (full).
+- Day 1 welcome letter (`mail_tpl_welcome`, never expires): 5 carrot seeds, 3 sunflower seeds, and a picture guide (till, plant, water, wait).
+- Day 2: the pet adoption letter (D11).

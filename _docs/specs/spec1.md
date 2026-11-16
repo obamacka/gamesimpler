@@ -2,8 +2,8 @@
 
 | Field | Value |
 |---|---|
-| Status | DRAFT rev 3.2, pending review of Section 0.5 (Open Decisions D20 to D25) |
-| Revision | rev 1: core systems. rev 2: kid-friendly, accessibility, forgiving logic, expression systems, integration tests. rev 3: D1 to D4 resolved (dig-anywhere blocky voxels, jump and double jump, context-aware interaction with dedicated critical states, crafting flow confirmed). rev 3.1: D16 to D19 confirmed. rev 3.2: D5 to D15 resolved (farming system added, pets on day 2, keep last tool), min-spec hardware, test command note |
+| Status | DRAFT rev 3.3, all product decisions resolved except D26 (recommended spec) |
+| Revision | rev 1: core systems. rev 2: kid-friendly, accessibility, forgiving logic, expression systems, integration tests. rev 3: D1 to D4 resolved (dig-anywhere blocky voxels, jump and double jump, context-aware interaction with dedicated critical states, crafting flow confirmed). rev 3.1: D16 to D19 confirmed. rev 3.2: D5 to D15 resolved (farming system added, pets on day 2, keep last tool), min-spec hardware, test command note. rev 3.3: D20 to D25 resolved (macOS min spec M1 16 GB; 30 fps on min spec, 60 fps on recommended spec) |
 | Engine | Godot 4.7 stable (4.7.2 latest patch found, 2026-08-18), GDScript |
 | Physics | Jolt Physics (built-in module) |
 | Voxels | Zylann Voxel Tools 1.7, GDExtension edition (MIT), released 2026-08-20, targets Godot 4.5+ |
@@ -99,18 +99,17 @@ Godot facts verified against `godotengine/godot` tag `4.7-stable` class referenc
 | D13 | **Forward+ renderer** | 0.3, 0.7, 7.2 |
 | D14 | **TTS with OS voices, setting default off** | 2.8, 5.10 |
 | D15 | **Keep the last tool** when no targets remain; `auto_tool_revert` setting (default off) restores the 1.0 s revert | 2.6, 8.3 A13 |
+| D20 | **No seasons in v1**: every crop grows all year | 10.1 |
+| D21 | **No weather in v1**: watering by can and sprinklers only | 10.1 |
+| D22 | **Farming only on owned plots and the starter garden** | 10.2 |
+| D23 | **Neglected crops suffer nothing**: unwatered crops do not grow that day; crops never wilt, die or rot | 10.5 |
+| D24 | **macOS minimum spec: base Apple M1 with 16 GB RAM** (Apple Silicon only; Intel Macs unsupported) | 0.7 |
+| D25 | **30 fps at 1920x1080, medium preset, on min spec** (Windows/Linux and macOS); **60 fps on the recommended spec** (D26) | 0.7, 9.5 |
 
 ### 0.5 Open decisions (owner confirmation needed)
-New questions raised by D9 (farming) and the min-spec hardware. Defaults are used until confirmed.
-
 | ID | Question | Proposed default | Alternative |
 |---|---|---|---|
-| D20 | Seasons for crops | **None in v1**: every crop grows all year | Seasons with crop sets per season (adds a calendar and crop death at season change, which conflicts with K1) |
-| D21 | Weather (rain waters crops) | **None in v1**: watering by can and sprinklers only | Rain days that auto-water |
-| D22 | Where can the player farm? | **Owned plots and the starter garden only** (tilling elsewhere is refused with a pictogram) | Anywhere outside protection volumes |
-| D23 | What happens to unwatered or neglected crops? | **Nothing bad**: unwatered crops do not grow that day; crops never wilt, die or rot (K1) | Wilting after N dry days |
-| D24 | macOS minimum spec (the given min spec is a Windows/Linux PC with an Nvidia GPU) | **Owner to define**, e.g. an Apple Silicon M1 Mac with 8 GB | Drop macOS from v1 targets |
-| D25 | Performance target on min spec | **60 fps at 1920x1080**, medium preset, plus the voxel budget in 9.5 | 30 fps; or 60 fps at a lower resolution |
+| D26 | "Newer hardware" for the 60 fps target (D25) is not a testable spec | **Owner to define a recommended spec** (CPU, GPU, RAM; Windows/Linux and macOS). Until then the 60 fps target is not gated | Gate 60 fps on the team's current dev machines |
 
 ### 0.6 Known issues and risks raised
 1. **Test command.** The owner updated CLAUDE.md (2026-11-16) to `godot --headless --path . -s -d res://addons/gdUnit4/bin/GdUnitCmdTool.gd --ignoreHeadlessMode -a res://test`. Remaining risk: with `-d` and no remote debugger, a GDScript parse error drops Godot into its interactive `debug>` prompt and the run never exits (a hung CI job instead of a failure). gdUnit4 v6.2.3's own `runtest.sh` passes `--remote-debug tcp://127.0.0.1:0` for exactly this reason (comment in that script). Recommended command, to verify in plan1 P0.3 and then propose for CLAUDE.md:
@@ -132,7 +131,7 @@ New questions raised by D9 (farming) and the min-spec hardware. Defaults are use
 16. **Zone overlaps need physics ticks.** `simulate_frames` advances process frames; tests must await physics frames.
 17. **Context reuse of buttons** (instrument notes on A/B/X/Y/shoulders/triggers, Build overrides on D-pad and shoulders). Safe only because contexts are disjoint; rebinding validation enforces it (2.5).
 18. **Voxel GDExtension maturity.** Less tested than the module edition. Plan1 starts with a spike: load, dig, place, save and reload, headless test run, exported build on all three OSes. Fallback is the module edition, which needs a custom editor binary, custom export templates, and a CI change.
-19. **Voxel collision rebuild latency.** Each dig rebuilds the trimesh collision of that data block. Budget: collision updated within 100 ms of an edit and no frame over 20 ms while digging continuously on min-spec hardware (defined in plan1). Fallback: `VoxelBoxMover` for player terrain collision (9.5).
+19. **Voxel collision rebuild latency.** Each dig rebuilds the trimesh collision of that data block. Budget: collision updated within 100 ms of an edit, and no frame over 33.3 ms (no drop below the 30 fps min-spec target, D25) while digging continuously on min-spec hardware (0.7). Fallback: `VoxelBoxMover` for player terrain collision (9.5).
 20. **Navigation on editable voxels is unsolved upstream.** Pet uses `VoxelAStarGrid3D` (fits its 1x2 agent assumption) with teleport fallback; NPCs are confined to protected areas with baked navmeshes and never path across dug terrain.
 21. **Headless voxel behavior is unverified** (meshing, collision, worker threads with the headless display server). All gameplay talks to terrain through `IVoxelWorld`; tests use `FakeVoxelWorld` (9.7). One real-terrain smoke suite, tagged `@voxel_real`, must pass in the spike.
 22. **Two-file save consistency.** JSON state and the voxel SQLite file can diverge after a crash. Slot files change only at explicit saves through a working copy, with an epoch check (9.6). Copying the SQLite file while the stream holds it open after the save tracker completes is **unverified**; the spike confirms it or switches to a fresh `database_path` per save.
@@ -142,7 +141,8 @@ New questions raised by D9 (farming) and the min-spec hardware. Defaults are use
 26. **Farming makes soil targets ambiguous.** Aiming at grass could mean dig (shovel) or till (hoe). Rule: the selected hotbar item decides; seeds selected means till-and-plant, otherwise dig (10.4). Tilling without seeds needs a manual HOE pick on the wheel.
 27. **Crops in unloaded zones.** Growth is computed in `FarmService` data at rollover, never by scene nodes, so crops grow while the player is elsewhere. Crop visuals and the wet-soil overlay are rebuilt from data on zone load.
 28. **Min spec is CPU-bound.** The i7-3770 (4 cores, 8 threads, 2012, no AVX2) is far weaker relative to the GTX 1070. Voxel meshing threads, Jolt and GDScript compete for 8 hardware threads; the voxel spike and all performance budgets are measured on this CPU. A Voxel Tools GDExtension requirement for AVX2 was not found in its docs or build files, but this is unverified until the spike runs on the i7-3770.
-29. **No macOS min spec yet** (D24). The given hardware does not exist as a Mac.
+29. **macOS min spec is a different machine class** (D24: base M1, 16 GB). Forward+ runs on Metal there (verified: `rendering/rendering_device/driver.macos` defaults to `metal` on Apple Silicon; Intel Macs fall back to Vulkan over MoltenVK and are unsupported). The M1's integrated GPU and the i7-3770 CPU are different bottlenecks, so every performance check runs on both min-spec machines.
+30. **30 fps render with 60 Hz physics.** Two physics ticks per rendered frame on min spec; movement stays correct, but camera and character motion may look less smooth on high-refresh displays. Physics interpolation (`physics/common/physics_interpolation`) is evaluated in the Phase 1 manual check.
 
 ### 0.7 Target hardware (minimum spec, Windows and Linux)
 | Component | Minimum |
@@ -150,14 +150,15 @@ New questions raised by D9 (farming) and the min-spec hardware. Defaults are use
 | CPU | Intel Core i7-3770 (Ivy Bridge, 4 cores / 8 threads, 3.4 GHz; SSE4.2 and AVX, no AVX2) |
 | RAM | 16 GB DDR3-1333 |
 | GPU | Nvidia GeForce GTX 1070 (8 GB, Vulkan capable) |
-| macOS | not yet defined (D24) |
+| macOS (D24) | Apple M1 (base chip), 16 GB RAM; Apple Silicon only |
 
 | Fact or target | Consequence |
 |---|---|
 | Godot 4.5 and 4.6 system requirements list an x86_64 CPU with SSE4.2 for the 64-bit editor and exports. The i7-3770 has SSE4.2. | Official x86_64 builds run on min spec. Re-check the 4.7 page when godotengine.org is reachable. |
 | Forward+ uses Vulkan on Windows and Linux; the GTX 1070 supports Vulkan. | D13 Forward+ is viable on min spec. |
-| Performance target (D25 default): 60 fps at 1920x1080, medium preset. | Measured on min spec in the Phase 0 spike and at every phase gate that adds heavy systems (2, 3, 5, 6). |
-| Voxel budget (9.5): edit-to-collision <= 100 ms, no frame > 20 ms while digging. | Measured on the i7-3770. |
+| Performance targets (D25): 30 fps at 1920x1080, medium preset, on both min-spec machines; 60 fps on the recommended spec (D26, to be defined). | Measured in the Phase 0 spike and at every phase gate that adds heavy systems (2, 2B, 3, 5, 6). |
+| Forward+ on macOS uses the Metal driver by default on Apple Silicon (4.7 `rendering/rendering_device/driver.macos`). | D13 Forward+ is viable on the M1; decals (stamps) are measured there too. |
+| Voxel budget (9.5): edit-to-collision <= 100 ms, no frame > 33.3 ms while digging. | Measured on the i7-3770 and the M1. |
 | Worker threads: leave at least 2 hardware threads for the main and physics threads. | Voxel Tools thread count is capped accordingly (spike confirms the setting). |
 
 ---
@@ -1593,7 +1594,7 @@ Protection volumes are authored in zone scenes; P3 to P5 are computed at runtime
 
 ### 9.5 Collision
 - Default: `VoxelTerrain` mesh-based collision on layer `world`; the player is a Jolt `CharacterBody3D`.
-- Budget (verified in the spike): edit-to-collision <= 100 ms; no frame > 20 ms during continuous digging on min-spec hardware.
+- Budget (verified in the spike): edit-to-collision <= 100 ms; no frame > 33.3 ms during continuous digging on both min-spec machines (0.7).
 - Edge safety: when a dug voxel supports the player's capsule edge (straight down is blocked by P6), the player gets a temporary support until the rebuild finishes or 0.2 s pass.
 - Fallback if the budget fails: player terrain collision via `VoxelBoxMover` (`get_motion`, step climbing for auto-jump), Jolt for everything else. This is a plan-level switch; the airborne FSM then reads floor state from the mover.
 

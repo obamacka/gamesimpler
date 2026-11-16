@@ -2,7 +2,7 @@
 
 | Field | Value |
 |---|---|
-| Implements | `_docs/specs/spec1.md` rev 3.2 |
+| Implements | `_docs/specs/spec1.md` rev 3.3 |
 | Status | DRAFT, not started |
 | Tracking | `_docs/PROGRESS.md` (update after every completed task, per CLAUDE.md) |
 | Engine / libs | Godot 4.7.x, Jolt, gdUnit4 v6.2.3, Voxel Tools 1.7 GDExtension |
@@ -43,7 +43,7 @@ res://spikes/                Phase 0 spikes, excluded from export
 - [ ] Pause-safety lint suite passes (P1.24).
 - [ ] `Database` integrity suite passes for every resource type introduced so far.
 - [ ] Manual gamepad pass on the phase's checklist with an Xbox-layout pad and a DualShock 4 or DualSense, plus keyboard/mouse.
-- [ ] Phases 2, 2B, 3, 5, 6: performance check on the min-spec machine (spec 0.7: i7-3770, 16 GB DDR3-1333, GTX 1070) against the D25 target and the voxel budget; numbers logged in `_docs/PROGRESS.md`.
+- [ ] Phases 2, 2B, 3, 5, 6: performance check on both min-spec machines (spec 0.7: i7-3770 / 16 GB DDR3-1333 / GTX 1070, and base M1 / 16 GB) against D25 (30 fps at 1080p medium) and the voxel budget; numbers logged in `_docs/PROGRESS.md`. The 60 fps recommended-spec check is added once D26 is defined.
 - [ ] `_docs/PROGRESS.md` updated: tasks ticked, test run logged with commit SHA, open issues recorded.
 - [ ] Commit with a meaningful message.
 
@@ -62,13 +62,11 @@ res://spikes/                Phase 0 spikes, excluded from export
 8. **Added Phase 2B (Farming)** for D9, between Phases 2 and 3, so your phase numbers stay unchanged. It needs Phase 2 terrain, tools, stamina and day rollover; seeds in shops come in Phase 4 and crop donations in Phase 6.
 
 ### 0.5 Decision gates
-D1 to D19 are resolved (spec 0.4). Remaining open decisions use spec defaults until the owner confirms them before the listed phase.
+D1 to D25 are resolved (spec 0.4). One item remains:
 
 | Decision | Default assumed | Needed by |
 |---|---|---|
-| D25 performance target | 60 fps at 1920x1080, medium preset, on min spec | Phase 0 (spike pass/fail) |
-| D24 macOS min spec | owner to define | Phase 0 (P0.9 macOS export check) |
-| D20 seasons, D21 weather, D22 farmable area, D23 no crop death | none, none, owned plots + starter garden, crops never die | Phase 2B |
+| D26 recommended spec for the 60 fps target | not gated until defined | any phase gate after it is defined |
 
 ---
 
@@ -84,20 +82,20 @@ D1 to D19 are resolved (spec 0.4). Remaining open decisions use spec defaults un
 - [x] **P0.4 Update CLAUDE.md test command.** Done by the owner on 2026-11-16 (commit `3682356`). Follow-up after P0.3: if the parse-error run hangs, propose adding `--remote-debug tcp://127.0.0.1:0` (owner approval required).
 - [ ] **P0.5 Test helpers.** `res://test/helpers/signal_recorder.gd` (records name, args, physics frame), `res://test/helpers/physics_wait.gd` (`await_physics_frames(n)`), `res://test/helpers/test_session.gd` (factory placeholder, filled per phase). Unit suite `res://test/unit/helpers/test_signal_recorder.gd`.
 - [ ] **P0.6 CI.** GitHub Actions workflow running the headless command on Linux with a pinned Godot 4.7.x binary; upload gdUnit4 reports. Optional Windows and macOS jobs for exports in P0.9.
-- [x] **P0.7 Min-spec hardware.** Defined by the owner on 2026-11-16: Intel Core i7-3770, 16 GB DDR3-1333, Nvidia GTX 1070 (spec 0.7). macOS min spec still open (D24).
-- [ ] **P0.8 Voxel spike** (in `res://spikes/voxel/`, not shipped). Install Voxel Tools 1.7 GDExtension into `res://addons/zylann.voxel/`. Run all measurements on the min-spec machine (spec 0.7). Verify and record numbers in `_docs/reports/voxel_spike.md`:
+- [x] **P0.7 Min-spec hardware.** Defined by the owner on 2026-11-16: Intel Core i7-3770, 16 GB DDR3-1333, Nvidia GTX 1070 (Windows/Linux); base Apple M1, 16 GB (macOS, D24). Target 30 fps at 1080p medium (D25).
+- [ ] **P0.8 Voxel spike** (in `res://spikes/voxel/`, not shipped). Install Voxel Tools 1.7 GDExtension into `res://addons/zylann.voxel/`. Run all measurements on both min-spec machines (spec 0.7). Verify and record numbers in `_docs/reports/voxel_spike.md`:
   - [ ] a. Extension loads in the editor and in a headless run.
   - [ ] b. `VoxelTerrain` + `VoxelMesherBlocky` + `VoxelBlockyLibrary` with 4 materials renders; data block size confirmed.
   - [ ] c. Dig and place through `get_voxel_tool()` (`set_voxel`, `get_voxel`, `raycast`).
-  - [ ] d. Collision rebuild latency after single-voxel edits against the budget (<= 100 ms edit-to-collision, no frame > 20 ms during continuous digging) on min-spec hardware, with a Jolt `CharacterBody3D` standing and walking over edits.
+  - [ ] d. Collision rebuild latency after single-voxel edits against the budget (<= 100 ms edit-to-collision, no frame > 33.3 ms during continuous digging) on min-spec hardware, with a Jolt `CharacterBody3D` standing and walking over edits.
   - [ ] e. `VoxelStreamSQLite` save via `save_modified_blocks()` and `VoxelSaveCompletionTracker.is_complete()`, then reload.
   - [ ] f. Copy the SQLite file after the tracker completes while the stream is attached; reload the copy in a fresh terrain and diff voxels (spec 0.6 item 22).
   - [ ] g. `VoxelAStarGrid3D.find_path_async` for a pet-sized agent across dug terrain.
   - [ ] h. Jolt `CharacterBody3D` physics works in a headless run (needed by Phase 1 integration suites).
   - [ ] i. `@voxel_real` smoke suite `res://test/integration/test_voxel_smoke.gd` passes headless (or the report states why it needs a windowed job).
   - [ ] j. No illegal-instruction crash on the i7-3770 (no AVX2), in the editor or the exported build.
-  - [ ] k. Frame rate at 1920x1080 with the target view distance while walking and digging (D25); voxel worker thread count chosen so at least 2 hardware threads stay free for main and physics.
-- [ ] **P0.9 Export smoke.** Export the spike for Windows x86_64, Linux x86_64, macOS (universal) with stock templates; each launches and digs.
+  - [ ] k. Frame rate at 1920x1080 medium with the target view distance while walking and digging: >= 30 fps on both min-spec machines (D25); on the M1 confirm the Metal driver is active; voxel worker thread count chosen so at least 2 hardware threads stay free for main and physics.
+- [ ] **P0.9 Export smoke.** Export the spike for Windows x86_64, Linux x86_64, macOS (universal) with stock templates; each launches and digs. The macOS build is run on the base M1.
 - [ ] **P0.10 Go / no-go record.** In `_docs/reports/voxel_spike.md`: GDExtension go, or fallback to module edition (custom editor, templates, CI change), and/or `VoxelBoxMover` for player collision (spec 9.5), and/or per-save `database_path` (spec 9.6). Update spec 0.6 and 9 if anything changed.
 
 ### P0 tests
@@ -160,6 +158,7 @@ Integration (`res://test/integration/`):
 ### P1 manual checklist
 - [ ] Xbox pad and DualShock/DualSense on Windows and Linux (macOS if available): every gameplay action in spec 2.2 fires; glyphs switch on device change; hotplug does not crash.
 - [ ] KB/M: same actions; mouse captured in gameplay.
+- [ ] At a forced 30 fps cap, compare camera and character smoothness with physics interpolation on and off (spec 0.6 item 30); record the choice in PROGRESS.
 
 ---
 

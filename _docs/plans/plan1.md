@@ -222,29 +222,29 @@ Integration (`res://test/integration/`):
 **Spec:** 10, 2.6 (farm rules), 2.8 (farm prompts), 3.1 (SEED), 3.5 (`farm`), 6.1, 6.2 (rollover step 4), 9.3 P3, 8.5.1 (Suite F).
 
 ### P2B resources
-- [ ] **P2B.1** `CropDef`s (carrot, sunflower, pumpkin, cotton, strawberry, tomato) with stage meshes; SEED items and PRODUCE harvest items; `FarmConfig.tres`; `mat_farmland` material and library model; HOE and WATERING_CAN tool items; `piece_sprinkler` (`BuildPieceDef` with `farm_effect = SPRINKLER`); well scene; `mail_tpl_welcome` with starter seeds.
-- [ ] **P2B.2** Home Meadow zone: protected starter cabin exterior, owned `plot_starter_garden` (8x8), well; starter cabin interior stays STATIC.
+- [x] **P2B.1** `CropDef`s (carrot, sunflower, pumpkin, cotton, strawberry, tomato) with stage meshes (placeholder boxes until art; JSON content per spec 3 conventions); SEED items and PRODUCE harvest items; `FarmConfig.tres`; `mat_farmland` material and library model; HOE and WATERING_CAN tool items; `piece_sprinkler` (`BuildPieceDef` with `farm_effect = SPRINKLER`; Phase 2B ships `item_sprinkler` with the minimal placement command, the BuildPieceDef arrives with Phase 3); well scene; `mail_tpl_welcome` with starter seeds.
+- [x] **P2B.2** Home Meadow zone: protected starter cabin exterior, owned `plot_starter_garden` (8x8), well; starter cabin interior stays STATIC.
 
 ### P2B scripts
-- [ ] **P2B.3 `FarmModel`** (pure): farmable-cell rule (D22), till, plant, water (no-op if already watered today), growth at rollover (watered `day - 1` or sprinkler), stage mapping, harvest with seeded yield and seed return, regrow, no death (D23), can capacity and refill.
-- [ ] **P2B.4 `FarmService`**: commands and events per spec 1.8; registers `daily_growth` as `DayRollover` step 4; computes growth for every zone in data.
-- [ ] **P2B.5 Farm views:** `CropView` scene per crop cell, `SoilOverlay` MultiMesh for wet cells, rebuilt from data on zone load.
-- [ ] **P2B.6 Tool rules:** extend `ToolSelectionModel` with the spec 10.4 table (hotbar SEED selection decides till vs dig); HOE and WATERING_CAN in the starter ToolBelt.
-- [ ] **P2B.7 Interactions:** TILL, PLANT, WATER (repeat while RT held), REFILL, HARVEST kinds in the context `Interact` state; PromptOverlay farm rows; HUD watering-can level.
-- [ ] **P2B.8 Protection and occupancy:** planted crops add P3 support protection and occupy their cell for blocks and pieces.
-- [ ] **P2B.9 Sprinkler effect:** placing `piece_sprinkler` uses a minimal placement command now (full Build mode arrives in Phase 3, which then takes over sprinkler placement).
-- [ ] **P2B.10 New-game kit:** welcome letter scheduled for day 1 with seeds; starter tools.
-- [ ] **P2B.11 Serialization:** `farm` section (tilled, crops, watering can).
+- [x] **P2B.3 `FarmModel`** (pure): farmable-cell rule (D22), till, plant, water (no-op if already watered today), growth at rollover (watered `day - 1` or sprinkler), stage mapping, harvest with seeded yield and seed return, regrow, no death (D23), can capacity and refill.
+- [x] **P2B.4 `FarmService`**: commands and events per spec 1.8; registers `daily_growth` as `DayRollover` step 4; computes growth for every zone in data.
+- [x] **P2B.5 Farm views:** `CropView` scene per crop cell, `SoilOverlay` MultiMesh for wet cells, rebuilt from data on zone load.
+- [x] **P2B.6 Tool rules:** extend `ToolSelectionModel` with the spec 10.4 table (hotbar SEED selection decides till vs dig); HOE and WATERING_CAN in the starter ToolBelt.
+- [x] **P2B.7 Interactions:** TILL, PLANT, WATER (repeat while RT held), REFILL, HARVEST kinds in the context `Interact` state; PromptOverlay farm rows; HUD watering-can level.
+- [x] **P2B.8 Protection and occupancy:** planted crops add P3 support protection and occupy their cell for blocks and pieces.
+- [x] **P2B.9 Sprinkler effect:** placing `piece_sprinkler` uses a minimal placement command now (full Build mode arrives in Phase 3, which then takes over sprinkler placement).
+- [x] **P2B.10 New-game kit:** welcome letter scheduled for day 1 with seeds; starter tools.
+- [x] **P2B.11 Serialization:** `farm` section (tilled, crops, watering can).
 
 ### P2B tests
 Unit:
-- [ ] **P2B.12** `farm/test_farm_model.gd`: farmable rule (owned plot, starter garden, outside, protected, not top-exposed, < 2 free cells above); till sets farmland; plant needs farmland and a SEED; growth only when watered the previous day or sprinkler-covered; same-day plant and water counts; stage boundaries per `days_per_stage`; unwatered for many days keeps stage and never dies; ripe stays ripe; harvest yield and seed return deterministic for a seed; regrow returns to `regrow_stage`; watering twice spends water once; can empty and refill.
-- [ ] **P2B.13** `tools/test_tool_selection_farm.gd`: spec 10.4 table row by row, including SEED vs non-SEED selection on the same soil and the empty-can badge.
-- [ ] **P2B.14** `sleep/test_day_rollover.gd` extended: farm growth is step 4, after terrain reset and before mail; `save/test_farm_round_trip.gd`; `data/test_database_integrity.gd` extended for crops and seeds.
+- [x] **P2B.12** `farm/test_farm_model.gd`: farmable rule (owned plot, starter garden, outside, protected, not top-exposed, < 2 free cells above); till sets farmland; plant needs farmland and a SEED; growth only when watered the previous day or sprinkler-covered; same-day plant and water counts; stage boundaries per `days_per_stage`; unwatered for many days keeps stage and never dies; ripe stays ripe; harvest yield and seed return deterministic for a seed; regrow returns to `regrow_stage`; watering twice spends water once; can empty and refill.
+- [x] **P2B.13** `tools/test_tool_selection_farm.gd`: spec 10.4 table row by row, including SEED vs non-SEED selection on the same soil and the empty-can badge.
+- [x] **P2B.14** `sleep/test_day_rollover.gd` extended: farm growth is step 4, after terrain reset and before mail; `save/test_farm_round_trip.gd`; `data/test_database_integrity.gd` extended for crops and seeds.
 
 Integration:
-- [ ] **P2B.15** `test_farming.gd`: spec 8.5.1 Suite F cases **F1 to F16**.
-- [ ] **P2B.16** `test_auto_tool_selection.gd`: re-run in full to confirm farm rules did not change cases A1 to A22.
+- [x] **P2B.15** `test_farming.gd`: spec 8.5.1 Suite F cases **F1 to F16**.
+- [x] **P2B.16** `test_auto_tool_selection.gd`: re-run in full to confirm farm rules did not change cases A1 to A22.
 
 ### P2B manual checklist
 - [ ] Plant, water and harvest with pad only; prompts make the hoe vs shovel choice obvious; a 6-year-old-readable picture guide in the welcome letter.

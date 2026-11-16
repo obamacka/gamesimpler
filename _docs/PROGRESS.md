@@ -2,9 +2,9 @@
 
 | Field | Value |
 |---|---|
-| Spec | `_docs/specs/spec1.md` rev 3.4 |
+| Spec | `_docs/specs/spec1.md` rev 3.5 |
 | Plan | `_docs/plans/plan1.md` |
-| Active phase | Phase 2 (automated tasks done; manual checklist and performance check pending); Phase 1 manual and Phase 0 hardware checks pending |
+| Active phase | Phase 2B (automated tasks done; manual checklist pending); Phase 2 and Phase 1 manual checks and Phase 0 hardware checks pending |
 | Last updated | 2026-11-16 |
 
 ## How to update
@@ -34,7 +34,7 @@ Status values: `Not started`, `In progress`, `Blocked`, `Done`.
 | 0 | Bootstrap, Test Harness and Voxel Spike | In progress | |
 | 1 | Core Engine, Gamepad Input, Camera, Tall Character FSM | In progress: all automated tasks done, manual checklist pending | |
 | 2 | Mining, Foraging, Stamina Loop, Auto-Tool | In progress: all automated tasks done, manual checklist and min-spec performance check pending | |
-| 2B | Farming | Not started | |
+| 2B | Farming | In progress: all automated tasks done, manual checklist pending | |
 | 3 | Magnetic Grid Building, Screw/Hammer Mini-Games | Not started | |
 | 4 | Economy, Jobs, Wardrobe UI, Game Pause | Not started | |
 | 5 | NPCs, Mail, Pet Companion | Not started | |
@@ -79,11 +79,11 @@ Status values: `Not started`, `In progress`, `Blocked`, `Done`.
 ### Phase 2B
 | Task | Status | Date | Commit | Notes |
 |---|---|---|---|---|
-| P2B.1 to P2B.2 Resources and zone | Not started | | | |
-| P2B.3 to P2B.11 Scripts | Not started | | | |
-| P2B.12 to P2B.14 Unit suites | Not started | | | |
-| P2B.15 to P2B.16 Integration suites | Not started | | | Suite F: F1 to F16 |
-| Manual checklist and performance check | Not started | | | |
+| P2B.1 to P2B.2 Resources and zone | Done | 2026-11-16 | 93b088c | 6 crops, seeds, produce, hoe, can, `item_sprinkler`, `mat_farmland` (voxel 13), welcome letter, `plot_starter_garden`; Home Meadow generated zone with flattened garden, protected cabin exterior, well; cabin door now leads to the meadow |
+| P2B.3 to P2B.11 Scripts | Done | 2026-11-16 | 93b088c | FarmModel, FarmService, FarmView/CropView/SoilOverlay, HotbarModel, farm rules in the selector, FarmActionTarget in Interact, occupancy and P3 protection, sprinkler command, new-game kit, `farm` save section |
+| P2B.12 to P2B.14 Unit suites | Done | 2026-11-16 | 93b088c | farm model 13, farm tool rules 10, rollover step order, farm round trip 2, database integrity +2 |
+| P2B.15 to P2B.16 Integration suites | Done | 2026-11-16 | 93b088c | Suite F 16/16 (F15 asserts PRODUCE only; `entry_discovered` waits for Phase 6 CollectionService); Suite A 19/19 unchanged; Home Meadow real-terrain smoke |
+| Manual checklist | Not started | | | plant, water, harvest with pad only; hoe vs shovel prompts; picture guide in the welcome letter (letter art not made yet) |
 
 ### Phase 3
 | Task | Status | Date | Commit | Notes |
@@ -137,6 +137,7 @@ Status values: `Not started`, `In progress`, `Blocked`, `Done`.
 | 2026-11-16 | 205f54a | 2 | `ci/run_tests.sh` | 0 | 0 | 199 cases (part 1) |
 | 2026-11-16 | 5e4c70e | 2 | `ci/run_tests.sh` | 0 | 0 | 262 cases (Phases 0 to 2) |
 | 2026-11-16 | 24a5cfd | 0 | `ci/run_tests.sh` | 0 | 0 | 17 cases incl. voxel smoke |
+| 2026-11-16 | 93b088c | 2B | `ci/run_tests.sh` | 0 | 0 | 311 cases (Phases 0 to 2B) |
 
 ## Decisions
 | ID | Status | Value |
@@ -152,7 +153,9 @@ Status values: `Not started`, `In progress`, `Blocked`, `Done`.
 |---|---|---|---|
 | 2026-11-16 | Phase 1 manual gamepad checklist (plan Phase 1) | team | Open |
 | 2026-11-16 | Phase 2 manual checklist and min-spec performance check | team | Open |
-| 2026-11-16 | Phase 2 choices for owner review: JSON content authoring (spec 3 conventions updated); care-letter snack rule compares against the collapse day (spec 6.2 corrected, the old rule could never trigger); `player_woke` emitted just before the transition pause is released (spec 6.2 diagram updated to match Suite B); Bed and Mine Entrance act without the confirm dialog until Phase 3 adds menus; SafeGround uses the standing-capsule clearance as the "3 free voxels" check; prompt occlusion check not yet implemented (behind-camera hiding is) | owner review | Open |
+| 2026-11-16 | Phase 2 choices for owner review: JSON content authoring (spec 3 conventions updated); care-letter snack rule compares against the collapse day (spec 6.2 corrected, the old rule could never trigger); `player_woke` emitted just before the transition pause is released (spec 6.2 diagram updated to match Suite B); Bed and Mine Entrance act without the confirm dialog until Phase 3 adds menus; SafeGround uses the standing-capsule clearance as the "3 free voxels" check; prompt occlusion implemented in 5ac70f4 | owner review | Open |
+| 2026-11-16 | Phase 2B manual checklist (plan P2B) | team | Open |
+| 2026-11-16 | Phase 2B choices for owner review: seeds aimed at non-farmable grass/dirt show a blocked prompt instead of digging (spec 10.4 row added); wetness stored per soil cell so empty farmland can be watered (save shape in spec 3.5 updated, crop `stage`/`watered_day` no longer saved); harvest is X only per spec 10.4 (RT does nothing on a ripe crop); sprinkler is an item placed with RT while selected on owned plot soil until Phase 3; crop visuals are placeholder boxes; plots are flattened to the natural height at their center, which can leave a ledge at the border; no water voxels yet, so the well is the only refill source | owner review | Open |
 | 2026-11-16 | Phase 1 implementation choices recorded in spec: input map generated from InputBindings; `ui_tertiary` KB moved from Shift+Enter to R; Esc overlap rule; ledge probes are direct physics queries; VoxelViewer added in Phase 2 | owner review | Open |
 | 2026-11-15 | CLAUDE.md headless command does not match gdUnit4 v6.2.3 (spec 0.6 item 1) | owner | Closed 2026-11-16 (3682356) |
 | 2026-11-16 | Confirmed: the CLAUDE.md command hangs at `debug>` on GDScript parse errors; `--remote-debug tcp://127.0.0.1:0` fixes it (exit 105). `ci/run_tests.sh` uses the fix | owner | Closed 2026-11-16: CLAUDE.md updated (owner approved) |

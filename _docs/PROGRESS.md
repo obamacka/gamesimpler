@@ -97,10 +97,10 @@ Status values: `Not started`, `In progress`, `Blocked`, `Done`.
 ### Phase 4
 | Task | Status | Date | Commit | Notes |
 |---|---|---|---|---|
-| P4.1 Resources | Done | 2026-11-16 | see Phase 4 commit | `economy.json` (3 shops, starting coins 150), `recipes.json` (10), `jobs.json` (2 jobs, 4 contracts, 1 blueprint), `outfits.json` (6 outfits, 7 dyes, 5 default dyes), `plot_meadow_east` (500 coins); outfits use placeholder boxes |
-| P4.2 to P4.13 Scripts | Done | 2026-11-16 | see Phase 4 commit | Coordinator with snapshot rollback and `fail_at` seam; EconomyService restock in rollover `restock` step (with job expiry); Craft state; JobService (blueprint auto-complete, craft progress, mail, B13); deeds via PlotSign; OutfitService and customizer with SubViewport turntable; 12 menus; MenuStack globals, focus recovery and debug focus check; focus-loss and pad-loss pause with DeviceBanner; Accessibility runtime (text scale, palette, reduce motion, prompt labels, TTS, master volume, fullscreen, vsync) |
-| P4.14 to P4.16 Unit suites | Done | 2026-11-16 | see Phase 4 commit | wallet 2, coordinator 7, accretion 2, pricing 3, craft 2, jobs 3, outfit 3, inventory transactions 4, phase 4 round trip 2, accessibility 5, scene/script load checks 2 |
-| P4.17 to P4.23 Integration suites | Done | 2026-11-16 | see Phase 4 commit | menu pause flow 8, auto-pause 2, shop and craft 5, job contracts 3, B13, wardrobe 3, settings rebind 4 |
+| P4.1 Resources | Done | 2026-11-16 | 8566596 | `economy.json` (3 shops, starting coins 150), `recipes.json` (10), `jobs.json` (2 jobs, 4 contracts, 1 blueprint), `outfits.json` (6 outfits, 7 dyes, 5 default dyes), `plot_meadow_east` (500 coins); outfits use placeholder boxes |
+| P4.2 to P4.13 Scripts | Done | 2026-11-16 | 8566596 | Coordinator with snapshot rollback and `fail_at` seam; EconomyService restock in rollover `restock` step (with job expiry); Craft state; JobService (blueprint auto-complete, craft progress, mail, B13); deeds via PlotSign; OutfitService and customizer with SubViewport turntable; 12 menus; MenuStack globals, focus recovery and debug focus check; focus-loss and pad-loss pause with DeviceBanner; Accessibility runtime (text scale, palette, reduce motion, prompt labels, TTS, master volume, fullscreen, vsync) |
+| P4.14 to P4.16 Unit suites | Done | 2026-11-16 | 8566596 | wallet 2, coordinator 7, accretion 2, pricing 3, craft 2, jobs 3, outfit 3, inventory transactions 4, phase 4 round trip 2, accessibility 5, scene/script load checks 2 |
+| P4.17 to P4.23 Integration suites | Done | 2026-11-16 | 8566596 | menu pause flow 8, auto-pause 2, shop and craft 5, job contracts 3, B13, wardrobe 3, settings rebind 4 |
 | Manual checklist | Not started | | | every menu by pad only with no dead-end focus; unplug/replug the pad mid-game |
 
 ### Phase 5
@@ -139,7 +139,7 @@ Status values: `Not started`, `In progress`, `Blocked`, `Done`.
 | 2026-11-16 | 24a5cfd | 0 | `ci/run_tests.sh` | 0 | 0 | 17 cases incl. voxel smoke |
 | 2026-11-16 | 93b088c | 2B | `ci/run_tests.sh` | 0 | 0 | 311 cases (Phases 0 to 2B) |
 | 2026-11-16 | 405aae6 | 3 | `ci/run_tests.sh` | 0 | 0 | 369 cases (Phases 0 to 3) |
-| 2026-11-16 | Phase 4 commit | 4 | `ci/run_tests.sh` | 0 | 0 | 430 cases (Phases 0 to 4) |
+| 2026-11-16 | 8566596 | 4 | `ci/run_tests.sh` | 0 | 0 | 430 cases (Phases 0 to 4) |
 
 ## Decisions
 | ID | Status | Value |

@@ -1,0 +1,49 @@
+name: tests
+
+on:
+  push:
+  pull_request:
+
+env:
+  GODOT_VERSION: 4.7.2-stable
+  GODOT_ZIP: Godot_v4.7.2-stable_linux.x86_64.zip
+  # From https://github.com/godotengine/godot-builds/releases/download/4.7.2-stable/SHA512-SUMS.txt
+  GODOT_SHA512: 9aa00f7a605200940bce3027a567b782f49bd8e940dd06ae9e987bd65aee1b1467edd56ed84fcdcbdd44354bf613bdbb4e5d2913e925850368e150c59ed54c65
+
+jobs:
+  gdunit4:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Cache Godot
+        id: cache-godot
+        uses: actions/cache@v4
+        with:
+          path: ~/godot
+          key: godot-${{ env.GODOT_VERSION }}-linux-x86_64
+
+      - name: Download and verify Godot
+        if: steps.cache-godot.outputs.cache-hit != 'true'
+        run: |
+          mkdir -p ~/godot
+          cd ~/godot
+          curl -sSL -o "$GODOT_ZIP" "https://github.com/godotengine/godot-builds/releases/download/${GODOT_VERSION}/${GODOT_ZIP}"
+          echo "${GODOT_SHA512}  ${GODOT_ZIP}" | sha512sum -c -
+          unzip -q "$GODOT_ZIP"
+          rm "$GODOT_ZIP"
+          chmod +x Godot_v4.7.2-stable_linux.x86_64
+
+      - name: Run gdUnit4 headless
+        env:
+          GODOT_BIN: /home/runner/godot/Godot_v4.7.2-stable_linux.x86_64
+        run: ci/run_tests.sh
+
+      - name: Upload reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: gdunit4-reports
+          path: reports/
+          if-no-files-found: ignore

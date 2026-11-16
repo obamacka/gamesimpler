@@ -19,6 +19,11 @@ func physics_tick(_delta: float, _f: InputFrame) -> void:
 	pass
 
 
+## True while the body is parked (Sit): no movement or gravity.
+func freezes_body() -> bool:
+	return false
+
+
 ## True while the state holds the auto-tool lock (spec 2.6 rule 5).
 func locks_tool() -> bool:
 	return false

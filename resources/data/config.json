@@ -27,5 +27,50 @@
     "can_capacity": 20,
     "sprinkler_radius": 1,
     "till_stamina": 1
+  },
+  "build": {
+    "snap_radius_structure": [
+      0.3,
+      0.45,
+      0.6
+    ],
+    "snap_radius_furniture": [
+      0.2,
+      0.3,
+      0.35
+    ],
+    "reticle_angle_deg": [
+      4,
+      6,
+      9
+    ],
+    "screw_hold_sec": 0.8,
+    "nail_hold_sec": 0.4,
+    "remove_hold_sec": 0.6,
+    "sticky_factor": 1.5,
+    "debug_kit": {
+      "plot": "plot_test",
+      "tools": [
+        "item_hammer_basic",
+        "item_screwdriver_basic"
+      ],
+      "items": {
+        "item_piece_floor": 12,
+        "item_piece_wall": 12,
+        "item_piece_wall_door": 2,
+        "item_piece_window_wall": 2,
+        "item_piece_roof": 9,
+        "item_piece_chair": 2,
+        "item_piece_bed": 1,
+        "item_piece_lamp": 1,
+        "item_piece_shelf": 2,
+        "item_piece_stairs": 2,
+        "item_piece_fence": 4,
+        "item_piece_table": 1,
+        "item_piece_sofa": 1,
+        "item_piece_radio": 1,
+        "item_piece_chest": 1
+      }
+    }
   }
 }

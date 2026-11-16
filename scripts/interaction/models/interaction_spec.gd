@@ -7,6 +7,9 @@ var duration_sec := 0.0
 var stamina_cost := 0
 var handoff_state: StringName = &""   # &"sleep", &"talk", &"sit", &"craft" or empty
 var prompt_icon: StringName = &""
+var opens_menu: StringName = &""      # pushed on the MenuStack after Perform (spec 4.5)
+var menu_args: Dictionary = {}
+var menu_result: Variant = null       # the menu's result, set before resolve
 
 
 func _init(k: StringName = &"", duration: float = 0.0, cost: int = 0, handoff: StringName = &"") -> void:

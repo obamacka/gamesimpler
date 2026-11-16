@@ -47,7 +47,7 @@ func _process(delta: float) -> void:
 	var low := st.current * 100 <= st.max_value() * 25
 	_stamina.modulate = Color(1, 0.6, 0.6, 0.6 + 0.4 * absf(sin(Time.get_ticks_msec() / 300.0))) if low else Color.WHITE
 	var m := GameClock.model.minute
-	var held := s.hotbar.selected_stack(s.inventory.model)
+	var held: Variant = s.hotbar.selected_stack(s.inventory.model)
 	_info.text = "Day %d  %02d:%02d\nCoins %d   Tool %s   Mail %d\nCan %d/%d   Hand %d: %s" % [GameClock.model.day, (m / 60) % 24, m % 60,
 		s.wallet.model.coins, String(s.toolbelt.model.equipped) if s.toolbelt.model.equipped != &"" else "hands",
 		s.mail.model.unread_count(), s.farm.model.can_water, s.farm.model.can_capacity, s.hotbar.selected + 1,

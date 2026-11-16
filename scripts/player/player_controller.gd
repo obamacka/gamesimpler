@@ -38,6 +38,8 @@ var _focused: Node3D              # Interactable or the FarmActionTarget
 var farm_target: FarmActionTarget
 var _farm_aim: Dictionary = {}    # this tick's farm action (spec 10.4) or {}
 var _farm_pos := Vector3.ZERO
+var build_ctl: BuildController
+var build_active := false
 var _target: Dictionary = {}     # current tool target: {"kind": &"voxel", "cell"} or {"kind": &"zone", "node"}
 var _safe_timer := 0.0
 var _target_destroyed := false
@@ -67,6 +69,10 @@ func _ready() -> void:
 	_was_on_floor = true
 	_fall_peak_y = global_position.y
 	tool_selector.setup(self, tool_detector)
+	build_ctl = BuildController.new()
+	build_ctl.name = "BuildController"
+	add_child(build_ctl)
+	build_ctl.setup(self)
 	farm_target = FarmActionTarget.new()
 	farm_target.name = "FarmTarget"
 	farm_target.top_level = true
@@ -95,6 +101,8 @@ func _physics_process(delta: float) -> void:
 	jump.tick(delta)
 	_since_manual_jump += delta
 	_update_toggles(f)
+	if build_active or machine.current_id == PlayerTransitionTable.SIT:
+		duck_toggle.reset()   # B exits Build / stands up; it must not also start a duck
 	camera_rig.apply_input(f, delta, _facing_yaw)
 	_build_context(f, delta)
 	_build_phase2_context(f, delta)
@@ -105,10 +113,14 @@ func _physics_process(delta: float) -> void:
 	elif machine.has_state(t.to):
 		if t.to == PlayerTransitionTable.MINE or (t.effect == PlayerTransitionTable.FX_FARM and tool_selector.best().get("tool", &"") != &""):
 			tool_selector.commit_now()
+		if t.effect in [PlayerTransitionTable.FX_BUILD_EXIT, PlayerTransitionTable.FX_STAND]:
+			duck_toggle.reset()
 		machine.transition_to(t.to, {"effect": t.effect, "from": machine.current_id, "auto": context.auto_jump_ready and not f.jump_pressed, "reason": pending_sleep_reason})
 		if t.effect == PlayerTransitionTable.FX_SOFT_LAND:
 			feedback.emit(t.effect)
 	current_state().physics_tick(delta, f)
+	if build_active and current_state().is_airborne():
+		build_ctl.tick(delta, f, true)   # single-shot air placement (spec 4.2.1)
 
 	_move(f, delta)
 	_after_move()
@@ -151,6 +163,8 @@ func _build_context(f: InputFrame, delta: float) -> void:
 
 func _apply_stay_effect(effect: StringName) -> void:
 	match effect:
+		PlayerTransitionTable.FX_NO_BUILD_ZONE:
+			feedback.emit(effect)
 		PlayerTransitionTable.FX_BUFFER:
 			jump.buffer_press()
 		PlayerTransitionTable.FX_BUMP, PlayerTransitionTable.FX_LOW_CEILING:
@@ -166,6 +180,9 @@ func _apply_stay_effect(effect: StringName) -> void:
 
 func _move(f: InputFrame, delta: float) -> void:
 	var state := current_state()
+	if state.freezes_body():
+		velocity = Vector3.ZERO
+		return
 	var dir := camera_rig.move_direction(f.move)
 	var horizontal := Vector2(velocity.x, velocity.z)
 	var accel := config.ground_accel
@@ -225,7 +242,14 @@ func set_ducking(on: bool) -> void:
 	camera_rig.set_ducking(config, on)
 
 
+func _on_transitioned_build(from: StringName, to: StringName) -> void:
+	if build_active and not (to in [PlayerTransitionTable.BUILD, PlayerTransitionTable.JUMP, PlayerTransitionTable.FALL]):
+		build_active = false
+		build_ctl.exit()
+
+
 func _on_transitioned(from: StringName, to: StringName) -> void:
+	_on_transitioned_build(from, to)
 	EventBus.player_state_changed.emit(from, to)
 
 
@@ -276,6 +300,9 @@ func _build_phase2_context(f: InputFrame, delta: float) -> void:
 		return
 	c.exhaustion_pending = c.exhaustion_pending or s.stamina.exhaustion_pending
 	var feet := IVoxelWorld.cell_of(global_position + Vector3(0, -0.1, 0))
+	c.in_build_zone = s.housing.plot_at(SceneRouter.current_zone_id, feet + Vector3i.UP) != null
+	c.build_active = build_active
+	c.build_fastening = build_active and build_ctl.is_fastening()
 	s.terrain.rules.player_feet_cell = feet
 	s.terrain.rules.player_cells = [feet + Vector3i.UP, feet + Vector3i(0, 2, 0), feet + Vector3i(0, 3, 0)]
 
@@ -394,6 +421,51 @@ func _resolve_focus(prefer_tree: bool) -> Interactable:
 	return lookup.get(best.get("key", ""))
 
 
+func build_place_active() -> bool:
+	return build_active and build_ctl.model.tool == BuildModel.PLACE
+
+
+func arm_resume_guard() -> void:
+	input_reader.arm_resume_guard(Engine.get_physics_frames())
+
+
+## Sit: collider off while seated (spec 4.5).
+func set_seated(on: bool) -> void:
+	collision_standing.set_deferred("disabled", on or is_ducking)
+	collision_ducking.set_deferred("disabled", on or not is_ducking)
+	velocity = Vector3.ZERO
+
+
+## Stand point after sitting: the preferred exit, else the opposite side of the seat, else
+## the nearest free floor cell within 2 cells (spec 4.5). Free = no voxel and no piece body
+## in the 3 cells of the standing player.
+func find_stand_position(preferred: Vector3, seat: Vector3) -> Vector3:
+	var opposite := seat + (seat - preferred) * Vector3(1, 0, 1)
+	for p in [preferred, opposite]:
+		if _stand_free(IVoxelWorld.cell_of(Vector3(p.x, seat.y + 0.1, p.z))):
+			return Vector3(p.x, floorf(seat.y + 0.1), p.z)
+	var base := IVoxelWorld.cell_of(Vector3(seat.x, seat.y + 0.1, seat.z))
+	for r in range(1, 3):
+		for dx in range(-r, r + 1):
+			for dz in range(-r, r + 1):
+				var c := base + Vector3i(dx, 0, dz)
+				if _stand_free(c):
+					return Vector3(c) + Vector3(0.5, 0, 0.5)
+	return preferred
+
+
+func _stand_free(c: Vector3i) -> bool:
+	var s := session()
+	if s == null:
+		return true
+	var o: Dictionary = s.build.occ(SceneRouter.current_zone_id)
+	for i in 3:
+		var cell := c + Vector3i(0, i, 0)
+		if s.terrain.world.get_voxel(cell) != IVoxelWorld.AIR or o.has(BuildGrid.cell_key("b", cell)):
+			return false
+	return true
+
+
 func focused_interactable() -> Node3D:
 	return _focused
 
@@ -455,6 +527,9 @@ func request_sleep(reason: StringName) -> void:
 
 
 func _on_woke(_reason: StringName, _day: int) -> void:
+	if build_active:
+		build_active = false
+		build_ctl.exit()
 	pending_sleep_reason = &"exhausted"
 	_forced_sleep = &""
 	context.mine_done = false

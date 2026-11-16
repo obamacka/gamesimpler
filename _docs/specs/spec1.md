@@ -2,8 +2,8 @@
 
 | Field | Value |
 |---|---|
-| Status | DRAFT rev 3.5, all decisions resolved |
-| Revision | rev 1: core systems. rev 2: kid-friendly, accessibility, forgiving logic, expression systems, integration tests. rev 3: D1 to D4 resolved (dig-anywhere blocky voxels, jump and double jump, context-aware interaction with dedicated critical states, crafting flow confirmed). rev 3.1: D16 to D19 confirmed. rev 3.2: D5 to D15 resolved (farming system added, pets on day 2, keep last tool), min-spec hardware, test command note. rev 3.3: D20 to D25 resolved (macOS min spec M1 16 GB; 30 fps on min spec, 60 fps on recommended spec). rev 3.4: D26 recommended spec. rev 3.5: Phase 2B farming details (farm events, save shape, extra 10.4 rows, Home Meadow) |
+| Status | DRAFT rev 3.6, all decisions resolved |
+| Revision | rev 1: core systems. rev 2: kid-friendly, accessibility, forgiving logic, expression systems, integration tests. rev 3: D1 to D4 resolved (dig-anywhere blocky voxels, jump and double jump, context-aware interaction with dedicated critical states, crafting flow confirmed). rev 3.1: D16 to D19 confirmed. rev 3.2: D5 to D15 resolved (farming system added, pets on day 2, keep last tool), min-spec hardware, test command note. rev 3.3: D20 to D25 resolved (macOS min spec M1 16 GB; 30 fps on min spec, 60 fps on recommended spec). rev 3.4: D26 recommended spec. rev 3.5: Phase 2B farming details (farm events, save shape, extra 10.4 rows, Home Meadow). rev 3.6: Phase 3 build lattice layers, socket attach transforms, support rule, `build` save shape (`build_rev36` replaces the per-plot list) |
 | Engine | Godot 4.7 stable (4.7.2 latest patch found, 2026-08-18), GDScript |
 | Physics | Jolt Physics (built-in module) |
 | Voxels | Zylann Voxel Tools 1.7, GDExtension edition (MIT), released 2026-08-20, targets Godot 4.5+ |
@@ -308,6 +308,10 @@ Services do not reference each other, except `TransactionCoordinator` (Economy),
 - Build cells and voxels share one lattice: cell `(x, y, z)` spans `[x, x+1) x [y, y+1) x [z, z+1)` meters.
 - A cell holds a voxel **or** part of a build piece footprint, never both. `TerrainService` and `BuildService` both consult the shared occupancy check.
 - Storey height 3 cells (3.0 m), clearing the 2.1 m player and 2.4 m doors.
+- Occupancy layers (rev 3.6): a cell holds at most one FLOOR slab, one BODY piece (furniture, stairs) and one WALL piece per face. Walls sit on a cell face and are keyed by the canonical face, so two walls on the same edge collide while a floor, a wall and a chair can share one cell. Voxels still exclude every layer.
+- Snap sockets carry the attach transform: `attach_offset` (cell offset of the attaching piece's anchor) and `attach_rot`, both rotated with the providing piece. Tags in use: `floor_next`, `wall_slot`, `floor_top`, `wall_end`, `wall_top`, `roof_slot`, `wall_face`, `ground`.
+- Support (rev 3.6): at least one bottom footprint cell must stand on a solid voxel, on a FASTENED `provides_support` piece in the cell below, or (for non-floor pieces) on a FASTENED floor slab in the same cell.
+- Phase 3 places furniture on whole cells; the 0.5 m furniture sub-grid is deferred.
 
 ### 1.7 Physics layers
 | Layer | Name | Used by |
@@ -685,6 +689,7 @@ Rules:
     "instruments": ["inst_flute"]
   },
   "housing": { "owned_plots": ["plot_03"] },
+  "build_rev36": { "pieces": { "p0001": { "piece_id": "piece_wall", "zone": "zone_home_meadow", "cell": [-8, 0, 14], "rot": 3, "state": "LOOSE", "fasten": [2, 1, 0, 0], "toggle": 0 } }, "next_uid": 2, "placed_blocks": { "zone_home_meadow/-10,0,12": "mat_dirt" } },
   "build": {
     "plot_03": [
       {

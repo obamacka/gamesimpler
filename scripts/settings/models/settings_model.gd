@@ -17,6 +17,16 @@ const DEFAULTS := {
 		"auto_tool": true,
 		"auto_tool_revert": false,
 		"go_home_confirm": true,
+		"snap_strength": "high",
+		"fasten_mode": "press",
+		"remove_hold_sec": 0.6,
+	},
+	"accessibility": {
+		"color_palette": "DEFAULT",
+		"prompt_labels": true,
+		"text_scale": 1.25,
+		"reduce_motion": false,
+		"tts_enabled": false,
 	},
 }
 

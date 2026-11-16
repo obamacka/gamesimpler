@@ -4,6 +4,7 @@
 [ext_resource type="PackedScene" path="res://ui/debug/debug_overlay.tscn" id="2_debug"]
 [ext_resource type="Script" path="res://ui/hud/hud.gd" id="3_hud"]
 [ext_resource type="Script" path="res://ui/prompts/prompt_overlay.gd" id="4_prompts"]
+[ext_resource type="Script" path="res://ui/menus/menu_stack.gd" id="5_menus"]
 
 [sub_resource type="ProceduralSkyMaterial" id="sky_mat"]
 
@@ -33,5 +34,8 @@ script = ExtResource("3_hud")
 
 [node name="PromptOverlay" type="CanvasLayer" parent="UI"]
 script = ExtResource("4_prompts")
+
+[node name="MenuStack" type="CanvasLayer" parent="UI"]
+script = ExtResource("5_menus")
 
 [node name="DebugOverlay" parent="." instance=ExtResource("2_debug")]

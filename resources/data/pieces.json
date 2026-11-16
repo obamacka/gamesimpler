@@ -1,0 +1,1405 @@
+{
+ "pieces": [
+  {
+   "id": "piece_floor",
+   "layer": "FLOOR",
+   "grid": "STRUCTURE_1M",
+   "footprint": [
+    [
+     0,
+     0,
+     0
+    ]
+   ],
+   "fastener": "NAILS",
+   "hits_per_socket": 2,
+   "fastener_sockets": [
+    [
+     0.25,
+     0.1,
+     0.25
+    ],
+    [
+     0.75,
+     0.1,
+     0.75
+    ]
+   ],
+   "requires_support": true,
+   "provides_support": true,
+   "accepts": [
+    "floor_next",
+    "roof_slot",
+    "ground"
+   ],
+   "snap_sockets": [
+    {
+     "position": [
+      0.5,
+      0,
+      1.0
+     ],
+     "provides": "floor_next",
+     "attach_offset": [
+      0,
+      0,
+      1
+     ],
+     "attach_rot": 0
+    },
+    {
+     "position": [
+      0.5,
+      0,
+      0.0
+     ],
+     "provides": "floor_next",
+     "attach_offset": [
+      0,
+      0,
+      -1
+     ],
+     "attach_rot": 0
+    },
+    {
+     "position": [
+      1.0,
+      0,
+      0.5
+     ],
+     "provides": "floor_next",
+     "attach_offset": [
+      1,
+      0,
+      0
+     ],
+     "attach_rot": 0
+    },
+    {
+     "position": [
+      0.0,
+      0,
+      0.5
+     ],
+     "provides": "floor_next",
+     "attach_offset": [
+      -1,
+      0,
+      0
+     ],
+     "attach_rot": 0
+    },
+    {
+     "position": [
+      0.5,
+      0.1,
+      0.98
+     ],
+     "provides": "wall_slot",
+     "attach_offset": [
+      0,
+      0,
+      0
+     ],
+     "attach_rot": 2
+    },
+    {
+     "position": [
+      0.5,
+      0.1,
+      0.02
+     ],
+     "provides": "wall_slot",
+     "attach_offset": [
+      0,
+      0,
+      0
+     ],
+     "attach_rot": 0
+    },
+    {
+     "position": [
+      0.98,
+      0.1,
+      0.5
+     ],
+     "provides": "wall_slot",
+     "attach_offset": [
+      0,
+      0,
+      0
+     ],
+     "attach_rot": 3
+    },
+    {
+     "position": [
+      0.02,
+      0.1,
+      0.5
+     ],
+     "provides": "wall_slot",
+     "attach_offset": [
+      0,
+      0,
+      0
+     ],
+     "attach_rot": 1
+    },
+    {
+     "position": [
+      0.5,
+      0.1,
+      0.5
+     ],
+     "provides": "floor_top",
+     "attach_offset": [
+      0,
+      0,
+      0
+     ],
+     "attach_rot": 0
+    }
+   ],
+   "color": "#b08a5a",
+   "parts": [
+    {
+     "size": [
+      1,
+      0.1,
+      1
+     ],
+     "center": [
+      0.5,
+      0.05,
+      0.5
+     ],
+     "solid": true
+    }
+   ],
+   "opening": [],
+   "interactions": [],
+   "item_id": "item_piece_floor"
+  },
+  {
+   "id": "piece_wall",
+   "layer": "WALL",
+   "grid": "STRUCTURE_1M",
+   "footprint": [
+    [
+     0,
+     0,
+     0
+    ],
+    [
+     0,
+     1,
+     0
+    ],
+    [
+     0,
+     2,
+     0
+    ]
+   ],
+   "fastener": "NAILS",
+   "hits_per_socket": 2,
+   "fastener_sockets": [
+    [
+     0.2,
+     0.3,
+     0.15
+    ],
+    [
+     0.8,
+     0.3,
+     0.15
+    ],
+    [
+     0.2,
+     2.7,
+     0.15
+    ],
+    [
+     0.8,
+     2.7,
+     0.15
+    ]
+   ],
+   "requires_support": true,
+   "provides_support": true,
+   "accepts": [
+    "wall_slot",
+    "wall_end",
+    "wall_top",
+    "ground"
+   ],
+   "snap_sockets": [
+    {
+     "position": [
+      1.0,
+      0,
+      0.07
+     ],
+     "provides": "wall_end",
+     "attach_offset": [
+      1,
+      0,
+      0
+     ],
+     "attach_rot": 0
+    },
+    {
+     "position": [
+      0.0,
+      0,
+      0.07
+     ],
+     "provides": "wall_end",
+     "attach_offset": [
+      -1,
+      0,
+      0
+     ],
+     "attach_rot": 0
+    },
+    {
+     "position": [
+      0.5,
+      3.0,
+      0.07
+     ],
+     "provides": "wall_top",
+     "attach_offset": [
+      0,
+      3,
+      0
+     ],
+     "attach_rot": 0
+    },
+    {
+     "position": [
+      0.5,
+      3.0,
+      0.5
+     ],
+     "provides": "roof_slot",
+     "attach_offset": [
+      0,
+      3,
+      0
+     ],
+     "attach_rot": 0
+    },
+    {
+     "position": [
+      0.5,
+      0.5,
+      0.15
+     ],
+     "provides": "wall_face",
+     "attach_offset": [
+      0,
+      0,
+      0
+     ],
+     "attach_rot": 0
+    }
+   ],
+   "color": "#d8c8a8",
+   "parts": [
+    {
+     "size": [
+      1,
+      3,
+      0.15
+     ],
+     "center": [
+      0.5,
+      1.5,
+      0.075
+     ],
+     "solid": true
+    }
+   ],
+   "opening": [],
+   "interactions": [],
+   "item_id": "item_piece_wall"
+  },
+  {
+   "id": "piece_wall_door",
+   "layer": "WALL",
+   "grid": "STRUCTURE_1M",
+   "footprint": [
+    [
+     -1,
+     0,
+     0
+    ],
+    [
+     -1,
+     1,
+     0
+    ],
+    [
+     -1,
+     2,
+     0
+    ],
+    [
+     1,
+     0,
+     0
+    ],
+    [
+     1,
+     1,
+     0
+    ],
+    [
+     1,
+     2,
+     0
+    ]
+   ],
+   "opening": [
+    [
+     0,
+     0,
+     0
+    ],
+    [
+     0,
+     1,
+     0
+    ],
+    [
+     0,
+     2,
+     0
+    ]
+   ],
+   "fastener": "NAILS",
+   "hits_per_socket": 2,
+   "fastener_sockets": [
+    [
+     -0.5,
+     0.3,
+     0.15
+    ],
+    [
+     1.5,
+     0.3,
+     0.15
+    ],
+    [
+     -0.5,
+     2.7,
+     0.15
+    ],
+    [
+     1.5,
+     2.7,
+     0.15
+    ]
+   ],
+   "requires_support": true,
+   "provides_support": true,
+   "accepts": [
+    "wall_slot",
+    "wall_end",
+    "wall_top",
+    "ground"
+   ],
+   "snap_sockets": [
+    {
+     "position": [
+      2.0,
+      0,
+      0.07
+     ],
+     "provides": "wall_end",
+     "attach_offset": [
+      3,
+      0,
+      0
+     ],
+     "attach_rot": 0
+    },
+    {
+     "position": [
+      -1.0,
+      0,
+      0.07
+     ],
+     "provides": "wall_end",
+     "attach_offset": [
+      -3,
+      0,
+      0
+     ],
+     "attach_rot": 0
+    }
+   ],
+   "color": "#d8c8a8",
+   "parts": [
+    {
+     "size": [
+      1,
+      3,
+      0.15
+     ],
+     "center": [
+      -0.5,
+      1.5,
+      0.075
+     ],
+     "solid": true
+    },
+    {
+     "size": [
+      1,
+      3,
+      0.15
+     ],
+     "center": [
+      1.5,
+      1.5,
+      0.075
+     ],
+     "solid": true
+    },
+    {
+     "size": [
+      1,
+      0.6,
+      0.15
+     ],
+     "center": [
+      0.5,
+      2.7,
+      0.075
+     ],
+     "solid": true
+    }
+   ],
+   "interactions": [],
+   "item_id": "item_piece_wall_door"
+  },
+  {
+   "id": "piece_window_wall",
+   "layer": "WALL",
+   "grid": "STRUCTURE_1M",
+   "footprint": [
+    [
+     0,
+     0,
+     0
+    ],
+    [
+     0,
+     1,
+     0
+    ],
+    [
+     0,
+     2,
+     0
+    ]
+   ],
+   "fastener": "NAILS",
+   "hits_per_socket": 2,
+   "fastener_sockets": [
+    [
+     0.2,
+     0.3,
+     0.15
+    ],
+    [
+     0.8,
+     0.3,
+     0.15
+    ],
+    [
+     0.2,
+     2.7,
+     0.15
+    ],
+    [
+     0.8,
+     2.7,
+     0.15
+    ]
+   ],
+   "requires_support": true,
+   "provides_support": true,
+   "accepts": [
+    "wall_slot",
+    "wall_end",
+    "wall_top",
+    "ground"
+   ],
+   "snap_sockets": [
+    {
+     "position": [
+      1.0,
+      0,
+      0.07
+     ],
+     "provides": "wall_end",
+     "attach_offset": [
+      1,
+      0,
+      0
+     ],
+     "attach_rot": 0
+    },
+    {
+     "position": [
+      0.0,
+      0,
+      0.07
+     ],
+     "provides": "wall_end",
+     "attach_offset": [
+      -1,
+      0,
+      0
+     ],
+     "attach_rot": 0
+    },
+    {
+     "position": [
+      0.5,
+      3.0,
+      0.07
+     ],
+     "provides": "wall_top",
+     "attach_offset": [
+      0,
+      3,
+      0
+     ],
+     "attach_rot": 0
+    },
+    {
+     "position": [
+      0.5,
+      3.0,
+      0.5
+     ],
+     "provides": "roof_slot",
+     "attach_offset": [
+      0,
+      3,
+      0
+     ],
+     "attach_rot": 0
+    },
+    {
+     "position": [
+      0.5,
+      0.5,
+      0.15
+     ],
+     "provides": "wall_face",
+     "attach_offset": [
+      0,
+      0,
+      0
+     ],
+     "attach_rot": 0
+    }
+   ],
+   "color": "#d8c8a8",
+   "parts": [
+    {
+     "size": [
+      1,
+      1.0,
+      0.15
+     ],
+     "center": [
+      0.5,
+      0.5,
+      0.075
+     ],
+     "solid": true
+    },
+    {
+     "size": [
+      1,
+      1.0,
+      0.15
+     ],
+     "center": [
+      0.5,
+      2.5,
+      0.075
+     ],
+     "solid": true
+    },
+    {
+     "size": [
+      0.2,
+      1.0,
+      0.15
+     ],
+     "center": [
+      0.1,
+      1.5,
+      0.075
+     ],
+     "solid": true
+    },
+    {
+     "size": [
+      0.2,
+      1.0,
+      0.15
+     ],
+     "center": [
+      0.9,
+      1.5,
+      0.075
+     ],
+     "solid": true
+    }
+   ],
+   "opening": [],
+   "interactions": [],
+   "item_id": "item_piece_window_wall"
+  },
+  {
+   "id": "piece_stairs",
+   "layer": "BODY",
+   "grid": "STRUCTURE_1M",
+   "footprint": [
+    [
+     0,
+     0,
+     0
+    ]
+   ],
+   "fastener": "NAILS",
+   "hits_per_socket": 2,
+   "fastener_sockets": [
+    [
+     0.5,
+     0.3,
+     0.2
+    ],
+    [
+     0.5,
+     0.8,
+     0.7
+    ]
+   ],
+   "requires_support": true,
+   "provides_support": false,
+   "accepts": [
+    "floor_top",
+    "ground"
+   ],
+   "snap_sockets": [],
+   "color": "#9a7448",
+   "parts": [
+    {
+     "size": [
+      1,
+      0.33,
+      0.33
+     ],
+     "center": [
+      0.5,
+      0.165,
+      0.835
+     ],
+     "solid": true
+    },
+    {
+     "size": [
+      1,
+      0.66,
+      0.33
+     ],
+     "center": [
+      0.5,
+      0.33,
+      0.5
+     ],
+     "solid": true
+    },
+    {
+     "size": [
+      1,
+      1.0,
+      0.34
+     ],
+     "center": [
+      0.5,
+      0.5,
+      0.17
+     ],
+     "solid": true
+    }
+   ],
+   "opening": [],
+   "interactions": [],
+   "item_id": "item_piece_stairs"
+  },
+  {
+   "id": "piece_roof",
+   "layer": "FLOOR",
+   "grid": "STRUCTURE_1M",
+   "footprint": [
+    [
+     0,
+     0,
+     0
+    ]
+   ],
+   "fastener": "NAILS",
+   "hits_per_socket": 2,
+   "fastener_sockets": [
+    [
+     0.25,
+     0.1,
+     0.25
+    ],
+    [
+     0.75,
+     0.1,
+     0.75
+    ]
+   ],
+   "requires_support": true,
+   "provides_support": true,
+   "accepts": [
+    "roof_slot",
+    "floor_next"
+   ],
+   "snap_sockets": [
+    {
+     "position": [
+      0.5,
+      0,
+      1.0
+     ],
+     "provides": "floor_next",
+     "attach_offset": [
+      0,
+      0,
+      1
+     ],
+     "attach_rot": 0
+    },
+    {
+     "position": [
+      0.5,
+      0,
+      0.0
+     ],
+     "provides": "floor_next",
+     "attach_offset": [
+      0,
+      0,
+      -1
+     ],
+     "attach_rot": 0
+    },
+    {
+     "position": [
+      1.0,
+      0,
+      0.5
+     ],
+     "provides": "floor_next",
+     "attach_offset": [
+      1,
+      0,
+      0
+     ],
+     "attach_rot": 0
+    },
+    {
+     "position": [
+      0.0,
+      0,
+      0.5
+     ],
+     "provides": "floor_next",
+     "attach_offset": [
+      -1,
+      0,
+      0
+     ],
+     "attach_rot": 0
+    }
+   ],
+   "color": "#8a3b2e",
+   "parts": [
+    {
+     "size": [
+      1,
+      0.15,
+      1
+     ],
+     "center": [
+      0.5,
+      0.075,
+      0.5
+     ],
+     "solid": true
+    }
+   ],
+   "opening": [],
+   "interactions": [],
+   "item_id": "item_piece_roof"
+  },
+  {
+   "id": "piece_fence",
+   "layer": "WALL",
+   "grid": "STRUCTURE_1M",
+   "footprint": [
+    [
+     0,
+     0,
+     0
+    ]
+   ],
+   "fastener": "NAILS",
+   "hits_per_socket": 2,
+   "fastener_sockets": [
+    [
+     0.2,
+     0.5,
+     0.1
+    ],
+    [
+     0.8,
+     0.5,
+     0.1
+    ]
+   ],
+   "requires_support": true,
+   "provides_support": false,
+   "accepts": [
+    "wall_slot",
+    "wall_end",
+    "ground"
+   ],
+   "snap_sockets": [
+    {
+     "position": [
+      1.0,
+      0,
+      0.07
+     ],
+     "provides": "wall_end",
+     "attach_offset": [
+      1,
+      0,
+      0
+     ],
+     "attach_rot": 0
+    },
+    {
+     "position": [
+      0.0,
+      0,
+      0.07
+     ],
+     "provides": "wall_end",
+     "attach_offset": [
+      -1,
+      0,
+      0
+     ],
+     "attach_rot": 0
+    }
+   ],
+   "color": "#c09060",
+   "parts": [
+    {
+     "size": [
+      1,
+      0.9,
+      0.1
+     ],
+     "center": [
+      0.5,
+      0.45,
+      0.05
+     ],
+     "solid": true
+    }
+   ],
+   "opening": [],
+   "interactions": [],
+   "item_id": "item_piece_fence"
+  },
+  {
+   "id": "piece_shelf",
+   "layer": "BODY",
+   "grid": "FURNITURE_0_5M",
+   "footprint": [
+    [
+     0,
+     0,
+     0
+    ]
+   ],
+   "fastener": "SCREWS",
+   "hits_per_socket": 1,
+   "fastener_sockets": [
+    [
+     0.2,
+     1.2,
+     0.2
+    ],
+    [
+     0.8,
+     1.2,
+     0.2
+    ]
+   ],
+   "requires_support": true,
+   "provides_support": false,
+   "accepts": [
+    "wall_face",
+    "floor_top",
+    "ground"
+   ],
+   "snap_sockets": [],
+   "color": "#a07850",
+   "parts": [
+    {
+     "size": [
+      1,
+      1.6,
+      0.35
+     ],
+     "center": [
+      0.5,
+      0.8,
+      0.33
+     ],
+     "solid": true
+    }
+   ],
+   "opening": [],
+   "interactions": [],
+   "item_id": "item_piece_shelf"
+  },
+  {
+   "id": "piece_chair",
+   "layer": "BODY",
+   "grid": "FURNITURE_0_5M",
+   "footprint": [
+    [
+     0,
+     0,
+     0
+    ]
+   ],
+   "fastener": "NONE",
+   "requires_support": true,
+   "accepts": [
+    "wall_face",
+    "floor_top",
+    "ground"
+   ],
+   "color": "#7a5a3a",
+   "parts": [
+    {
+     "size": [
+      0.6,
+      0.45,
+      0.6
+     ],
+     "center": [
+      0.5,
+      0.225,
+      0.55
+     ],
+     "solid": true
+    },
+    {
+     "size": [
+      0.6,
+      0.6,
+      0.1
+     ],
+     "center": [
+      0.5,
+      0.75,
+      0.25
+     ],
+     "solid": true
+    }
+   ],
+   "interactions": [
+    {
+     "kind": "SIT",
+     "seats": [
+      [
+       0.5,
+       0.45,
+       0.55
+      ]
+     ],
+     "exits": [
+      [
+       0.5,
+       0,
+       1.5
+      ]
+     ],
+     "stamina_regen_per_sec": 0.5
+    }
+   ],
+   "hits_per_socket": 0,
+   "fastener_sockets": [],
+   "provides_support": false,
+   "snap_sockets": [],
+   "opening": [],
+   "item_id": "item_piece_chair"
+  },
+  {
+   "id": "piece_sofa",
+   "layer": "BODY",
+   "grid": "FURNITURE_0_5M",
+   "footprint": [
+    [
+     0,
+     0,
+     0
+    ],
+    [
+     1,
+     0,
+     0
+    ]
+   ],
+   "fastener": "NONE",
+   "requires_support": true,
+   "accepts": [
+    "wall_face",
+    "floor_top",
+    "ground"
+   ],
+   "color": "#5a7aa8",
+   "parts": [
+    {
+     "size": [
+      2,
+      0.45,
+      0.8
+     ],
+     "center": [
+      1.0,
+      0.225,
+      0.5
+     ],
+     "solid": true
+    },
+    {
+     "size": [
+      2,
+      0.5,
+      0.2
+     ],
+     "center": [
+      1.0,
+      0.7,
+      0.2
+     ],
+     "solid": true
+    }
+   ],
+   "interactions": [
+    {
+     "kind": "SIT",
+     "seats": [
+      [
+       0.5,
+       0.45,
+       0.55
+      ],
+      [
+       1.5,
+       0.45,
+       0.55
+      ]
+     ],
+     "exits": [
+      [
+       0.5,
+       0,
+       1.5
+      ],
+      [
+       1.5,
+       0,
+       1.5
+      ]
+     ],
+     "stamina_regen_per_sec": 0.6
+    }
+   ],
+   "hits_per_socket": 0,
+   "fastener_sockets": [],
+   "provides_support": false,
+   "snap_sockets": [],
+   "opening": [],
+   "item_id": "item_piece_sofa"
+  },
+  {
+   "id": "piece_table",
+   "layer": "BODY",
+   "grid": "FURNITURE_0_5M",
+   "footprint": [
+    [
+     0,
+     0,
+     0
+    ]
+   ],
+   "fastener": "NONE",
+   "requires_support": true,
+   "accepts": [
+    "wall_face",
+    "floor_top",
+    "ground"
+   ],
+   "color": "#8a6a42",
+   "parts": [
+    {
+     "size": [
+      0.9,
+      0.08,
+      0.9
+     ],
+     "center": [
+      0.5,
+      0.75,
+      0.5
+     ],
+     "solid": true
+    },
+    {
+     "size": [
+      0.12,
+      0.72,
+      0.12
+     ],
+     "center": [
+      0.5,
+      0.36,
+      0.5
+     ],
+     "solid": true
+    }
+   ],
+   "hits_per_socket": 0,
+   "fastener_sockets": [],
+   "provides_support": false,
+   "snap_sockets": [],
+   "opening": [],
+   "interactions": [],
+   "item_id": "item_piece_table"
+  },
+  {
+   "id": "piece_bed",
+   "layer": "BODY",
+   "grid": "FURNITURE_0_5M",
+   "footprint": [
+    [
+     0,
+     0,
+     0
+    ],
+    [
+     0,
+     0,
+     1
+    ]
+   ],
+   "fastener": "NONE",
+   "requires_support": true,
+   "accepts": [
+    "wall_face",
+    "floor_top",
+    "ground"
+   ],
+   "color": "#d06a6a",
+   "parts": [
+    {
+     "size": [
+      1,
+      0.5,
+      2
+     ],
+     "center": [
+      0.5,
+      0.25,
+      1.0
+     ],
+     "solid": true
+    }
+   ],
+   "interactions": [
+    {
+     "kind": "SLEEP"
+    }
+   ],
+   "hits_per_socket": 0,
+   "fastener_sockets": [],
+   "provides_support": false,
+   "snap_sockets": [],
+   "opening": [],
+   "item_id": "item_piece_bed"
+  },
+  {
+   "id": "piece_lamp",
+   "layer": "BODY",
+   "grid": "FURNITURE_0_5M",
+   "footprint": [
+    [
+     0,
+     0,
+     0
+    ]
+   ],
+   "fastener": "NONE",
+   "requires_support": true,
+   "accepts": [
+    "wall_face",
+    "floor_top",
+    "ground"
+   ],
+   "color": "#e8d070",
+   "parts": [
+    {
+     "size": [
+      0.3,
+      1.4,
+      0.3
+     ],
+     "center": [
+      0.5,
+      0.7,
+      0.5
+     ],
+     "solid": true
+    }
+   ],
+   "interactions": [
+    {
+     "kind": "TOGGLE",
+     "toggle_states": 2
+    }
+   ],
+   "hits_per_socket": 0,
+   "fastener_sockets": [],
+   "provides_support": false,
+   "snap_sockets": [],
+   "opening": [],
+   "item_id": "item_piece_lamp"
+  },
+  {
+   "id": "piece_radio",
+   "layer": "BODY",
+   "grid": "FURNITURE_0_5M",
+   "footprint": [
+    [
+     0,
+     0,
+     0
+    ]
+   ],
+   "fastener": "NONE",
+   "requires_support": true,
+   "accepts": [
+    "wall_face",
+    "floor_top",
+    "ground"
+   ],
+   "color": "#506070",
+   "parts": [
+    {
+     "size": [
+      0.5,
+      0.35,
+      0.3
+     ],
+     "center": [
+      0.5,
+      0.175,
+      0.5
+     ],
+     "solid": true
+    }
+   ],
+   "interactions": [
+    {
+     "kind": "TOGGLE",
+     "toggle_states": 3
+    }
+   ],
+   "hits_per_socket": 0,
+   "fastener_sockets": [],
+   "provides_support": false,
+   "snap_sockets": [],
+   "opening": [],
+   "item_id": "item_piece_radio"
+  },
+  {
+   "id": "piece_chest",
+   "layer": "BODY",
+   "grid": "FURNITURE_0_5M",
+   "footprint": [
+    [
+     0,
+     0,
+     0
+    ]
+   ],
+   "fastener": "NONE",
+   "requires_support": true,
+   "accepts": [
+    "wall_face",
+    "floor_top",
+    "ground"
+   ],
+   "color": "#7a4a20",
+   "parts": [
+    {
+     "size": [
+      0.9,
+      0.6,
+      0.6
+     ],
+     "center": [
+      0.5,
+      0.3,
+      0.5
+     ],
+     "solid": true
+    }
+   ],
+   "interactions": [
+    {
+     "kind": "STORAGE",
+     "slots": 12
+    }
+   ],
+   "hits_per_socket": 0,
+   "fastener_sockets": [],
+   "provides_support": false,
+   "snap_sockets": [],
+   "opening": [],
+   "item_id": "item_piece_chest"
+  }
+ ]
+}

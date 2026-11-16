@@ -1,5 +1,5 @@
-## Bed: X sleeps (hands off to the Sleep state). Node name is the bed key used as spawn marker.
-## Phase 3 adds the confirm dialog and Set Home.
+## Bed: X asks "Sleep until morning?" then hands off to Sleep(bed); Y sets it as home
+## (spec 4.5, 7.3). Node name is the bed key used as spawn marker.
 class_name Bed
 extends WorldObject
 
@@ -10,8 +10,17 @@ func _ready() -> void:
 
 
 func interaction_spec(_player: Node, _forage: bool, alt: bool) -> InteractionSpec:
-	return null if alt else InteractionSpec.new(&"BED", 0.0, 0, &"sleep")
+	var spec := InteractionSpec.new(&"SET_HOME" if alt else &"BED", 0.0)
+	spec.opens_menu = &"confirm"
+	spec.menu_args = {"text": "Make this bed your home?" if alt else "Sleep until morning?", "default_yes": not alt}
+	return spec
 
 
-func resolve_interaction(_spec: InteractionSpec, player: Node) -> void:
-	player.pending_sleep_reason = &"bed"
+func resolve_interaction(spec: InteractionSpec, player: Node) -> void:
+	if spec.menu_result != &"yes":
+		return
+	if spec.kind == &"BED":
+		player.pending_sleep_reason = &"bed"
+		spec.handoff_state = &"sleep"
+	else:
+		session().housing.set_home_bed(SceneRouter.current_zone_id, StringName(name))

@@ -139,6 +139,22 @@
       ],
       "owned_from_start": true,
       "price_coins": 0
+    },
+    {
+      "id": "plot_test",
+      "zone_id": "zone_home_meadow",
+      "min_cell": [
+        -12,
+        -24,
+        10
+      ],
+      "max_cell": [
+        -3,
+        48,
+        19
+      ],
+      "owned_from_start": false,
+      "price_coins": 0
     }
   ]
 }

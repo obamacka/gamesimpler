@@ -19,6 +19,7 @@ var mail: MailService
 var housing: HousingService
 var sleep: SleepDirector
 var farm: FarmService
+var build: BuildService
 var hotbar := HotbarModel.new()
 var exhaustion := {"last_snack_day": 0, "count_total": 0}
 var zone_root: Node3D
@@ -46,11 +47,13 @@ func _build(world: IVoxelWorld) -> void:
 	housing = _add(HousingService.new(), "HousingService")
 	sleep = _add(SleepDirector.new(), "SleepDirector")
 	farm = _add(FarmService.new(), "FarmService")
+	build = _add(BuildService.new(), "BuildService")
 	terrain.setup(self, world)
 	world_state.setup(self)
 	mail.setup(self)
 	sleep.setup(self)
 	farm.setup(self)
+	build.setup(self)
 	rollover.register(&"clock", func(day): GameClock.model.set_morning(day))
 	rollover.register(&"world_respawn", func(day): world_state.respawn_due(day))
 	rollover.register(&"terrain_reset", func(day): terrain.daily_reset(day))
@@ -121,6 +124,8 @@ func to_dict() -> Dictionary:
 		"discovery": discovery.model.to_dict(),
 		"mail": mail.model.to_dict(),
 		"farm": farm.to_dict(),
+		"housing": housing.plots_to_dict(),
+		"build": build.to_dict(),
 	}
 
 
@@ -140,5 +145,7 @@ func from_dict(d: Dictionary) -> void:
 	discovery.model.from_dict(d.get("discovery", {}))
 	mail.model.from_dict(d.get("mail", {}))
 	farm.from_dict(d.get("farm", {}))
+	housing.plots_from_dict(d.get("housing", {}))
+	build.from_dict(d.get("build", {}))
 	hotbar.from_dict({"hotbar_refs": d.get("inventory", {}).get("hotbar_refs", hotbar.refs),
 		"hotbar_index": d.get("player", {}).get("hotbar_index", 0)})

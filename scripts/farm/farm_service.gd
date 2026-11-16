@@ -48,10 +48,7 @@ func _world() -> IVoxelWorld:
 
 
 func owned_plot_at(z: StringName, cell: Vector3i) -> PlotDef:
-	for p in Database.plots.values():
-		if p.owned_from_start and p.contains(z, cell):
-			return p
-	return null
+	return session.housing.plot_at(z, cell)
 
 
 func _cell_free(cell: Vector3i) -> bool:

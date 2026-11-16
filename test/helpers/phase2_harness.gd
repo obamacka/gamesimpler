@@ -16,6 +16,7 @@ var session: GameSession
 var world: FakeVoxelWorld
 var zone_root: Node3D
 var player: PlayerController
+var menus: MenuStack
 
 
 func _init(test_suite: Node) -> void:
@@ -41,6 +42,8 @@ func start(zone_id: StringName = &"zone_wilderness", spawn_key: StringName = &"s
 	session.zone_root = zone_root
 	SceneRouter.zone_root = zone_root
 	SceneRouter.overrides = ZONES.duplicate()
+	menus = MenuStack.new()
+	suite.add_child(menus)
 	player = PLAYER_SCENE.instantiate()
 	suite.add_child(player)
 	player.yawn_seconds = 0.0
@@ -59,7 +62,9 @@ func stop() -> void:
 	SceneRouter.reset_for_tests()
 	GameClock.running = false
 	Settings.model.reset()
-	for n in [player, zone_root, session]:
+	if is_instance_valid(menus):
+		menus.close_all()
+	for n in [player, zone_root, session, menus]:
 		if is_instance_valid(n):
 			n.queue_free()
 	SceneRouter.player = null

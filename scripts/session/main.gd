@@ -10,6 +10,8 @@ func _ready() -> void:
 	session = GameSession.create(randi())
 	add_child(session)
 	session.new_game()
+	if OS.is_debug_build():
+		session.build.grant_debug_kit()   # plan P3.2: test plot and pieces until Phase 4 sells plots
 	var zone_root := Node3D.new()
 	zone_root.name = "ZoneRoot"
 	$World.add_child(zone_root)

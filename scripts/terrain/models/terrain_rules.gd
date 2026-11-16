@@ -65,6 +65,12 @@ func _volume_at(cell: Vector3i) -> Dictionary:
 	return {}
 
 
+## P1 only: inside a protection volume that refuses this kind of edit.
+func is_protected(cell: Vector3i, for_place: bool) -> bool:
+	var vol := _volume_at(cell)
+	return not vol.is_empty() and vol["reason"] != &"JOB_SITE" and not (for_place and vol["allows_place"])
+
+
 func can_dig(cell: Vector3i) -> StringName:
 	var vol := _volume_at(cell)
 	if not vol.is_empty() and vol["reason"] != &"JOB_SITE":

@@ -26,3 +26,7 @@ var has_interact_target := false
 var mine_done := false
 var interact_done := false
 var interact_handoff: StringName = &""
+# Phase 3: Build and Sit
+var in_build_zone := false
+var build_active := false
+var build_fastening := false

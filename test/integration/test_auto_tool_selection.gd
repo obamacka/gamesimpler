@@ -1,5 +1,4 @@
-# P2.29: Suite A (spec 8.3) cases A1 to A7 and A11 to A22. A8 to A10 (loose build pieces)
-# arrive in Phase 3. Ground voxels sit at y = -1 so their tops align with the physics floor.
+# P2.29 / P3.19: Suite A (spec 8.3) cases A1 to A22. Ground voxels sit at y = -1 so their tops align with the physics floor.
 extends GdUnitTestSuite
 
 var h: Phase2Harness
@@ -240,3 +239,67 @@ func test_a22_paused() -> void:
 	PauseManager.release_pause(&"menu")
 	await h.frames(12)
 	assert_int(_selected().size()).is_equal(1)
+
+
+# ---- P3.19: A8 to A10, loose build pieces. A test plot in the wilderness holds a LOOSE
+# nailed wall at (3,0,6) and a LOOSE screwed shelf at (5,0,6).
+var _plot: PlotDef
+
+
+func _build_fixture() -> void:
+	_plot = PlotDef.new()
+	_plot.id = &"plot_suite_a"
+	_plot.zone_id = &"zone_wilderness"
+	_plot.min_cell = Vector3i(0, -2, 3)
+	_plot.max_cell = Vector3i(8, 10, 8)
+	Database.plots[_plot.id] = _plot
+	h.session.housing.grant_deed(_plot.id)
+	h.session.inventory.add(&"item_piece_wall", 1)
+	h.session.inventory.add(&"item_piece_shelf", 1)
+	assert_bool(h.session.build.try_place(&"piece_wall", Vector3i(3, 0, 6), 0).ok).is_true()
+	assert_bool(h.session.build.try_place(&"piece_shelf", Vector3i(5, 0, 6), 0).ok).is_true()
+	await h.frames(2)
+
+
+func _drop_fixture() -> void:
+	Database.plots.erase(&"plot_suite_a")
+
+
+func test_a8_hammer_in_build() -> void:
+	await _build_fixture()
+	_at(Vector3(3.5, 0, 4.5))
+	await h.frames(4)
+	_rec.clear()
+	h.press("build_toggle_pressed")
+	await h.frames(16)
+	assert_str(h.player.machine.current_id).is_equal(&"build")
+	assert_array(_selected()).contains_exactly([[ToolTypes.HAMMER, &"loose_piece", &"zone_enter"]])
+	_drop_fixture()
+
+
+func test_a9_screwdriver_by_fastener() -> void:
+	await _build_fixture()
+	_at(Vector3(6.5, 0, 4.5))
+	await h.frames(4)
+	h.press("build_toggle_pressed")
+	await h.frames(16)
+	assert_str(_equipped()).is_equal(ToolTypes.SCREWDRIVER)
+	assert_array(_selected().back()).contains_exactly([ToolTypes.SCREWDRIVER, &"loose_piece", &"zone_enter"])
+	_drop_fixture()
+
+
+func test_a10_loose_piece_zones_ignored_outside_build() -> void:
+	await _build_fixture()
+	_at(Vector3(3.5, 0, 4.5))
+	await h.frames(40)
+	assert_array(_selected().filter(func(a): return a[0] == ToolTypes.HAMMER)).is_empty()
+	h.press("build_toggle_pressed")
+	await h.frames(16)
+	h.press("build_toggle_pressed")   # exit Build, stay near the wall
+	await h.frames(4)
+	assert_str(h.player.machine.current_id).is_not_equal(&"build")
+	h.session.toolbelt.model.equip(ToolTypes.SHOVEL)
+	_rec.clear()
+	await h.frames(40)
+	assert_array(_selected().filter(func(a): return a[0] == ToolTypes.HAMMER)).is_empty()
+	_drop_fixture()

@@ -14,6 +14,8 @@
 [ext_resource type="Script" path="res://scripts/player/states/interact_state.gd" id="12_interact"]
 [ext_resource type="Script" path="res://scripts/player/states/sleep_state.gd" id="13_sleep"]
 [ext_resource type="Script" path="res://scripts/tools/tool_auto_selector.gd" id="14_tools"]
+[ext_resource type="Script" path="res://scripts/player/states/build_state.gd" id="15_build"]
+[ext_resource type="Script" path="res://scripts/player/states/sit_state.gd" id="16_sit"]
 
 [sub_resource type="CapsuleShape3D" id="shape_standing"]
 radius = 0.35
@@ -172,3 +174,9 @@ script = ExtResource("12_interact")
 
 [node name="Sleep" type="Node" parent="StateMachine"]
 script = ExtResource("13_sleep")
+
+[node name="Build" type="Node" parent="StateMachine"]
+script = ExtResource("15_build")
+
+[node name="Sit" type="Node" parent="StateMachine"]
+script = ExtResource("16_sit")

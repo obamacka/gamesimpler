@@ -13,6 +13,8 @@ const FALL := &"fall"
 const SLEEP := &"sleep"
 const MINE := &"mine"
 const INTERACT := &"interact"
+const BUILD := &"build"
+const SIT := &"sit"
 
 const MOVE_THRESHOLD := 0.2
 const SOFT_LAND_HEIGHT := 4.0
@@ -33,6 +35,9 @@ const FX_BLOCKED := &"blocked"
 const FX_TIER_LOW := &"tier_low"
 const FX_AIR_STRIKE := &"air_strike"
 const FX_FARM := &"farm"
+const FX_NO_BUILD_ZONE := &"no_build_zone"
+const FX_BUILD_EXIT := &"build_exit"
+const FX_STAND := &"stand"
 
 const TARGET_VOXEL := &"voxel"
 const TARGET_TIMBER := &"timber"
@@ -66,6 +71,10 @@ static func next(state: StringName, f: InputFrame, c: PlayerContext) -> Transiti
 		return _mine(c)
 	if state == INTERACT:
 		return _interact(c)
+	if state == BUILD:
+		return _build(f, c)
+	if state == SIT:
+		return _sit(f, c)
 	return Transition.new()
 
 
@@ -81,6 +90,12 @@ static func _grounded(state: StringName, f: InputFrame, c: PlayerContext) -> Tra
 	# Left the floor without jumping: stay grounded during coyote time, then fall.
 	if not c.on_floor and c.coyote_left <= 0.0:
 		return Transition.new(FALL)
+
+	# Build mode (spec 4.2): only inside an owned plot or job site.
+	if f.build_toggle_pressed and state != DUCK and state != RUN:
+		if c.in_build_zone:
+			return Transition.new(BUILD)
+		return Transition.new(&"", FX_NO_BUILD_ZONE)
 
 	# Actions (spec 4.2 table order: interact, forage with the picker, mine). Run slows to Walk first.
 	var wants_interact := (f.interact_pressed or f.interact_alt_pressed) and c.has_interact_target
@@ -161,6 +176,8 @@ static func _fall(f: InputFrame, c: PlayerContext) -> Transition:
 	if c.on_floor:
 		if c.exhaustion_pending:
 			return Transition.new(SLEEP)
+		if c.build_active and not (f.jump_pressed or c.jump_buffered):
+			return Transition.new(BUILD, FX_LAND)
 		if f.jump_pressed or c.jump_buffered:
 			return Transition.new(JUMP, FX_GROUND_JUMP)
 		var fx := FX_SOFT_LAND if c.fall_height > SOFT_LAND_HEIGHT else FX_LAND
@@ -180,7 +197,29 @@ static func _fall(f: InputFrame, c: PlayerContext) -> Transition:
 
 ## Single-shot dig while airborne (spec 4.2.1): no state change.
 static func _air_strike(f: InputFrame, c: PlayerContext) -> bool:
-	return f.use_pressed and not f.jump_pressed and c.tool_target_kind == TARGET_VOXEL and c.tool_ok and c.tool_blocked == &""
+	return f.use_pressed and not f.jump_pressed and not c.build_active and c.tool_target_kind == TARGET_VOXEL and c.tool_ok and c.tool_blocked == &""
+
+
+## Build (spec 4.2, 2.3): walk, jump (Build stays active in the air), exit on D-pad up or B.
+## B while fastening cancels the fasten instead (handled by the BuildController).
+static func _build(f: InputFrame, c: PlayerContext) -> Transition:
+	if c.exhaustion_pending:
+		return Transition.new(SLEEP)
+	if not c.on_floor and c.coyote_left <= 0.0:
+		return Transition.new(FALL)
+	if c.build_fastening:
+		return Transition.new()
+	if f.build_toggle_pressed or f.duck_pressed:
+		return Transition.new(IDLE, FX_BUILD_EXIT)
+	if (f.jump_pressed or c.jump_buffered) and c.headroom_ok:
+		return Transition.new(JUMP, FX_GROUND_JUMP)
+	return Transition.new()
+
+
+static func _sit(f: InputFrame, c: PlayerContext) -> Transition:
+	if f.duck_pressed or f.jump_pressed or c.move_len > 0.5:
+		return Transition.new(IDLE, FX_STAND)
+	return Transition.new()
 
 
 static func _mine(c: PlayerContext) -> Transition:

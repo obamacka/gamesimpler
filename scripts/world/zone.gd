@@ -39,6 +39,7 @@ func _ready() -> void:
 	for v in find_children("*", "ProtectionVolume", true, false):
 		s.terrain.rules.add_volume(v.min_cell, v.max_cell, v.reason, v.allows_place)
 	s.farm.bind_zone(zone_id, self)
+	s.build.bind_zone(zone_id, self)
 	if spawn_chests:
 		for key in s.world_state.chests:
 			if StringName(s.world_state.chests[key]["zone"]) == zone_id:

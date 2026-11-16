@@ -368,6 +368,111 @@
       "category": "FURNITURE",
       "max_stack": 20,
       "base_value": 60
+    },
+    {
+      "id": "item_piece_floor",
+      "category": "BUILD_PIECE",
+      "max_stack": 20,
+      "base_value": 4,
+      "piece_id": "piece_floor"
+    },
+    {
+      "id": "item_piece_wall",
+      "category": "BUILD_PIECE",
+      "max_stack": 20,
+      "base_value": 10,
+      "piece_id": "piece_wall"
+    },
+    {
+      "id": "item_piece_wall_door",
+      "category": "BUILD_PIECE",
+      "max_stack": 20,
+      "base_value": 16,
+      "piece_id": "piece_wall_door"
+    },
+    {
+      "id": "item_piece_window_wall",
+      "category": "BUILD_PIECE",
+      "max_stack": 20,
+      "base_value": 14,
+      "piece_id": "piece_window_wall"
+    },
+    {
+      "id": "item_piece_stairs",
+      "category": "BUILD_PIECE",
+      "max_stack": 5,
+      "base_value": 10,
+      "piece_id": "piece_stairs"
+    },
+    {
+      "id": "item_piece_roof",
+      "category": "BUILD_PIECE",
+      "max_stack": 20,
+      "base_value": 6,
+      "piece_id": "piece_roof"
+    },
+    {
+      "id": "item_piece_fence",
+      "category": "BUILD_PIECE",
+      "max_stack": 20,
+      "base_value": 4,
+      "piece_id": "piece_fence"
+    },
+    {
+      "id": "item_piece_shelf",
+      "category": "BUILD_PIECE",
+      "max_stack": 5,
+      "base_value": 12,
+      "piece_id": "piece_shelf"
+    },
+    {
+      "id": "item_piece_chair",
+      "category": "BUILD_PIECE",
+      "max_stack": 5,
+      "base_value": 15,
+      "piece_id": "piece_chair"
+    },
+    {
+      "id": "item_piece_sofa",
+      "category": "BUILD_PIECE",
+      "max_stack": 5,
+      "base_value": 40,
+      "piece_id": "piece_sofa"
+    },
+    {
+      "id": "item_piece_table",
+      "category": "BUILD_PIECE",
+      "max_stack": 5,
+      "base_value": 20,
+      "piece_id": "piece_table"
+    },
+    {
+      "id": "item_piece_bed",
+      "category": "BUILD_PIECE",
+      "max_stack": 5,
+      "base_value": 50,
+      "piece_id": "piece_bed"
+    },
+    {
+      "id": "item_piece_lamp",
+      "category": "BUILD_PIECE",
+      "max_stack": 5,
+      "base_value": 18,
+      "piece_id": "piece_lamp"
+    },
+    {
+      "id": "item_piece_radio",
+      "category": "BUILD_PIECE",
+      "max_stack": 5,
+      "base_value": 25,
+      "piece_id": "piece_radio"
+    },
+    {
+      "id": "item_piece_chest",
+      "category": "BUILD_PIECE",
+      "max_stack": 5,
+      "base_value": 30,
+      "piece_id": "piece_chest"
     }
   ]
 }

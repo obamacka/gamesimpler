@@ -15,6 +15,8 @@ var zones: Dictionary = {}          # StringName -> TerrainZoneDef
 var mail_templates: Dictionary = {}
 var crops: Dictionary = {}           # StringName -> CropDef
 var plots: Dictionary = {}           # StringName -> PlotDef
+var pieces: Dictionary = {}          # StringName -> BuildPieceDef
+var build: Dictionary = {}           # config.json "build" (radii, angles, hold times, debug kit)
 var farm := FarmConfig.new()
 var stamina := StaminaConfig.new()
 var discovery := DiscoveryConfig.new()
@@ -36,7 +38,7 @@ func load_all(dir: String) -> void:
 	load_errors.clear()
 	items.clear(); materials.clear(); materials_by_voxel.clear(); loot_tables.clear()
 	treasure_tables.clear(); fruit_trees.clear(); timber_trees.clear(); zones.clear(); mail_templates.clear()
-	crops.clear(); plots.clear()
+	crops.clear(); plots.clear(); pieces.clear()
 	var items_json := _read(dir.path_join("items.json"))
 	for d in items_json.get("items", []):
 		var it := _item(d)
@@ -89,6 +91,9 @@ func load_all(dir: String) -> void:
 		c.regrow_stage = int(d.get("regrow_stage", -1)); c.yield_min = int(d.get("yield_min", 1)); c.yield_max = int(d.get("yield_max", 1))
 		c.seed_return_pct = int(d.get("seed_return_pct", 0)); c.color = Color.html(d.get("color", "#40a040"))
 		crops[c.id] = c
+	for d in _read(dir.path_join("pieces.json")).get("pieces", []):
+		var p := _piece(d)
+		pieces[p.id] = p
 	var home: Dictionary = world.get("home", {})
 	home_zone = StringName(home.get("zone_id", "zone_starter_cabin"))
 	home_bed_key = StringName(home.get("bed_key", "bed_01"))
@@ -117,6 +122,7 @@ func load_all(dir: String) -> void:
 	starter_tools.assign((cfg.get("starter_kit", {}).get("tools", []) as Array).map(func(v): return StringName(v)))
 	var fc: Dictionary = cfg.get("farm", {})
 	farm = FarmConfig.new()
+	build = cfg.get("build", {})
 	farm.can_capacity = int(fc.get("can_capacity", 20)); farm.sprinkler_radius = int(fc.get("sprinkler_radius", 1)); farm.till_stamina = int(fc.get("till_stamina", 1))
 
 
@@ -246,6 +252,19 @@ func validate() -> Array[String]:
 			errors.append("plot %s in unknown zone" % id)
 	if not materials.has(&"mat_farmland"):
 		errors.append("mat_farmland material missing")
+	for id in pieces:
+		var p: BuildPieceDef = pieces[id]
+		if not items.has(p.item_id) or items[p.item_id].piece_id != id:
+			errors.append("piece %s item %s missing or not linked" % [id, p.item_id])
+		if p.footprint.is_empty():
+			errors.append("piece %s has an empty footprint" % id)
+		if p.fastener != BuildPieceDef.NONE and (p.fastener_sockets.is_empty() or p.hits_per_socket < 1):
+			errors.append("piece %s is fastened but has no sockets or hits" % id)
+		if not (p.layer in [BuildPieceDef.LAYER_FLOOR, BuildPieceDef.LAYER_BODY, BuildPieceDef.LAYER_WALL]):
+			errors.append("piece %s has unknown layer %s" % [id, p.layer])
+	for id in items:
+		if items[id].category == &"BUILD_PIECE" and not pieces.has(items[id].piece_id):
+			errors.append("build piece item %s places unknown piece" % id)
 	return errors
 
 
@@ -276,6 +295,7 @@ func _item(d: Dictionary) -> ItemDef:
 	it.has_instance_data = bool(d.get("has_instance_data", false))
 	it.block_material = StringName(d.get("block_material", ""))
 	it.seed_crop = StringName(d.get("seed_crop", ""))
+	it.piece_id = StringName(d.get("piece_id", ""))
 	if d.has("tool"):
 		var t := ToolData.new()
 		var td: Dictionary = d["tool"]
@@ -287,6 +307,34 @@ func _item(d: Dictionary) -> ItemDef:
 		f.stamina_restore = int(d["food"].get("stamina_restore", 0)); f.pet_happiness = int(d["food"].get("pet_happiness", 0))
 		it.food = f
 	return it
+
+
+func _v3(a: Array) -> Vector3:
+	return Vector3(float(a[0]), float(a[1]), float(a[2]))
+
+
+func _piece(d: Dictionary) -> BuildPieceDef:
+	var p := BuildPieceDef.new()
+	p.id = StringName(d["id"]); p.item_id = StringName(d["item_id"]); p.layer = StringName(d.get("layer", "BODY"))
+	p.grid = StringName(d.get("grid", "STRUCTURE_1M")); p.fastener = StringName(d.get("fastener", "NONE"))
+	p.hits_per_socket = int(d.get("hits_per_socket", 0))
+	p.requires_support = bool(d.get("requires_support", true)); p.provides_support = bool(d.get("provides_support", false))
+	p.footprint.assign((d.get("footprint", [[0, 0, 0]]) as Array).map(func(a): return _v3i(a)))
+	p.opening.assign((d.get("opening", []) as Array).map(func(a): return _v3i(a)))
+	p.fastener_sockets.assign((d.get("fastener_sockets", []) as Array).map(func(a): return _v3(a)))
+	p.accepts.assign((d.get("accepts", []) as Array).map(func(v): return StringName(v)))
+	p.snap_sockets = (d.get("snap_sockets", []) as Array).map(func(s): return {"position": _v3(s["position"]),
+		"provides": StringName(s["provides"]), "attach_offset": _v3i(s["attach_offset"]), "attach_rot": int(s.get("attach_rot", 0))})
+	p.interactions = (d.get("interactions", []) as Array).map(func(i):
+		var o := {"kind": StringName(i["kind"])}
+		o["seats"] = (i.get("seats", []) as Array).map(func(a): return _v3(a))
+		o["exits"] = (i.get("exits", []) as Array).map(func(a): return _v3(a))
+		o["toggle_states"] = int(i.get("toggle_states", 0)); o["slots"] = int(i.get("slots", 0))
+		o["stamina_regen_per_sec"] = float(i.get("stamina_regen_per_sec", 0.0))
+		return o)
+	p.parts = (d.get("parts", []) as Array).map(func(b): return {"size": _v3(b["size"]), "center": _v3(b["center"]), "solid": bool(b.get("solid", true))})
+	p.color = Color.html(d.get("color", "#ffffff"))
+	return p
 
 
 func _material(d: Dictionary) -> VoxelMaterialDef:

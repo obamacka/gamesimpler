@@ -4,7 +4,7 @@
 |---|---|
 | Spec | `_docs/specs/spec1.md` rev 3.4 |
 | Plan | `_docs/plans/plan1.md` |
-| Active phase | Phase 0 (in progress) |
+| Active phase | Phase 1 (automated tasks done; manual checklist pending) and Phase 0 (hardware checks pending) |
 | Last updated | 2026-11-16 |
 
 ## How to update
@@ -32,7 +32,7 @@ Status values: `Not started`, `In progress`, `Blocked`, `Done`.
 | Phase | Title | Status | Gate commit |
 |---|---|---|---|
 | 0 | Bootstrap, Test Harness and Voxel Spike | In progress | |
-| 1 | Core Engine, Gamepad Input, Camera, Tall Character FSM | Not started | |
+| 1 | Core Engine, Gamepad Input, Camera, Tall Character FSM | In progress: all automated tasks done, manual checklist pending | |
 | 2 | Mining, Foraging, Stamina Loop, Auto-Tool | Not started | |
 | 2B | Farming | Not started | |
 | 3 | Magnetic Grid Building, Screw/Hammer Mini-Games | Not started | |
@@ -59,12 +59,12 @@ Status values: `Not started`, `In progress`, `Blocked`, `Done`.
 ### Phase 1
 | Task | Status | Date | Commit | Notes |
 |---|---|---|---|---|
-| P1.1 to P1.4 Resources and project settings | Not started | | | |
-| P1.5 to P1.17 Scripts | Not started | | | |
-| P1.18 to P1.21 Scenes and UI | Not started | | | |
-| P1.22 to P1.27 Unit suites | Not started | | | |
-| P1.28 to P1.30 Integration suites | Not started | | | |
-| Manual checklist | Not started | | | |
+| P1.1 to P1.4 Resources and project settings | Done | 2026-11-16 | 62d93a5 | input map generated from InputBindings (61 actions); config and glyph set resources |
+| P1.5 to P1.17 Scripts | Done | 2026-11-16 | 62d93a5 | autoloads, input models, player FSM, controller, camera |
+| P1.18 to P1.21 Scenes and UI | Done | 2026-11-16 | 62d93a5 | VoxelViewer deferred to Phase 2 |
+| P1.22 to P1.27 Unit suites | Done | 2026-11-16 | 62d93a5 | input map, device, rebind, resume guard, lint, transition table, jump, ledge, settings, state machine |
+| P1.28 to P1.30 Integration suites | Done | 2026-11-16 | 62d93a5 | pause manager, player locomotion (13 cases), input service, glyph icon |
+| Manual checklist | Not started | | | needs Xbox pad, DualShock/DualSense, KB/M on Windows/Linux (macOS optional); includes physics interpolation check at 30 fps |
 
 ### Phase 2
 | Task | Status | Date | Commit | Notes |
@@ -132,6 +132,8 @@ Status values: `Not started`, `In progress`, `Blocked`, `Done`.
 | 2026-11-16 | 0abde5d | 0 | CI run 1 | 0 | 0 | GitHub Actions |
 | 2026-11-16 | 24a5cfd | 0 | CI run 2 | 0 | 0 | GitHub Actions, 17 cases incl. voxel smoke |
 | 2026-11-16 | 1756fff | 0 | updated CLAUDE.md command | 0 | 0 | 17 cases |
+| 2026-11-16 | cf7ecc6 | 0 | `ci/run_tests.sh` | 0 | 0 | 17 cases; plus `ci/run_benchmark.sh --headless-smoke` OK |
+| 2026-11-16 | 62d93a5 | 1 | `ci/run_tests.sh` | 0 | 0 | 117 cases (Phase 0 + Phase 1) |
 | 2026-11-16 | 24a5cfd | 0 | `ci/run_tests.sh` | 0 | 0 | 17 cases incl. voxel smoke |
 
 ## Decisions
@@ -146,6 +148,8 @@ Status values: `Not started`, `In progress`, `Blocked`, `Done`.
 ## Blockers and open issues
 | Date | Item | Owner | Status |
 |---|---|---|---|
+| 2026-11-16 | Phase 1 manual gamepad checklist (plan Phase 1) | team | Open |
+| 2026-11-16 | Phase 1 implementation choices recorded in spec: input map generated from InputBindings; `ui_tertiary` KB moved from Shift+Enter to R; Esc overlap rule; ledge probes are direct physics queries; VoxelViewer added in Phase 2 | owner review | Open |
 | 2026-11-15 | CLAUDE.md headless command does not match gdUnit4 v6.2.3 (spec 0.6 item 1) | owner | Closed 2026-11-16 (3682356) |
 | 2026-11-16 | Confirmed: the CLAUDE.md command hangs at `debug>` on GDScript parse errors; `--remote-debug tcp://127.0.0.1:0` fixes it (exit 105). `ci/run_tests.sh` uses the fix | owner | Closed 2026-11-16: CLAUDE.md updated (owner approved) |
 | 2026-11-15 | Voxel GDExtension maturity, collision latency, headless behavior, SQLite copy safety unverified (spec 0.6 items 18, 19, 21, 22) | P0.8 | Partly closed 2026-11-16: headless, SQLite copy and container latency verified; hardware frame budget pending |

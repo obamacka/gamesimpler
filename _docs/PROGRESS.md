@@ -2,9 +2,9 @@
 
 | Field | Value |
 |---|---|
-| Spec | `_docs/specs/spec1.md` rev 3.8 |
+| Spec | `_docs/specs/spec1.md` rev 3.9 |
 | Plan | `_docs/plans/plan1.md` |
-| Active phase | Phases 3 to 5 automated work done (started on owner request before the Phase 1, 2 and 2B gates passed); manual checklists for Phases 1 to 5 and Phase 0 hardware checks pending; Phase 6 not started |
+| Active phase | All six phases have their automated work done (Phases 3 to 6 started on owner request before earlier gates passed); manual checklists for Phases 1 to 6, Phase 0 hardware checks and the release-candidate checklist pending |
 | Last updated | 2026-11-16 |
 
 ## How to update
@@ -38,7 +38,7 @@ Status values: `Not started`, `In progress`, `Blocked`, `Done`.
 | 3 | Magnetic Grid Building, Screw/Hammer Mini-Games | In progress: automated tasks done except P3.8 icons; manual checklist pending | |
 | 4 | Economy, Jobs, Wardrobe UI, Game Pause | In progress: automated tasks done; manual checklist pending | |
 | 5 | NPCs, Mail, Pet Companion | In progress: automated tasks done; manual checklist pending | |
-| 6 | Museum, Collection Book, Dye Painting, Save/Load | Not started | |
+| 6 | Museum, Collection Book, Dye Painting, Save/Load | In progress: automated tasks done (plus navmesh); manual and release-candidate checklists pending | |
 
 ## Task tracker
 
@@ -115,11 +115,12 @@ Status values: `Not started`, `In progress`, `Blocked`, `Done`.
 ### Phase 6
 | Task | Status | Date | Commit | Notes |
 |---|---|---|---|---|
-| P6.1 Resources | Not started | | | |
-| P6.2 to P6.10 Scripts | Not started | | | |
-| P6.11 to P6.13 Unit suites | Not started | | | |
-| P6.14 to P6.18 Integration suites | Not started | | | Suite B: B12. Suite C: C1 to C17 |
-| Manual checklist and release candidate | Not started | | | |
+| P6.1 Resources | Done | 2026-11-16 | 803e74c | collection entries on 13 items (3 new minerals), `museum.json` (3 cases, 4 trophies, geodes), `stickers.json` (7), 2 dyes, 3 blueprint recipes, paint regions on 12 pieces, `piece.gdshader` with 3 instance uniforms, museum zone; treasure pools now reference real ids (they named missing ones before) |
+| P6.2 to P6.10 Scripts | Done | 2026-11-16 | 803e74c | Collection and Museum services (guards, batch, rewards once, load reconcile, geodes with undiscovered bias), DisplayCase and TrophyPedestal, donation / collection book / chest reveal / dye palette / sticker sheet / save-load menus, Paint and Stamp tools with eyedropper and undo (20, cleared on zone change), SaveCodec (schema v2, migration from v1, int casting, sanitization, structural failure), SaveService (3 manual + autosave, atomic JSON and voxel-dir rotation, crash seam, consistent-pair load), per-zone SQLite working copies flushed before unload |
+| P6.11 to P6.13 Unit suites | Done | 2026-11-16 | 803e74c | museum 7, collection and geode 2, paint 1, stamp 4, undo 2, codec 6, migrations 2, atomic write 2, voxel epoch 3 |
+| P6.14 to P6.18 Integration suites | Done | 2026-11-16 | 803e74c | Suite C 15 tests covering C1 to C17, save round trip 3, save failures 3 (B12), paint and stamp 3, real-terrain dig/place/save/reload in `test_voxel_smoke.gd` |
+| P6.19 Navigation meshes (owner request) | Done | 2026-11-16 | 803e74c | navigation suite 5 plus the real Home Meadow town bake |
+| Manual checklist and release candidate | Not started | | | donate and read the book by pad; paint and stamp a house, save, quit, reload, kill during save; exports for Windows, Linux, macOS not attempted from the cloud session |
 
 ## Test run log
 | Date | Commit | Phase | Command | Exit code | Failures | Notes |
@@ -141,6 +142,7 @@ Status values: `Not started`, `In progress`, `Blocked`, `Done`.
 | 2026-11-16 | 405aae6 | 3 | `ci/run_tests.sh` | 0 | 0 | 369 cases (Phases 0 to 3) |
 | 2026-11-16 | 8566596 | 4 | `ci/run_tests.sh` | 0 | 0 | 430 cases (Phases 0 to 4) |
 | 2026-11-16 | 56d4cef | 5 | `ci/run_tests.sh` | 0 | 0 | 489 cases (Phases 0 to 5) |
+| 2026-11-16 | 803e74c | 6 | `ci/run_tests.sh` | 0 | 0 | 549 cases (Phases 0 to 6) |
 
 ## Decisions
 | ID | Status | Value |
@@ -160,6 +162,8 @@ Status values: `Not started`, `In progress`, `Blocked`, `Done`.
 | 2026-11-16 | Phase 2B manual checklist (plan P2B) | team | Open |
 | 2026-11-16 | Plan 0 rule broken on owner request: Phases 3 to 5 started while the Phase 1, 2 and 2B gates (manual checklists, min-spec performance) are open. Rework risk if those checks find feel or performance problems | owner | Open |
 | 2026-11-16 | Bugs found and fixed in Phase 4: `Database.templates_in_pool` sorted StringNames by address, so care-letter pool order (and the seeded pick) could differ between runs (fixed with a text sort, test added); two zone `.tscn` files with 3-component Colors failed to load (new scene-load test). Neither reached a commit | team | Closed |
+| 2026-11-16 | Bugs found and fixed in Phase 6: crash (segfault) when anything raycast the previous zone's VoxelTerrain during a zone change, and STATIC zones kept a dangling voxel adapter (reachable since Phase 2 by walking from the overworld into the cabin); the player body left the physics space while frozen; navmesh voxel faces had the wrong winding (masked in fixtures by the floor collider); treasure pools referenced non-existent blueprint, dye and sticker ids | team | Closed |
+| 2026-11-16 | Phase 6 choices for owner review: save schema v2 (v1 saves migrate); slot 0 is the autosave; each slot holds a voxel directory with one SQLite per overworld zone; a crash between the JSON and voxel renames loads the older consistent pair; the curator's Y opens donations (gifts to the curator are not possible); museum content is a first pass (3 cases, 4 trophies, 5 minerals); sticker and dye pattern art are placeholders; paint and stamps are refused on job-site pieces | owner review | Open |
 | 2026-11-16 | Phase 5 choices for owner review: no navmesh is baked yet, so NPCs steer straight between schedule markers inside protected town volumes and the pet uses a straight line in the cabin (VoxelAStarGrid3D on voxel ground); instrument notes are generated tones (no samples); NPC and pet visuals are placeholder boxes with a real Skeleton3D and BoneAttachment3D slots; friendship: gifts loved 80 / liked 45 / neutral 20 / disliked 0, first talk per day 5, first wave per day 1, letters at 200 and 400; the pet settles at 80% of follow distance; care letters are signed by the best friend; the sweater fits dogs only (exercises the species check) | owner review | Open |
 | 2026-11-16 | Bugs found and fixed in Phase 5 work: deferred grab_focus on rebuilt or closed menus (engine errors in every menu test, also in the real game); the pet parked exactly at follow_distance so Idle could never trigger; inbox prune ran before the day's delivery; float drift in pet timers | team | Closed |
 | 2026-11-16 | Phase 4 choices for owner review: starting coins 150; contracts that miss their deadline end with no penalty at the next rollover; B13 extends contracts due on the collapse day by one day; buying a tool from a shop grants it to the ToolBelt; music and effects volumes are stored but no audio buses exist yet; NPC shopkeepers arrive in Phase 5 (stations are counters for now); the job site lives in Home Meadow (x 16..22, z 6..12) | owner review | Open |

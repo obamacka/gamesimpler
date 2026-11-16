@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="GlyphSetDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/ui/glyph_set_def.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"kbm"
+labels = {&"face_bottom": "Space", &"face_right": "C", &"face_left": "E", &"face_top": "F", &"trigger_right": "LMB", &"trigger_left": "RMB", &"shoulder_right": "]", &"shoulder_left": "["}
+colors = {&"face_bottom": Color(0.8, 0.8, 0.8, 1), &"face_right": Color(0.8, 0.8, 0.8, 1), &"face_left": Color(0.8, 0.8, 0.8, 1), &"face_top": Color(0.8, 0.8, 0.8, 1), &"trigger_right": Color(0.8, 0.8, 0.8, 1), &"trigger_left": Color(0.8, 0.8, 0.8, 1), &"shoulder_right": Color(0.8, 0.8, 0.8, 1), &"shoulder_left": Color(0.8, 0.8, 0.8, 1)}

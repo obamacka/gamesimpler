@@ -276,8 +276,8 @@ Main (Node)                                   PAUSABLE
 Player (CharacterBody3D)
 +-- CollisionStanding, CollisionDucking (CollisionShape3D)
 +-- HeadClearance (ShapeCast3D)        stand-up and jump headroom
-+-- StepProbe (ShapeCast3D)            auto-jump ledge test (4.2.1)
-+-- VoxelViewer                        drives VoxelTerrain loading around the player
++-- JumpClearance (ShapeCast3D)        headroom above the head for jumping
++-- VoxelViewer                        drives VoxelTerrain loading (added in Phase 2)
 +-- Visual/Rig/Skeleton3D
 |   +-- BodyMesh, OutfitSlots (Head, Top, Bottom, Feet, Accessory)
 |   +-- ToolSocket (BoneAttachment3D, right hand)
@@ -355,8 +355,9 @@ Economy rules: integer coins only; buy price rounded up, sell rounded down; defa
 2. No gameplay script references device-specific events or constants. Exceptions: `InputService`, rebinding UI.
 3. Only `Player/InputReader` polls gameplay actions, producing an `InputFrame` consumed by the FSM. `InputReader.inject(frame)` is the test seam.
 4. Mouse motion delta is the one raw event, read only in `InputReader`.
+5. The default input map's single source of truth is `scripts/input/input_bindings.gd` (actions, contexts, events as plain dictionaries, deadzones). `scripts/tools/generate_input_map.gd` writes it into `project.godot`; a unit suite fails if they drift (implemented in Phase 1).
 
-`InputFrame` fields: `move: Vector2`, `look: Vector2`, `run_held`, `jump_pressed`, `jump_held`, `duck_pressed`, `duck_held`, `interact_pressed`, `interact_alt_pressed`, `use_pressed`, `use_held`, `use_released`, `alt_pressed`, `alt_held`, `build_toggle_pressed`, `rotate_cw_pressed`, `rotate_ccw_pressed`, `build_tool_next_pressed`, `build_tool_prev_pressed`, `hotbar_next_pressed`, `hotbar_prev_pressed`, `hotbar_select: int`, `catalog_pressed`, `undo_pressed`, `wheel_pressed`, `pet_call_pressed`, `quick_eat_pressed`, `notes_pressed: int` (bitmask of 8 notes), `frame: int`.
+`InputFrame` fields: `move: Vector2`, `look: Vector2`, `look_mouse: Vector2` (mouse delta), `run_pressed`, `run_held`, `jump_pressed`, `jump_held`, `duck_pressed`, `duck_held`, `interact_pressed`, `interact_alt_pressed`, `use_pressed`, `use_held`, `use_released`, `alt_pressed`, `alt_held`, `build_toggle_pressed`, `rotate_cw_pressed`, `rotate_ccw_pressed`, `build_tool_next_pressed`, `build_tool_prev_pressed`, `hotbar_next_pressed`, `hotbar_prev_pressed`, `hotbar_select: int`, `catalog_pressed`, `undo_pressed`, `wheel_pressed`, `pet_call_pressed`, `quick_eat_pressed`, `camera_reset_pressed`, `notes_pressed: int` (bitmask of 8 notes), `frame: int`.
 
 ### 2.2 Gameplay actions
 | Action | Xbox | PlayStation | Godot joypad event | KB/M | Behavior |
@@ -399,7 +400,7 @@ Meaning changes by FSM context, never by rebinding. Contexts: `GAMEPLAY`, `AIRBO
 | `duck` (B) | exit Build / cancel fasten | exit Build | exit Build | note 2 |
 | `move` | walk | walk | walk | exits instrument |
 
-KB/M in Build: rotate R / Shift+R or mouse wheel; Build tools 1 / 2 / 3; undo Z; catalog F; pick/eyedropper E; exit B or C. Instrument KB/M: notes on keys 1..8.
+KB/M in Build: rotate R / Shift+R or mouse wheel (read with exact matching so Shift+R does not also rotate clockwise); Build tools 1 / 2 / 3 (actions `build_tool_place`, `build_tool_paint`, `build_tool_stamp`); undo Z; catalog F; pick/eyedropper E; exit B or C. Instrument KB/M: notes on keys 1..8.
 
 `AIRBORNE` (Jump, Fall): only `move`, `look`, `jump` (double jump), `use_tool` (single-shot dig or block place, 4.2.1) and `interact` on pickups are read.
 
@@ -412,7 +413,7 @@ KB/M in Build: rotate R / Shift+R or mouse wheel; Build tools 1 / 2 / 3; undo Z;
 | `ui_tab_next/prev` | RB / LB | E / Q |
 | `ui_page_next/prev` | RT / LT | Page Down / Page Up |
 | `ui_secondary` | X / Square | Right click |
-| `ui_tertiary` | Y / Triangle | Shift+Enter |
+| `ui_tertiary` | Y / Triangle | R (Shift+Enter would also trigger `ui_accept`, which Controls read without exact matching) |
 | `ui_wheel_select` | right or left stick direction (0.6) | Mouse direction from center |
 
 ### 2.5 Device handling and rebinding
@@ -421,7 +422,7 @@ KB/M in Build: rotate R / Shift+R or mouse wheel; Build tools 1 / 2 / 3; undo Z;
 - Mouse captured in gameplay, visible in menus or when window unfocused.
 - Active pad disconnect opens Pause with `DeviceBanner`.
 - Rebinds stored as plain dictionaries in `user://settings.cfg`; never serialized `InputEvent` objects.
-- Conflict rule: one physical input may map to several actions only if they belong to disjoint contexts. Context table: `GAMEPLAY`, `AIRBORNE`, `BUILD`, `INSTRUMENT`, `UI`. `jump`, `pause_menu`, `ui_accept`, `ui_cancel` cannot be unbound from the gamepad.
+- Conflict rule: one physical input may map to several actions only if they belong to disjoint contexts. Context table: `GAMEPLAY`, `AIRBORNE`, `BUILD`, `INSTRUMENT`, `UI`. `jump`, `pause_menu`, `ui_accept`, `ui_cancel` cannot be unbound from the gamepad. One intentional overlap: Esc is both `pause_menu` and `ui_cancel`; in menus `ui_cancel` is handled first and marks the event handled.
 
 ### 2.6 Auto-tool context switching
 Tools live in the **ToolBelt**, not in inventory slots. Acquiring a `TOOL` item grants it to the belt. For each `ToolType`, the highest owned tier is the active instance.
@@ -904,7 +905,7 @@ Duck mechanics: on enter, disable `CollisionStanding`, enable `CollisionDucking`
 
 #### 4.2.1 Airborne details
 - Jump height is fixed (releasing A does not cut the jump), for predictability (K5).
-- Auto-jump (`StepProbe`): the cell in front at foot level is solid, the cell above it is free, and 3 cells above the step top are free. Disabled while ducking, in Build Fasten, or within 0.5 s after a manual jump.
+- Auto-jump (ledge probes: physics ray and shape queries from `PlayerController`): the cell in front at foot level is solid, the cell above it is free, and 3 cells above the step top are free. Disabled while ducking, in Build Fasten, or within 0.5 s after a manual jump.
 - Air actions: `use_tool` while airborne performs one dig strike or one block placement without entering Mine or Build (single-shot, no hold-repeat). This supports pillar building: jump, place a block below. Placing into the player's own cell is allowed only when the capsule bottom is above that cell's top.
 - Landing never damages, stuns beyond 0.2 s, or costs stamina.
 

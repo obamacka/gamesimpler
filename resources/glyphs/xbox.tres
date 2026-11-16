@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="GlyphSetDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/ui/glyph_set_def.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"xbox"
+labels = {&"face_bottom": "A", &"face_right": "B", &"face_left": "X", &"face_top": "Y", &"trigger_right": "RT", &"trigger_left": "LT", &"shoulder_right": "RB", &"shoulder_left": "LB"}
+colors = {&"face_bottom": Color(0.36, 0.73, 0.27, 1), &"face_right": Color(0.86, 0.2, 0.2, 1), &"face_left": Color(0.2, 0.45, 0.9, 1), &"face_top": Color(0.95, 0.78, 0.15, 1), &"trigger_right": Color(1, 1, 1, 1), &"trigger_left": Color(1, 1, 1, 1), &"shoulder_right": Color(1, 1, 1, 1), &"shoulder_left": Color(1, 1, 1, 1)}

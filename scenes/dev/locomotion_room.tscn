@@ -1,0 +1,6 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scenes/dev/locomotion_room.gd" id="1"]
+
+[node name="LocomotionRoom" type="Node3D"]
+script = ExtResource("1")

@@ -541,7 +541,7 @@ Invalid reasons with pictograms: `occupied`, `no_support`, `outside_plot`, `over
 
 ## 3. Data Structures
 
-Conventions: `StringName` ids, lowercase snake_case, never renamed after ship. Prefixes: `item_`, `recipe_`, `piece_`, `outfit_`, `npc_`, `job_`, `contract_`, `plot_`, `mail_tpl_`, `shop_`, `dye_`, `sticker_`, `emote_`, `pet_`, `petacc_`, `case_`, `trophy_`, `loot_`, `mat_` (voxel materials), `zone_`, `prot_`. Display text is a translation key. Definitions are `Resource` subclasses under `res://resources/<type>/`, read-only. Runtime state is plain data serialized to JSON.
+Conventions: `StringName` ids, lowercase snake_case, never renamed after ship. Prefixes: `item_`, `recipe_`, `piece_`, `outfit_`, `npc_`, `job_`, `contract_`, `plot_`, `mail_tpl_`, `shop_`, `dye_`, `sticker_`, `emote_`, `pet_`, `petacc_`, `case_`, `trophy_`, `loot_`, `mat_` (voxel materials), `zone_`, `prot_`. Display text is a translation key. Definitions are `Resource` subclasses (typed classes under `res://scripts/data/`), authored as JSON in `res://resources/data/*.json` and built by the `Database` autoload at boot (implemented in Phase 2; CLAUDE.md allows Resource scripts or JSON, and JSON keeps content reviewable in diffs). Read-only at runtime. Runtime state is plain data serialized to JSON.
 
 ### 3.1 Item definition (`ItemDef`)
 | Field | Type | Rule |
@@ -1262,8 +1262,8 @@ sequenceDiagram
     SD->>SS: refill()
     SD->>SV: autosave (D7)
     SD->>SD: show sleep_card, Fader in
-    SD->>PM: release_pause(&"transition")
     SD->>EB: player_woke(&"exhausted", day+1)
+    SD->>PM: release_pause(&"transition")
 ```
 
 Care letter rules:

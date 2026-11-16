@@ -4,7 +4,7 @@
 |---|---|
 | Spec | `_docs/specs/spec1.md` rev 3.4 |
 | Plan | `_docs/plans/plan1.md` |
-| Active phase | Phase 1 (automated tasks done; manual checklist pending) and Phase 0 (hardware checks pending) |
+| Active phase | Phase 2 (automated tasks done; manual checklist and performance check pending); Phase 1 manual and Phase 0 hardware checks pending |
 | Last updated | 2026-11-16 |
 
 ## How to update
@@ -33,7 +33,7 @@ Status values: `Not started`, `In progress`, `Blocked`, `Done`.
 |---|---|---|---|
 | 0 | Bootstrap, Test Harness and Voxel Spike | In progress | |
 | 1 | Core Engine, Gamepad Input, Camera, Tall Character FSM | In progress: all automated tasks done, manual checklist pending | |
-| 2 | Mining, Foraging, Stamina Loop, Auto-Tool | Not started | |
+| 2 | Mining, Foraging, Stamina Loop, Auto-Tool | In progress: all automated tasks done, manual checklist and min-spec performance check pending | |
 | 2B | Farming | Not started | |
 | 3 | Magnetic Grid Building, Screw/Hammer Mini-Games | Not started | |
 | 4 | Economy, Jobs, Wardrobe UI, Game Pause | Not started | |
@@ -69,12 +69,12 @@ Status values: `Not started`, `In progress`, `Blocked`, `Done`.
 ### Phase 2
 | Task | Status | Date | Commit | Notes |
 |---|---|---|---|---|
-| P2.1 to P2.4 Resources | Not started | | | |
-| P2.5 to P2.21 Scripts | Not started | | | P2.18 adds a temporary mailbox `claim_all`, removed in P5.13 |
-| P2.22 Scenes | Not started | | | |
-| P2.23 to P2.28 Unit suites | Not started | | | |
-| P2.29 to P2.33 Integration suites | Not started | | | Suite A: A1 to A7, A11 to A22. Suite B: B1 to B11, B14 to B17 |
-| Manual checklist | Not started | | | |
+| P2.1 to P2.4 Resources | Done | 2026-11-16 | 205f54a | content authored as JSON in resources/data, built into typed Resources by Database |
+| P2.5 to P2.21 Scripts | Done | 2026-11-16 | 5e4c70e | P2.18 temporary mailbox `claim_all` (removed in P5.13); ProtectionVolume editor gizmo deferred; WalletModel pulled in for chest coins |
+| P2.22 Scenes | Done | 2026-11-16 | 5e4c70e | wilderness, orchard, deep mine (generated), starter cabin (static); main scene playable |
+| P2.23 to P2.28 Unit suites | Done | 2026-11-16 | 5e4c70e | terrain, tools, stamina, discovery, rollover, mail, inventory, resolver, mine, database, rng, round trip, prompt model |
+| P2.29 to P2.33 Integration suites | Done | 2026-11-16 | 5e4c70e | Suite A 19/19 (A1-A7, A11-A22), Suite B 15/15 (B1-B11, B14-B17), dig and forage 10, safe ground 4, real-terrain smoke 9 |
+| Manual checklist | Not started | | | dig, forage, chop, exhaustion loop with pad and KB/M; performance on the min-spec machines |
 
 ### Phase 2B
 | Task | Status | Date | Commit | Notes |
@@ -134,6 +134,8 @@ Status values: `Not started`, `In progress`, `Blocked`, `Done`.
 | 2026-11-16 | 1756fff | 0 | updated CLAUDE.md command | 0 | 0 | 17 cases |
 | 2026-11-16 | cf7ecc6 | 0 | `ci/run_tests.sh` | 0 | 0 | 17 cases; plus `ci/run_benchmark.sh --headless-smoke` OK |
 | 2026-11-16 | 62d93a5 | 1 | `ci/run_tests.sh` | 0 | 0 | 117 cases (Phase 0 + Phase 1) |
+| 2026-11-16 | 205f54a | 2 | `ci/run_tests.sh` | 0 | 0 | 199 cases (part 1) |
+| 2026-11-16 | 5e4c70e | 2 | `ci/run_tests.sh` | 0 | 0 | 262 cases (Phases 0 to 2) |
 | 2026-11-16 | 24a5cfd | 0 | `ci/run_tests.sh` | 0 | 0 | 17 cases incl. voxel smoke |
 
 ## Decisions
@@ -149,6 +151,8 @@ Status values: `Not started`, `In progress`, `Blocked`, `Done`.
 | Date | Item | Owner | Status |
 |---|---|---|---|
 | 2026-11-16 | Phase 1 manual gamepad checklist (plan Phase 1) | team | Open |
+| 2026-11-16 | Phase 2 manual checklist and min-spec performance check | team | Open |
+| 2026-11-16 | Phase 2 choices for owner review: JSON content authoring (spec 3 conventions updated); care-letter snack rule compares against the collapse day (spec 6.2 corrected, the old rule could never trigger); `player_woke` emitted just before the transition pause is released (spec 6.2 diagram updated to match Suite B); Bed and Mine Entrance act without the confirm dialog until Phase 3 adds menus; SafeGround uses the standing-capsule clearance as the "3 free voxels" check; prompt occlusion check not yet implemented (behind-camera hiding is) | owner review | Open |
 | 2026-11-16 | Phase 1 implementation choices recorded in spec: input map generated from InputBindings; `ui_tertiary` KB moved from Shift+Enter to R; Esc overlap rule; ledge probes are direct physics queries; VoxelViewer added in Phase 2 | owner review | Open |
 | 2026-11-15 | CLAUDE.md headless command does not match gdUnit4 v6.2.3 (spec 0.6 item 1) | owner | Closed 2026-11-16 (3682356) |
 | 2026-11-16 | Confirmed: the CLAUDE.md command hangs at `debug>` on GDScript parse errors; `--remote-debug tcp://127.0.0.1:0` fixes it (exit 105). `ci/run_tests.sh` uses the fix | owner | Closed 2026-11-16: CLAUDE.md updated (owner approved) |

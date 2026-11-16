@@ -28,8 +28,8 @@
 
 ## Notable findings
 1. Voxel meshing, collision generation and SQLite streaming all work under the headless display server. Standard integration suites can use real terrain where useful, not only `FakeVoxelWorld`; the fake stays for speed and determinism.
-2. The CLAUDE.md test command hangs at `debug>` on a GDScript parse error (exit code 124 from a 90 s timeout). Adding `--remote-debug tcp://127.0.0.1:0` makes it exit 105. `ci/run_tests.sh` uses the safe variant; the CLAUDE.md change awaits owner approval.
-3. The GDExtension binaries are 134 MB for all platforms, 65 MB for the desktop set. They are not committed; `ci/fetch_voxel.sh` downloads and verifies them (SHA256 pinned). Alternative: Git LFS. Owner decision.
+2. The CLAUDE.md test command hangs at `debug>` on a GDScript parse error (exit code 124 from a 90 s timeout). Adding `--remote-debug tcp://127.0.0.1:0` makes it exit 105. `ci/run_tests.sh` uses the safe variant; CLAUDE.md was updated on 2026-11-16.
+3. The GDExtension binaries are 134 MB for all platforms, 65 MB for the desktop set. They are not committed; `ci/fetch_voxel.sh` downloads and verifies them (SHA256 pinned). Owner decision 2026-11-16: keep the fetch script (no Git LFS).
 
 ## How to run the hardware checks (b, d, j, k, P0.9)
 On each machine (i7-3770/GTX 1070, Ryzen 5 3600/RTX 2070, M1 16 GB, M2 16 GB):

@@ -29,7 +29,8 @@
 ## Testing & Verification Rules
 - Framework: GdUnit4 plugin.
 - Test Directory Structure: `res://test/unit/` (data/FSM logic) and `res://test/integration/` (UI/world signals).
-- Headless CLI Command: `godot --headless --path . -s -d res://addons/gdUnit4/bin/GdUnitCmdTool.gd --ignoreHeadlessMode -a res://test`
+- Headless CLI Command: `godot --headless --path . -s -d --remote-debug tcp://127.0.0.1:0 res://addons/gdUnit4/bin/GdUnitCmdTool.gd --ignoreHeadlessMode -a res://test` (or `GODOT_BIN=<path> ci/run_tests.sh`). The flag prevents a hang at `debug>` on GDScript parse errors; its two "remote port"/"Unable to connect" ERROR lines are expected.
+- Before the first run after cloning: `ci/fetch_voxel.sh` installs the Voxel Tools binaries (gitignored).
 - Mandatory Validation:
   1. Write GdUnit4 test suites (`TestSuite`) for pure logic components (Inventory, Economy, FSM transitions, Save/Load serialization) before feature sign-off.
   2. Execute the headless test suite CLI command and verify 0 failures (exit code 0) before marking any task complete in `_docs/PROGRESS.md`.

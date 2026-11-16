@@ -13,6 +13,11 @@ const DEFAULTS := {
 		"glyph_override": -1,
 		"rebinds": {},
 	},
+	"assist": {
+		"auto_tool": true,
+		"auto_tool_revert": false,
+		"go_home_confirm": true,
+	},
 }
 
 var _data: Dictionary = DEFAULTS.duplicate(true)

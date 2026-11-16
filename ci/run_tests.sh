@@ -5,10 +5,11 @@
 # Exit codes (gdUnit4 v6.2.3): 0 pass, 100 failures, 101 warnings,
 # 103 headless not allowed, 105 script errors.
 # The two "remote port"/"Unable to connect" ERROR lines this flag prints are expected.
+# -c continues after a failing suite so every failure is reported (exit code is unchanged).
 set -u
 : "${GODOT_BIN:?Set GODOT_BIN to a Godot 4.7.x binary}"
 cd "$(dirname "$0")/.."
 "$GODOT_BIN" --headless --path . --import > /dev/null 2>&1
 "$GODOT_BIN" --headless --path . -s -d --remote-debug tcp://127.0.0.1:0 \
-  res://addons/gdUnit4/bin/GdUnitCmdTool.gd --ignoreHeadlessMode -a res://test "$@"
+  res://addons/gdUnit4/bin/GdUnitCmdTool.gd --ignoreHeadlessMode -c -a res://test "$@"
 exit $?

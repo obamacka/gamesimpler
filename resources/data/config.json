@@ -1,0 +1,5 @@
+{
+  "stamina": {"base_max": 100, "max_bonus_cap": 50, "low_thresholds_pct": [25, 10], "sit_regen_per_sec": 0.5, "forage_cost": 1},
+  "discovery": {"geode_item_id": "item_geode", "geode_pity": 40, "chest_pity": 150},
+  "starter_kit": {"tools": ["item_shovel_basic", "item_pickaxe_basic", "item_picker_basic"]}
+}

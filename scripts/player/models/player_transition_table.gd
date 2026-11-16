@@ -11,6 +11,8 @@ const DUCK := &"duck"
 const JUMP := &"jump"
 const FALL := &"fall"
 const SLEEP := &"sleep"
+const MINE := &"mine"
+const INTERACT := &"interact"
 
 const MOVE_THRESHOLD := 0.2
 const SOFT_LAND_HEIGHT := 4.0
@@ -26,6 +28,14 @@ const FX_CEILING := &"ceiling"
 const FX_LAND := &"land"
 const FX_SOFT_LAND := &"soft_land"
 const FX_BUFFER := &"buffer"
+const FX_FORAGE := &"forage"
+const FX_BLOCKED := &"blocked"
+const FX_TIER_LOW := &"tier_low"
+const FX_AIR_STRIKE := &"air_strike"
+
+const TARGET_VOXEL := &"voxel"
+const TARGET_TIMBER := &"timber"
+const TARGET_FRUIT_TREE := &"fruit_tree"
 
 const GROUNDED: Array[StringName] = [IDLE, WALK, RUN, DUCK]
 const AIRBORNE: Array[StringName] = [JUMP, FALL]
@@ -50,6 +60,10 @@ static func next(state: StringName, f: InputFrame, c: PlayerContext) -> Transiti
 		return _jump(f, c)
 	if state == FALL:
 		return _fall(f, c)
+	if state == MINE:
+		return _mine(c)
+	if state == INTERACT:
+		return _interact(c)
 	return Transition.new()
 
 
@@ -65,6 +79,22 @@ static func _grounded(state: StringName, f: InputFrame, c: PlayerContext) -> Tra
 	# Left the floor without jumping: stay grounded during coyote time, then fall.
 	if not c.on_floor and c.coyote_left <= 0.0:
 		return Transition.new(FALL)
+
+	# Actions (spec 4.2 table order: interact, forage with the picker, mine). Run slows to Walk first.
+	var wants_interact := (f.interact_pressed or f.interact_alt_pressed) and c.has_interact_target
+	var wants_tool := f.use_pressed and c.tool_target_kind != &""
+	if (wants_interact or wants_tool) and state == RUN:
+		return Transition.new(WALK)
+	if wants_interact:
+		return Transition.new(INTERACT)
+	if wants_tool:
+		if c.tool_target_kind == TARGET_FRUIT_TREE:
+			return Transition.new(INTERACT, FX_FORAGE)
+		if c.tool_blocked != &"":
+			return Transition.new(&"", FX_BLOCKED)
+		if not c.tool_ok:
+			return Transition.new(&"", FX_TIER_LOW)
+		return Transition.new(MINE)
 
 	# Jump (manual press, or a buffered press that just became possible).
 	if f.jump_pressed or c.jump_buffered:
@@ -110,6 +140,8 @@ static func _grounded(state: StringName, f: InputFrame, c: PlayerContext) -> Tra
 
 
 static func _jump(f: InputFrame, c: PlayerContext) -> Transition:
+	if _air_strike(f, c):
+		return Transition.new(&"", FX_AIR_STRIKE)
 	if c.ceiling_hit:
 		return Transition.new(FALL, FX_CEILING)
 	if f.jump_pressed:
@@ -131,6 +163,8 @@ static func _fall(f: InputFrame, c: PlayerContext) -> Transition:
 		return Transition.new(_moving_state(c), fx)
 	if c.ceiling_hit:
 		return Transition.new(&"", FX_CEILING)
+	if _air_strike(f, c):
+		return Transition.new(&"", FX_AIR_STRIKE)
 	if f.jump_pressed:
 		if c.coyote_left > 0.0:
 			return Transition.new(JUMP, FX_GROUND_JUMP)
@@ -138,3 +172,28 @@ static func _fall(f: InputFrame, c: PlayerContext) -> Transition:
 			return Transition.new(JUMP, FX_AIR_JUMP)
 		return Transition.new(&"", FX_BUFFER)
 	return Transition.new()
+
+
+## Single-shot dig while airborne (spec 4.2.1): no state change.
+static func _air_strike(f: InputFrame, c: PlayerContext) -> bool:
+	return f.use_pressed and not f.jump_pressed and c.tool_target_kind == TARGET_VOXEL and c.tool_ok and c.tool_blocked == &""
+
+
+static func _mine(c: PlayerContext) -> Transition:
+	if not c.mine_done:
+		return Transition.new()
+	if c.exhaustion_pending:
+		return Transition.new(SLEEP)
+	if c.is_ducking:
+		return Transition.new(DUCK)
+	return Transition.new(_moving_state(c))
+
+
+static func _interact(c: PlayerContext) -> Transition:
+	if not c.interact_done:
+		return Transition.new()
+	if c.interact_handoff != &"":
+		return Transition.new(c.interact_handoff)
+	if c.exhaustion_pending:
+		return Transition.new(SLEEP)
+	return Transition.new(_moving_state(c))

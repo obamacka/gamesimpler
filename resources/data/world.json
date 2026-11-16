@@ -1,0 +1,16 @@
+{
+  "fruit_trees": [
+    {"id": "tree_apple", "fruit_item_id": "item_apple", "fruit_min": 2, "fruit_max": 4, "regrow_days": 3}
+  ],
+  "timber_trees": [
+    {"id": "timber_oak", "max_hp": 4, "loot": "loot_timber", "respawn_days": 3},
+    {"id": "log_fallen", "max_hp": 2, "loot": "loot_log", "respawn_days": 4}
+  ],
+  "zones": [
+    {"id": "zone_wilderness", "kind": "OVERWORLD", "scene_path": "res://scenes/zones/wilderness.tscn", "seed_mode": "FIXED", "persist_edits": true, "stream_db_key": "wilderness", "bounds_min": [-96, -24, -96], "bounds_max": [96, 64, 96], "treasure_table": "loot_chest_overworld"},
+    {"id": "zone_orchard", "kind": "OVERWORLD", "scene_path": "res://scenes/zones/orchard.tscn", "seed_mode": "FIXED", "persist_edits": true, "stream_db_key": "orchard", "bounds_min": [-48, -16, -48], "bounds_max": [48, 48, 48], "treasure_table": "loot_chest_overworld"},
+    {"id": "zone_deep_mine", "kind": "DEEP_MINE", "scene_path": "res://scenes/zones/deep_mine.tscn", "seed_mode": "PER_DAY", "persist_edits": false, "stream_db_key": "", "bounds_min": [-48, -40, -48], "bounds_max": [48, 8, 48], "treasure_table": "loot_chest_mine"},
+    {"id": "zone_starter_cabin", "kind": "STATIC", "scene_path": "res://scenes/zones/starter_cabin.tscn", "seed_mode": "FIXED", "persist_edits": false, "stream_db_key": "", "bounds_min": [-16, -4, -16], "bounds_max": [16, 16, 16], "treasure_table": ""}
+  ],
+  "home": {"zone_id": "zone_starter_cabin", "bed_key": "bed_01"}
+}

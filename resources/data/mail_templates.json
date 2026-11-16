@@ -1,0 +1,9 @@
+{
+  "mail_templates": [
+    {"id": "mail_tpl_care_neighbor_01", "sender_id": "npc_neighbor", "kind": "CARE_PACKAGE", "pool_id": "pool_care_exhausted", "subject_key": "MAIL_CARE_SUBJ", "body_key": "MAIL_CARE_BODY_01", "has_snack": true, "attachments": [{"type": "item", "item_id": "item_honey_bun", "qty": 1}]},
+    {"id": "mail_tpl_care_neighbor_02", "sender_id": "npc_neighbor", "kind": "CARE_PACKAGE", "pool_id": "pool_care_exhausted", "subject_key": "MAIL_CARE_SUBJ", "body_key": "MAIL_CARE_BODY_02", "has_snack": true, "attachments": [{"type": "item", "item_id": "item_berry_tart", "qty": 1}]},
+    {"id": "mail_tpl_care_repeat_01", "sender_id": "npc_neighbor", "kind": "CARE_PACKAGE", "pool_id": "pool_care_exhausted_repeat", "subject_key": "MAIL_CARE_SUBJ", "body_key": "MAIL_CARE_REPEAT_01", "has_snack": false, "attachments": []},
+    {"id": "mail_tpl_care_repeat_02", "sender_id": "npc_neighbor", "kind": "CARE_PACKAGE", "pool_id": "pool_care_exhausted_repeat", "subject_key": "MAIL_CARE_SUBJ", "body_key": "MAIL_CARE_REPEAT_02", "has_snack": false, "attachments": []},
+    {"id": "mail_tpl_care_late_01", "sender_id": "npc_neighbor", "kind": "CARE_PACKAGE", "pool_id": "pool_care_late_night", "subject_key": "MAIL_LATE_SUBJ", "body_key": "MAIL_LATE_BODY_01", "has_snack": false, "attachments": []}
+  ]
+}

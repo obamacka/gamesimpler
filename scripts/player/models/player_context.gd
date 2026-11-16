@@ -18,3 +18,11 @@ var air_jumps_left := 1
 var auto_jump_ready := false   # LedgeModel decided an auto-jump should fire this tick
 var fall_height := 0.0
 var exhaustion_pending := false
+# Phase 2: tools, interaction, mining (spec 4.2, 4.3, 4.5)
+var tool_target_kind: StringName = &""   # &"voxel", &"timber", &"fruit_tree" or empty
+var tool_ok := false                     # owned tool, tier high enough
+var tool_blocked: StringName = &""       # TerrainRules reason when the aimed voxel cannot be dug
+var has_interact_target := false
+var mine_done := false
+var interact_done := false
+var interact_handoff: StringName = &""

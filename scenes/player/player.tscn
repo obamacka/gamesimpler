@@ -10,6 +10,10 @@
 [ext_resource type="Script" path="res://scripts/player/states/duck_state.gd" id="8_duck"]
 [ext_resource type="Script" path="res://scripts/player/states/jump_state.gd" id="9_jump"]
 [ext_resource type="Script" path="res://scripts/player/states/fall_state.gd" id="10_fall"]
+[ext_resource type="Script" path="res://scripts/player/states/mine_state.gd" id="11_mine"]
+[ext_resource type="Script" path="res://scripts/player/states/interact_state.gd" id="12_interact"]
+[ext_resource type="Script" path="res://scripts/player/states/sleep_state.gd" id="13_sleep"]
+[ext_resource type="Script" path="res://scripts/tools/tool_auto_selector.gd" id="14_tools"]
 
 [sub_resource type="CapsuleShape3D" id="shape_standing"]
 radius = 0.35
@@ -25,6 +29,12 @@ height = 2.0
 
 [sub_resource type="BoxShape3D" id="shape_jump_clear"]
 size = Vector3(0.6, 0.3, 0.6)
+
+[sub_resource type="SphereShape3D" id="shape_tool_detector"]
+radius = 0.05
+
+[sub_resource type="SphereShape3D" id="shape_interaction_probe"]
+radius = 2.0
 
 [sub_resource type="CapsuleMesh" id="mesh_body"]
 radius = 0.35
@@ -59,6 +69,29 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.3, 0)
 shape = SubResource("shape_jump_clear")
 target_position = Vector3(0, 0, 0)
 collision_mask = 65
+
+[node name="ToolDetector" type="Area3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+collision_layer = 0
+collision_mask = 32
+monitorable = false
+
+[node name="Shape" type="CollisionShape3D" parent="ToolDetector"]
+shape = SubResource("shape_tool_detector")
+
+[node name="InteractionProbe" type="Area3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+collision_layer = 0
+collision_mask = 16
+monitorable = false
+
+[node name="Shape" type="CollisionShape3D" parent="InteractionProbe"]
+shape = SubResource("shape_interaction_probe")
+
+[node name="VoxelViewer" type="VoxelViewer" parent="."]
+
+[node name="ToolAutoSelector" type="Node" parent="."]
+script = ExtResource("14_tools")
 
 [node name="Visual" type="Node3D" parent="."]
 
@@ -130,3 +163,12 @@ script = ExtResource("9_jump")
 
 [node name="Fall" type="Node" parent="StateMachine"]
 script = ExtResource("10_fall")
+
+[node name="Mine" type="Node" parent="StateMachine"]
+script = ExtResource("11_mine")
+
+[node name="Interact" type="Node" parent="StateMachine"]
+script = ExtResource("12_interact")
+
+[node name="Sleep" type="Node" parent="StateMachine"]
+script = ExtResource("13_sleep")

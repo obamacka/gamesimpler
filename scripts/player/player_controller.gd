@@ -27,6 +27,17 @@ var _toward_ledge_time := 0.0
 var _since_manual_jump := 10.0
 var _facing_yaw := 0.0
 
+# Phase 2
+var yawn_seconds := 1.5
+var pending_sleep_reason: StringName = &"exhausted"
+var last_safe_position := Vector3.ZERO
+var stuck := StuckDetector.new()
+var _forced_sleep: StringName = &""
+var _last_alt := false
+var _focused: Interactable
+var _target: Dictionary = {}     # current tool target: {"kind": &"voxel", "cell"} or {"kind": &"zone", "node"}
+var _safe_timer := 0.0
+
 @onready var machine: StateMachine = $StateMachine
 @onready var input_reader: InputReader = $InputReader
 @onready var camera_rig: CameraRig = $CameraRig
@@ -35,6 +46,9 @@ var _facing_yaw := 0.0
 @onready var head_clearance: ShapeCast3D = $HeadClearance
 @onready var jump_clearance: ShapeCast3D = $JumpClearance
 @onready var visual: Node3D = $Visual
+@onready var tool_selector: ToolAutoSelector = $ToolAutoSelector
+@onready var tool_detector: Area3D = $ToolDetector
+@onready var interaction_probe: Area3D = $InteractionProbe
 
 
 func _ready() -> void:
@@ -48,6 +62,11 @@ func _ready() -> void:
 	EventBus.settings_changed.connect(func(_s, _k, _v): apply_settings())
 	_was_on_floor = true
 	_fall_peak_y = global_position.y
+	tool_selector.setup(self, tool_detector)
+	EventBus.player_woke.connect(_on_woke)
+	last_safe_position = global_position
+	if GameSession.current:
+		GameSession.current.player = self
 
 
 func apply_settings() -> void:
@@ -70,14 +89,18 @@ func _physics_process(delta: float) -> void:
 	_update_toggles(f)
 	camera_rig.apply_input(f, delta, _facing_yaw)
 	_build_context(f, delta)
+	_build_phase2_context(f, delta)
 
 	var t := PlayerTransitionTable.next(machine.current_id, f, context)
 	if t.stays():
 		_apply_stay_effect(t.effect)
 	elif machine.has_state(t.to):
-		machine.transition_to(t.to, {"effect": t.effect, "from": machine.current_id, "auto": context.auto_jump_ready and not f.jump_pressed})
+		if t.to == PlayerTransitionTable.MINE:
+			tool_selector.commit_now()
+		machine.transition_to(t.to, {"effect": t.effect, "from": machine.current_id, "auto": context.auto_jump_ready and not f.jump_pressed, "reason": pending_sleep_reason})
 		if t.effect == PlayerTransitionTable.FX_SOFT_LAND:
 			feedback.emit(t.effect)
+	current_state().physics_tick(delta, f)
 
 	_move(f, delta)
 	_after_move()
@@ -126,6 +149,11 @@ func _apply_stay_effect(effect: StringName) -> void:
 			feedback.emit(effect)
 		PlayerTransitionTable.FX_CEILING:
 			velocity.y = minf(velocity.y, 0.0)
+		PlayerTransitionTable.FX_AIR_STRIKE:
+			tool_selector.commit_now()
+			perform_strike()
+		PlayerTransitionTable.FX_BLOCKED, PlayerTransitionTable.FX_TIER_LOW:
+			feedback.emit(effect)
 
 
 func _move(f: InputFrame, delta: float) -> void:
@@ -168,6 +196,7 @@ func _after_move() -> void:
 	else:
 		_fall_peak_y = maxf(_fall_peak_y, global_position.y)
 	_was_on_floor = on_floor_now
+	_track_safe_ground(get_physics_process_delta_time())
 
 
 ## Called by the Jump state on a ground jump.
@@ -218,3 +247,183 @@ func _probe_ledge(dir: Vector3) -> Dictionary:
 		q.transform = Transform3D(Basis(), origin + ahead + Vector3.UP * (1.0 + config.standing_height * 0.5 + 0.05))
 		clear = space.intersect_shape(q, 1).is_empty()
 	return {"step": step, "above": above_free, "clear": clear}
+
+
+# ---------------------------------------------------------------- Phase 2 integration
+
+func session() -> GameSession:
+	return GameSession.current
+
+
+func _build_phase2_context(f: InputFrame, delta: float) -> void:
+	var c := context
+	var s := session()
+	_last_alt = f.interact_alt_pressed
+	c.tool_target_kind = &""
+	c.tool_ok = false
+	c.tool_blocked = &""
+	c.has_interact_target = false
+	c.exhaustion_pending = _forced_sleep != &""
+	if s == null:
+		return
+	c.exhaustion_pending = c.exhaustion_pending or s.stamina.exhaustion_pending
+	var feet := IVoxelWorld.cell_of(global_position + Vector3(0, -0.1, 0))
+	s.terrain.rules.player_feet_cell = feet
+	s.terrain.rules.player_cells = [feet + Vector3i.UP, feet + Vector3i(0, 2, 0), feet + Vector3i(0, 3, 0)]
+
+	tool_selector.tick(delta, current_state().locks_tool())
+	var aim := tool_selector.last_aim
+	var best := tool_selector.best()
+	_target = {}
+	if not aim.is_empty() and aim.get("blocked", &"") != &"":
+		c.tool_target_kind = PlayerTransitionTable.TARGET_VOXEL
+		c.tool_blocked = aim["blocked"]
+	elif not best.is_empty():
+		var belt := s.toolbelt.model
+		match best["target_kind"]:
+			&"voxel_soft", &"voxel_hard":
+				if aim.get("key", "") == best["key"]:
+					_target = {"kind": &"voxel", "cell": aim["cell"]}
+					c.tool_target_kind = PlayerTransitionTable.TARGET_VOXEL
+					var mat := s.terrain.material_at(aim["cell"])
+					var data := belt.tool_data(best["tool"])
+					c.tool_ok = mat != null and data != null and VoxelDigModel.tool_can_dig(mat, data) == &""
+			&"timber":
+				_target = {"kind": &"zone", "node": _zone_node(best["key"], aim)}
+				c.tool_target_kind = PlayerTransitionTable.TARGET_TIMBER
+				c.tool_ok = belt.has_tool(ToolTypes.AXE)
+			&"fruit_tree":
+				_target = {"kind": &"zone", "node": _zone_node(best["key"], aim)}
+				c.tool_target_kind = PlayerTransitionTable.TARGET_FRUIT_TREE
+				c.tool_ok = true
+	if f.interact_pressed or f.interact_alt_pressed or f.use_pressed:
+		_focused = _resolve_focus(f.use_pressed and c.tool_target_kind == PlayerTransitionTable.TARGET_FRUIT_TREE)
+		c.has_interact_target = _focused != null and _focused.spec_for(self, false, f.interact_alt_pressed) != null
+	var enclosed := _enclosed()
+	if stuck.update(delta, f.move.length() > 0.2, global_position, enclosed):
+		EventBus.stuck_hint.emit()
+
+
+func _zone_node(key: String, aim: Dictionary) -> Node:
+	if aim.get("key", "") == key and aim.has("node"):
+		return aim["node"]
+	return tool_selector._tracked.get(key)
+
+
+## Focused interactable (spec 4.5). With `prefer_tree`, the tool-targeted fruit tree wins.
+func _resolve_focus(prefer_tree: bool) -> Interactable:
+	if prefer_tree and _target.get("kind") == &"zone" and is_instance_valid(_target.get("node")):
+		var tree = _target["node"].get_parent()
+		for ch in tree.get_children():
+			if ch is Interactable:
+				return ch
+	var cands: Array = []
+	var lookup := {}
+	var fwd := Vector3(-sin(_facing_yaw), 0, -cos(_facing_yaw))
+	for a in interaction_probe.get_overlapping_areas():
+		if a is Interactable:
+			var to := a.global_position - global_position
+			var flat := Vector3(to.x, 0, to.z)
+			var dot := fwd.dot(flat.normalized()) if flat.length() > 0.01 else 1.0
+			cands.append({"key": a.key if a.key != "" else str(a.get_instance_id()), "kind": a.kind, "distance": to.length(), "facing_dot": dot, "aimed": false})
+			lookup[cands.back()["key"]] = a
+	var best := InteractionResolver.best(cands)
+	return lookup.get(best.get("key", ""))
+
+
+func focused_interactable() -> Interactable:
+	return _focused
+
+
+func last_frame_alt() -> bool:
+	return _last_alt
+
+
+func face_towards(target: Vector3) -> void:
+	var d := target - global_position
+	if Vector2(d.x, d.z).length() > 0.01:
+		_facing_yaw = atan2(-d.x, -d.z)
+		visual.rotation.y = _facing_yaw
+
+
+func equipped_tool_data() -> ToolData:
+	var s := session()
+	return s.toolbelt.model.equipped_data() if s else null
+
+
+func mine_target_valid() -> bool:
+	var s := session()
+	if s == null or _target.is_empty():
+		return false
+	if _target["kind"] == &"voxel":
+		return s.terrain.can_dig(_target["cell"]) == TerrainRules.OK
+	var n = _target.get("node")
+	return is_instance_valid(n) and n.is_active()
+
+
+## One dig or chop strike on the current target. Returns true if the target was destroyed.
+func perform_strike() -> bool:
+	var s := session()
+	if s == null or _target.is_empty() or not s.stamina.can_act():
+		return false
+	var data := equipped_tool_data()
+	if _target["kind"] == &"voxel":
+		var cell: Vector3i = _target["cell"]
+		var mat := s.terrain.material_at(cell)
+		var r := s.terrain.hit_voxel(cell, data)
+		if r["result"] == VoxelDigModel.DAMAGED or r["result"] == VoxelDigModel.DUG:
+			s.stamina.spend(mat.stamina_cost, &"dig")
+		return r["result"] == VoxelDigModel.DUG
+	var zone = _target.get("node")
+	if not is_instance_valid(zone) or zone.target_kind != &"timber" or data == null or data.tool_type != ToolTypes.AXE:
+		return false
+	var cr := s.world_state.chop(zone.key, data.power, zone.global_position)
+	if cr["result"] != &"gone":
+		s.stamina.spend(data.stamina_cost, &"chop")
+	return cr["result"] == &"felled"
+
+
+## Late night (spec 6.2): sleep once grounded.
+func request_sleep(reason: StringName) -> void:
+	pending_sleep_reason = reason
+	_forced_sleep = reason
+
+
+func _on_woke(_reason: StringName, _day: int) -> void:
+	pending_sleep_reason = &"exhausted"
+	_forced_sleep = &""
+	context.mine_done = false
+	context.interact_done = false
+	duck_toggle.reset()
+	run_toggle.reset()
+	velocity = Vector3.ZERO
+	if machine.current_id != &"idle":
+		machine.transition_to(&"idle", {})
+	input_reader.arm_resume_guard(Engine.get_physics_frames())
+	last_safe_position = global_position
+
+
+func return_to_safe_ground() -> void:
+	var s := session()
+	if s:
+		s.sleep.return_to_safe(self, last_safe_position)
+
+
+func _track_safe_ground(delta: float) -> void:
+	_safe_timer += delta
+	if _safe_timer < 0.5:
+		return
+	_safe_timer = 0.0
+	if is_on_floor() and not is_ducking and not _probe_collides(head_clearance):
+		last_safe_position = global_position
+
+
+func _enclosed() -> bool:
+	var space := get_world_3d().direct_space_state
+	var origin := global_position + Vector3.UP * 1.0
+	var ex: Array[RID] = [get_rid()]
+	for d in [Vector3.LEFT, Vector3.RIGHT, Vector3.FORWARD, Vector3.BACK]:
+		var q := PhysicsRayQueryParameters3D.create(origin, origin + d * 0.7, MASK_SOLID, ex)
+		if space.intersect_ray(q).is_empty():
+			return false
+	return _probe_collides(jump_clearance)

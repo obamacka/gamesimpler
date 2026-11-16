@@ -1,0 +1,16 @@
+{
+  "materials": [
+    {"id": "mat_grass", "voxel_id": 1, "hardness_tier": 1, "hits": 2, "preferred_tool": "SHOVEL", "drop": "loot_dirt", "placeable": false, "stamina_cost": 1, "color": "#5cae4c"},
+    {"id": "mat_dirt", "voxel_id": 2, "hardness_tier": 1, "hits": 2, "preferred_tool": "SHOVEL", "drop": "loot_dirt", "placeable": true, "stamina_cost": 1, "color": "#7b5534"},
+    {"id": "mat_sand", "voxel_id": 3, "hardness_tier": 1, "hits": 1, "preferred_tool": "SHOVEL", "drop": "loot_sand", "placeable": true, "stamina_cost": 1, "color": "#e0cf8e"},
+    {"id": "mat_clay", "voxel_id": 4, "hardness_tier": 1, "hits": 2, "preferred_tool": "SHOVEL", "drop": "loot_clay", "placeable": true, "stamina_cost": 1, "color": "#b57a62"},
+    {"id": "mat_stone", "voxel_id": 5, "hardness_tier": 1, "hits": 3, "preferred_tool": "PICKAXE", "drop": "loot_stone", "placeable": true, "stamina_cost": 2, "color": "#8a8a90"},
+    {"id": "mat_stone_hard", "voxel_id": 6, "hardness_tier": 3, "hits": 4, "preferred_tool": "PICKAXE", "drop": "loot_stone", "placeable": false, "stamina_cost": 2, "color": "#5d5d66"},
+    {"id": "mat_copper_ore", "voxel_id": 7, "hardness_tier": 1, "hits": 3, "preferred_tool": "PICKAXE", "drop": "loot_copper", "placeable": false, "stamina_cost": 2, "color": "#c47a3e"},
+    {"id": "mat_iron_ore", "voxel_id": 8, "hardness_tier": 2, "hits": 4, "preferred_tool": "PICKAXE", "drop": "loot_iron", "placeable": false, "stamina_cost": 2, "color": "#b9a089"},
+    {"id": "mat_quartz_ore", "voxel_id": 9, "hardness_tier": 2, "hits": 4, "preferred_tool": "PICKAXE", "drop": "loot_quartz", "placeable": false, "stamina_cost": 2, "color": "#e8e4f0"},
+    {"id": "mat_geode_rock", "voxel_id": 10, "hardness_tier": 2, "hits": 4, "preferred_tool": "PICKAXE", "drop": "loot_geode_rock", "special": "GEODE", "placeable": false, "stamina_cost": 2, "color": "#6b5a8a"},
+    {"id": "mat_chest_block", "voxel_id": 11, "hardness_tier": 1, "hits": 1, "preferred_tool": "PICKAXE", "drop": "", "special": "CHEST", "placeable": false, "stamina_cost": 1, "color": "#a0702a"},
+    {"id": "mat_bedrock", "voxel_id": 12, "hardness_tier": 99, "hits": 999, "preferred_tool": "PICKAXE", "drop": "", "special": "BEDROCK", "placeable": false, "stamina_cost": 0, "color": "#222228"}
+  ]
+}

@@ -1,0 +1,25 @@
+{
+  "items": [
+    {"id": "item_dirt", "category": "BLOCK", "max_stack": 99, "base_value": 1, "block_material": "mat_dirt"},
+    {"id": "item_sand", "category": "BLOCK", "max_stack": 99, "base_value": 1, "block_material": "mat_sand"},
+    {"id": "item_clay", "category": "BLOCK", "max_stack": 99, "base_value": 2, "block_material": "mat_clay"},
+    {"id": "item_stone", "category": "BLOCK", "max_stack": 99, "base_value": 1, "block_material": "mat_stone"},
+    {"id": "item_copper_ore", "category": "RESOURCE", "max_stack": 99, "base_value": 8, "tags": ["ore"]},
+    {"id": "item_iron_ore", "category": "RESOURCE", "max_stack": 99, "base_value": 14, "tags": ["ore"]},
+    {"id": "item_quartz", "category": "MINERAL", "max_stack": 99, "base_value": 20},
+    {"id": "item_amethyst", "category": "MINERAL", "max_stack": 99, "base_value": 35},
+    {"id": "item_geode", "category": "GEODE", "max_stack": 99, "base_value": 10},
+    {"id": "item_wood", "category": "RESOURCE", "max_stack": 99, "base_value": 3},
+    {"id": "item_apple", "category": "PRODUCE", "max_stack": 99, "base_value": 6, "tags": ["fruit"], "food": {"stamina_restore": 10, "pet_happiness": 0}},
+    {"id": "item_honey_bun", "category": "FOOD", "max_stack": 20, "base_value": 15, "tags": ["snack"], "food": {"stamina_restore": 30, "pet_happiness": 0}},
+    {"id": "item_berry_tart", "category": "FOOD", "max_stack": 20, "base_value": 15, "tags": ["snack"], "food": {"stamina_restore": 30, "pet_happiness": 0}},
+    {"id": "item_shovel_basic", "category": "TOOL", "max_stack": 1, "base_value": 0, "sellable": false, "tool": {"tool_type": "SHOVEL", "tier": 1, "power": 1, "strike_interval_sec": 0.45, "stamina_cost": 0}},
+    {"id": "item_pickaxe_basic", "category": "TOOL", "max_stack": 1, "base_value": 0, "sellable": false, "tool": {"tool_type": "PICKAXE", "tier": 1, "power": 1, "strike_interval_sec": 0.5, "stamina_cost": 0}},
+    {"id": "item_pickaxe_copper", "category": "TOOL", "max_stack": 1, "base_value": 120, "sellable": false, "tool": {"tool_type": "PICKAXE", "tier": 2, "power": 1, "strike_interval_sec": 0.45, "stamina_cost": 0}},
+    {"id": "item_pickaxe_iron", "category": "TOOL", "max_stack": 1, "base_value": 300, "sellable": false, "tool": {"tool_type": "PICKAXE", "tier": 3, "power": 1, "strike_interval_sec": 0.4, "stamina_cost": 0}},
+    {"id": "item_axe_basic", "category": "TOOL", "max_stack": 1, "base_value": 0, "sellable": false, "tool": {"tool_type": "AXE", "tier": 1, "power": 1, "strike_interval_sec": 0.55, "stamina_cost": 2}},
+    {"id": "item_picker_basic", "category": "TOOL", "max_stack": 1, "base_value": 0, "sellable": false, "tool": {"tool_type": "FRUIT_PICKER", "tier": 1, "power": 1, "strike_interval_sec": 0.5, "stamina_cost": 0}},
+    {"id": "item_hammer_basic", "category": "TOOL", "max_stack": 1, "base_value": 0, "sellable": false, "tool": {"tool_type": "HAMMER", "tier": 1, "power": 1, "strike_interval_sec": 0.35, "stamina_cost": 1}},
+    {"id": "item_screwdriver_basic", "category": "TOOL", "max_stack": 1, "base_value": 0, "sellable": false, "tool": {"tool_type": "SCREWDRIVER", "tier": 1, "power": 1, "strike_interval_sec": 0.8, "stamina_cost": 1}}
+  ]
+}

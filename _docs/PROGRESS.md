@@ -4,7 +4,7 @@
 |---|---|
 | Spec | `_docs/specs/spec1.md` rev 3.10 |
 | Plan | `_docs/plans/plan1.md` |
-| Active phase | Phase A (art pass), PA1 KayKit in progress. All six phases have their automated work done (Phases 3 to 6 started on owner request before earlier gates passed); manual checklists for Phases 1 to 6, Phase 0 hardware checks and the release-candidate checklist pending |
+| Active phase | Phase A (art pass): PA1 KayKit done, PA2 to PA4 next. All six phases have their automated work done (Phases 3 to 6 started on owner request before earlier gates passed); manual checklists for Phases 1 to 6, Phase 0 hardware checks and the release-candidate checklist pending |
 | Last updated | 2026-11-19 |
 
 ## How to update
@@ -125,12 +125,12 @@ Status values: `Not started`, `In progress`, `Blocked`, `Done`.
 ### Phase A (art pass)
 | Task | Status | Date | Commit | Notes |
 |---|---|---|---|---|
-| PA1.1 Vendor KayKit packs | In progress | | | |
-| PA1.2 ModelFit and model support | Not started | | | |
-| PA1.3 Textured paint shader | Not started | | | |
-| PA1.4 Furniture mapping and new pieces | Not started | | | |
-| PA1.5 Item and station models | Not started | | | |
-| PA1.6 Tests | Not started | | | |
+| PA1.1 Vendor KayKit packs | Done | 2026-11-19 | 44e8742 | Furniture Bits 53 and Restaurant Bits 144 glTF models, pack textures, LICENSE.txt, SOURCE.md (commit SHAs), CREDITS.md; glTF references checked (own .bin and pack PNG only) |
+| PA1.2 ModelFit and model support | Done | 2026-11-19 | 44e8742 | `ModelFit`, `ItemVisual`; `model` on pieces, `world_model` on items, `model` on MenuStation; Database checks paths, quarter-turn yaw, PRIMARY-only paint, item models |
+| PA1.3 Textured paint shader | Done | 2026-11-19 | 44e8742 | texture shading kept under dye (`mix(tex, dye * (0.55 + 0.9 luma), painted)`); unpainted = white alpha 0; loose pieces lightened |
+| PA1.4 Furniture mapping and new pieces | Done | 2026-11-19 | 44e8742 | 7 existing pieces mapped, seat parts and seats moved to the art (seat = 0.5 model units x scale); 7 new pieces with items and builder-shop stock; radio, pet bed, feed bowl and structure pieces stay placeholders |
+| PA1.5 Item and station models | Done | 2026-11-19 | 44e8742 | carrot and tomato props; 3 shop counters, workbench and tailor bench in Home Meadow (colliders resized to the models) |
+| PA1.6 Tests | Done | 2026-11-19 | 44e8742 | unit art 9 (fit, turn, orientation with a mutation check, seat heights, glTF refs, validation, item visual), integration art 5; full suite 563 cases exit 0; visual check by Xvfb renders |
 | PA2 to PA4 Quaternius, Kenney | Not started | | | |
 
 ## Test run log
@@ -154,6 +154,7 @@ Status values: `Not started`, `In progress`, `Blocked`, `Done`.
 | 2026-11-16 | 8566596 | 4 | `ci/run_tests.sh` | 0 | 0 | 430 cases (Phases 0 to 4) |
 | 2026-11-16 | 56d4cef | 5 | `ci/run_tests.sh` | 0 | 0 | 489 cases (Phases 0 to 5) |
 | 2026-11-16 | 803e74c | 6 | `ci/run_tests.sh` | 0 | 0 | 549 cases (Phases 0 to 6) |
+| 2026-11-19 | 44e8742 | A | `ci/run_tests.sh` | 0 | 0 | 563 cases (Phases 0 to 6, PA1) |
 
 ## Decisions
 | ID | Status | Value |
@@ -167,6 +168,7 @@ Status values: `Not started`, `In progress`, `Blocked`, `Done`.
 ## Blockers and open issues
 | Date | Item | Owner | Status |
 |---|---|---|---|
+| 2026-11-19 | PA1 for owner review: KayKit uses a 2-unit tile, so 1-cell fits run 0.44 (stove, fridge) to 0.95 (wide cabinet) while seating is about 0.6 to 0.8; the fridge is barely taller than a chair next to the 2.1 m player capsule. Options: 2-cell kitchen pieces, one world scale with a smaller player when Quaternius characters land (PA2), or accept. Shop counters face their drawers to the shopkeeper side (yaw 0) | owner review | Open |
 | 2026-11-16 | Phase 1 manual gamepad checklist (plan Phase 1) | team | Open |
 | 2026-11-16 | Phase 2 manual checklist and min-spec performance check | team | Open |
 | 2026-11-16 | Phase 2 choices for owner review: JSON content authoring (spec 3 conventions updated); care-letter snack rule compares against the collapse day (spec 6.2 corrected, the old rule could never trigger); `player_woke` emitted just before the transition pause is released (spec 6.2 diagram updated to match Suite B); Bed and Mine Entrance act without the confirm dialog until Phase 3 adds menus; SafeGround uses the standing-capsule clearance as the "3 free voxels" check; prompt occlusion implemented in 5ac70f4 | owner review | Open |

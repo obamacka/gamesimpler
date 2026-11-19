@@ -432,12 +432,12 @@ Integration:
 **Spec:** 11.
 
 ### PA1 KayKit packs
-- [ ] **PA1.1** Vendor KayKit Furniture Bits and Restaurant Bits (glTF only) under `res://assets/third_party/kaykit/` with `LICENSE.txt`, `SOURCE.md`; `CREDITS.md`; committed `.import` files.
-- [ ] **PA1.2** `ModelFit` (yaw, uniform fit into the parts box, floor and centre) and model support in `BuildPieceDef`, `PieceView`, `Database` validation (model path exists).
-- [ ] **PA1.3** Piece shader samples the model texture; painting keeps shading (spec 11.3); pieces with models paint PRIMARY only.
-- [ ] **PA1.4** Map existing furniture (chair, sofa, table, bed, lamp, shelf, chest) to models; add pieces from the packs (armchair, double bed, cabinet, bookshelf, cactus plant, kitchen counter, stove, fridge) with items and shop stock.
-- [ ] **PA1.5** `ItemDef.world_model` for produce props (carrot, tomato) used by pickups, display cases and ripe crops; `MenuStation.model` for shop counters and benches.
-- [ ] **PA1.6** Tests: every model loads and fits its box; furniture backs face -z after `yaw_deg` (geometry heuristic); PieceView hides placeholder meshes but keeps collision; paint reaches model meshes; item visuals use models; full suite green.
+- [x] **PA1.1** Vendor KayKit Furniture Bits and Restaurant Bits (glTF only) under `res://assets/third_party/kaykit/` with `LICENSE.txt`, `SOURCE.md`; `CREDITS.md`; committed `.import` files.
+- [x] **PA1.2** `ModelFit` (yaw, uniform fit into the parts box, floor and centre) and model support in `BuildPieceDef`, `PieceView`, `Database` validation (model path exists).
+- [x] **PA1.3** Piece shader samples the model texture; painting keeps shading (spec 11.3); pieces with models paint PRIMARY only.
+- [x] **PA1.4** Map existing furniture (chair, sofa, table, bed, lamp, shelf, chest) to models; add pieces from the packs (armchair, double bed, cabinet, bookshelf, cactus plant, kitchen counter, stove, fridge) with items and shop stock.
+- [x] **PA1.5** `ItemDef.world_model` for produce props (carrot, tomato) used by pickups, display cases and ripe crops; `MenuStation.model` for shop counters and benches.
+- [x] **PA1.6** Tests: every model loads and fits its box; furniture backs face -z after `yaw_deg` (geometry heuristic); PieceView hides placeholder meshes but keeps collision; paint reaches model meshes; item visuals use models; full suite green.
 
 ### PA2 to PA4 (next)
 - [ ] **PA2** Quaternius base characters, modular outfits and animation library for the player and NPCs (outfit slots and hidden body regions).

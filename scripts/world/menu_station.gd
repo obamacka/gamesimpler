@@ -12,10 +12,22 @@ const MENUS := {&"DONATE": &"donation", &"SHOP": &"shop", &"JOB_BOARD": &"job_bo
 @export var plot_id: StringName = &""
 @export var color := Color(0.6, 0.45, 0.3)
 @export var size := Vector3(1.6, 1.1, 0.8)
+## Optional art model (spec 11.3) fitted into `size`; the box collider stays.
+@export_file("*.gltf", "*.glb", "*.tscn") var model := ""
+@export var model_yaw_deg := 0
+
+var visual: Node3D
 
 
 func _ready() -> void:
-	add_child(box_mesh(size, color, Vector3(0, size.y * 0.5, 0)))
+	visual = ModelFit.instantiate(model)
+	if visual:
+		visual.name = "Model"
+		add_child(visual)
+		ModelFit.fit(visual, AABB(Vector3(-size.x * 0.5, 0, -size.z * 0.5), size), model_yaw_deg)
+	else:
+		visual = box_mesh(size, color, Vector3(0, size.y * 0.5, 0))
+		add_child(visual)
 	add_static_box(self, size, Vector3(0, size.y * 0.5, 0))
 	make_interactable(String(name), kind, 1.6)
 

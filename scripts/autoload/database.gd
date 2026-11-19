@@ -378,6 +378,7 @@ func _item(d: Dictionary) -> ItemDef:
 	it.seed_crop = StringName(d.get("seed_crop", ""))
 	it.piece_id = StringName(d.get("piece_id", ""))
 	it.outfit_id = StringName(d.get("outfit_id", ""))
+	it.world_model = String(d.get("world_model", ""))
 	if d.has("collection"):
 		var c := CollectionEntryDef.new()
 		var cd: Dictionary = d["collection"]
@@ -580,6 +581,18 @@ func _validate_phase6() -> Array[String]:
 		for r in p.paint_regions:
 			if not ("instance uniform vec4 %s" % r["shader_param"]) in shader:
 				errors.append("piece %s paints %s, not an instance uniform of piece.gdshader" % [id, r["shader_param"]])
+		if p.has_model():
+			if not ResourceLoader.exists(p.model_scene):
+				errors.append("piece %s model %s does not exist" % [id, p.model_scene])
+			if not p.model_yaw_deg in [0, 90, 180, 270]:
+				errors.append("piece %s model yaw %d is not a quarter turn" % [id, p.model_yaw_deg])
+			if p.paint_regions.any(func(r): return r["region_id"] != &"PRIMARY"):
+				errors.append("piece %s has a model, so it paints PRIMARY only" % id)
+			if not p.fit_box().has_volume():
+				errors.append("piece %s has a model but no fit box" % id)
+	for id in items:
+		if not items[id].world_model.is_empty() and not ResourceLoader.exists(items[id].world_model):
+			errors.append("item %s world model %s does not exist" % [id, items[id].world_model])
 	for d in default_stickers:
 		if not stickers.has(d):
 			errors.append("default sticker %s unknown" % d)
@@ -678,6 +691,13 @@ func _piece(d: Dictionary) -> BuildPieceDef:
 	p.paint_regions = (d.get("paint_regions", []) as Array).map(func(r): return {"region_id": StringName(r["region_id"]),
 		"shader_param": StringName(r["shader_param"]), "default_dye_id": StringName(r.get("default_dye_id", ""))})
 	p.stampable = bool(d.get("stampable", false))
+	if d.has("model"):
+		var md: Dictionary = d["model"]
+		p.model_scene = String(md.get("scene", ""))
+		p.model_yaw_deg = int(md.get("yaw_deg", 0))
+		if md.has("box"):
+			var size := _v3(md["box"]["size"])
+			p.model_box = AABB(_v3(md["box"]["center"]) - size * 0.5, size)
 	for i in p.parts.size():
 		p.parts[i]["region"] = StringName((d.get("parts", [])[i] as Dictionary).get("region", ""))
 	return p

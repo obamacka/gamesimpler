@@ -26,6 +26,11 @@ static func regions(def: BuildPieceDef) -> Array:
 	return def.paint_regions.map(func(r): return r["region_id"])
 
 
+## Dye colour of a region; unpainted is white with alpha 0, so textured models keep their
+## texture (spec 11.3) while placeholder boxes multiply by white.
+const UNPAINTED := Color(1, 1, 1, 0)
+
+
 static func color_of(inst: Dictionary, region_id: StringName) -> Color:
 	var dye: DyeDef = Database.dyes.get(StringName(inst.get("paint", {}).get(String(region_id), "")))
-	return dye.color if dye else Color.WHITE
+	return dye.color if dye else UNPAINTED

@@ -52,7 +52,8 @@ func refresh() -> void:
 			slots[i].remove_child(c)   # free the "Display" name before the new one is added
 			c.queue_free()
 		if unlocked() and s and s.museum.model.is_donated(entries[i]):
-			var m := box_mesh(Vector3(0.3, 0.3, 0.3), MenuBase.item_color(entries[i]))
+			var m := ItemVisual.make(entries[i], 0.3, MenuBase.item_color(entries[i]))
+			m.position.y -= 0.15   # slot markers sit at the visual's centre
 			m.name = "Display"
 			slots[i].add_child(m)
 

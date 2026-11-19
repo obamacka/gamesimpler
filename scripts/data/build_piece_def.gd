@@ -36,6 +36,11 @@ const SCREWS := &"SCREWS"
 ## [{"region_id": PRIMARY|SECONDARY|TRIM, "shader_param": StringName, "default_dye_id"}] (max 3)
 @export var paint_regions: Array = []
 @export var stampable := false
+## Art model (spec 11.3): glTF scene, turn in degrees, and an optional fit box (size 0 = the
+## box spanned by `parts`). Parts stay authoritative for collision.
+@export var model_scene := ""
+@export var model_yaw_deg := 0
+@export var model_box := AABB()
 
 
 func region_param(region_id: StringName) -> StringName:
@@ -43,6 +48,24 @@ func region_param(region_id: StringName) -> StringName:
 		if r["region_id"] == region_id:
 			return r["shader_param"]
 	return &""
+
+
+func has_model() -> bool:
+	return not model_scene.is_empty()
+
+
+## Box spanned by the parts, in the anchor cell's unrotated local frame.
+func parts_box() -> AABB:
+	var out := AABB()
+	for i in parts.size():
+		var p: Dictionary = parts[i]
+		var b := AABB(p["center"] - p["size"] * 0.5, p["size"])
+		out = b if i == 0 else out.merge(b)
+	return out
+
+
+func fit_box() -> AABB:
+	return model_box if model_box.has_volume() else parts_box()
 
 
 func is_furniture() -> bool:

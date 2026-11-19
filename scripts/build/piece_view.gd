@@ -1,5 +1,7 @@
-## Placeholder piece visual and collision (plan P3.1): boxes from BuildPieceDef.parts on the
-## build_pieces layer, a loose-piece ToolTargetZone (P3.9) and furniture interactables (P3.12).
+## Piece visual and collision (plan P3.1): boxes from BuildPieceDef.parts on the build_pieces
+## layer, a loose-piece ToolTargetZone (P3.9) and furniture interactables (P3.12). Pieces with
+## a model (spec 11.3) show it fitted to the parts box instead of the placeholder boxes; the
+## parts still give the collision.
 class_name PieceView
 extends Node3D
 
@@ -10,7 +12,8 @@ const REGION_INDEX := {&"PRIMARY": 1, &"SECONDARY": 2, &"TRIM": 3}
 var uid := ""
 var def: BuildPieceDef
 var state: StringName = &"LOOSE"
-var meshes: Array[MeshInstance3D] = []
+var meshes: Array[MeshInstance3D] = []   # every visible mesh that takes paint
+var model: Node3D                         # fitted art model, or null for placeholder boxes
 var decals: Array[Decal] = []
 var seats: Array[Vector3] = []     # world seat positions
 var exits: Array[Vector3] = []
@@ -30,8 +33,19 @@ func setup(inst: Dictionary) -> void:
 	body.collision_mask = 0
 	body.set_meta(&"uid", uid)
 	add_child(body)
+	if def.has_model():
+		_build_model()
 	for p in def.parts:
 		var center: Vector3 = p["center"] - Vector3(0.5, 0, 0.5)
+		if p["solid"]:
+			var cs := CollisionShape3D.new()
+			var box := BoxShape3D.new()
+			box.size = p["size"]
+			cs.shape = box
+			cs.position = center
+			body.add_child(cs)
+		if model:
+			continue
 		var mi := MeshInstance3D.new()
 		var bm := BoxMesh.new()
 		bm.size = p["size"]
@@ -44,13 +58,6 @@ func setup(inst: Dictionary) -> void:
 		mi.material_override = mat
 		add_child(mi)
 		meshes.append(mi)
-		if p["solid"]:
-			var cs := CollisionShape3D.new()
-			var box := BoxShape3D.new()
-			box.size = p["size"]
-			cs.shape = box
-			cs.position = center
-			body.add_child(cs)
 	apply_decor(inst)
 	if state == &"LOOSE" and def.needs_fastening():
 		var z := ToolTargetZone.new()
@@ -72,6 +79,42 @@ func setup(inst: Dictionary) -> void:
 		i.radius = 1.2
 		i.position = Vector3(0, 0.8, 0)
 		add_child(i)
+
+
+static var _materials := {}   # [texture, region, lighten] -> ShaderMaterial, shared by all views
+
+
+func _build_model() -> void:
+	model = ModelFit.instantiate(def.model_scene)
+	if model == null:
+		return
+	model.name = "Model"
+	add_child(model)
+	var box := def.fit_box()
+	box.position -= Vector3(0.5, 0, 0.5)
+	ModelFit.fit(model, box, def.model_yaw_deg)
+	var region := REGION_INDEX[&"PRIMARY"] if def.region_param(&"PRIMARY") != &"" else 0
+	var lighten := 0.0 if state == &"FASTENED" else 0.45
+	for mi in ModelFit.mesh_instances(model):
+		mi.material_override = model_material(mi.get_active_material(0), region, lighten)
+		meshes.append(mi)
+
+
+## Piece shader material for an imported surface: samples its albedo texture (spec 11.3).
+static func model_material(src: Material, region: int, lighten: float) -> ShaderMaterial:
+	var tex: Texture2D = (src as BaseMaterial3D).albedo_texture if src is BaseMaterial3D else null
+	var key := [tex.get_rid() if tex else RID(), region, lighten, (src as BaseMaterial3D).albedo_color if src is BaseMaterial3D else Color.WHITE]
+	if _materials.has(key):
+		return _materials[key]
+	var mat := ShaderMaterial.new()
+	mat.shader = SHADER
+	mat.set_shader_parameter(&"use_texture", tex != null)
+	mat.set_shader_parameter(&"albedo_tex", tex)
+	mat.set_shader_parameter(&"base_color", key[3])
+	mat.set_shader_parameter(&"region", region)
+	mat.set_shader_parameter(&"lighten", lighten)
+	_materials[key] = mat
+	return mat
 
 
 ## Paint (spec 7.2): one instance shader parameter per region on every part; no material

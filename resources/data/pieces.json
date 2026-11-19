@@ -1050,12 +1050,12 @@
     {
      "size": [
       1,
-      1.6,
+      0.7,
       0.35
      ],
      "center": [
       0.5,
-      0.8,
+      1.25,
       0.33
      ],
      "solid": true,
@@ -1072,7 +1072,23 @@
      "default_dye_id": ""
     }
    ],
-   "stampable": false
+   "stampable": false,
+   "model": {
+    "scene": "res://assets/third_party/kaykit/furniture_bits/shelf_B_large_decorated.gltf",
+    "yaw_deg": 0,
+    "box": {
+     "size": [
+      1,
+      0.7,
+      0.35
+     ],
+     "center": [
+      0.5,
+      1.25,
+      0.33
+     ]
+    }
+   }
   },
   {
    "id": "piece_chair",
@@ -1097,12 +1113,12 @@
     {
      "size": [
       0.6,
-      0.45,
+      0.38,
       0.6
      ],
      "center": [
       0.5,
-      0.225,
+      0.19,
       0.55
      ],
      "solid": true,
@@ -1116,11 +1132,11 @@
      ],
      "center": [
       0.5,
-      0.75,
+      0.68,
       0.25
      ],
      "solid": true,
-     "region": "SECONDARY"
+     "region": "PRIMARY"
     }
    ],
    "interactions": [
@@ -1129,7 +1145,7 @@
      "seats": [
       [
        0.5,
-       0.45,
+       0.38,
        0.55
       ]
      ],
@@ -1154,14 +1170,13 @@
      "region_id": "PRIMARY",
      "shader_param": "primary_color",
      "default_dye_id": ""
-    },
-    {
-     "region_id": "SECONDARY",
-     "shader_param": "secondary_color",
-     "default_dye_id": ""
     }
    ],
-   "stampable": false
+   "stampable": false,
+   "model": {
+    "scene": "res://assets/third_party/kaykit/furniture_bits/chair_A.gltf",
+    "yaw_deg": 0
+   }
   },
   {
    "id": "piece_sofa",
@@ -1191,13 +1206,13 @@
     {
      "size": [
       2,
-      0.45,
+      0.31,
       0.8
      ],
      "center": [
       1.0,
-      0.225,
-      0.5
+      0.155,
+      0.55
      ],
      "solid": true,
      "region": "PRIMARY"
@@ -1205,16 +1220,16 @@
     {
      "size": [
       2,
-      0.5,
+      0.45,
       0.2
      ],
      "center": [
       1.0,
-      0.7,
-      0.2
+      0.535,
+      0.15
      ],
      "solid": true,
-     "region": "SECONDARY"
+     "region": "PRIMARY"
     }
    ],
    "interactions": [
@@ -1223,12 +1238,12 @@
      "seats": [
       [
        0.5,
-       0.45,
+       0.31,
        0.55
       ],
       [
        1.5,
-       0.45,
+       0.31,
        0.55
       ]
      ],
@@ -1258,14 +1273,25 @@
      "region_id": "PRIMARY",
      "shader_param": "primary_color",
      "default_dye_id": ""
-    },
-    {
-     "region_id": "SECONDARY",
-     "shader_param": "secondary_color",
-     "default_dye_id": ""
     }
    ],
-   "stampable": false
+   "stampable": false,
+   "model": {
+    "scene": "res://assets/third_party/kaykit/furniture_bits/couch.gltf",
+    "yaw_deg": 0,
+    "box": {
+     "size": [
+      1.95,
+      1.0,
+      1.0
+     ],
+     "center": [
+      1.0,
+      0.5,
+      0.5
+     ]
+    }
+   }
   },
   {
    "id": "piece_table",
@@ -1330,7 +1356,11 @@
      "default_dye_id": ""
     }
    ],
-   "stampable": true
+   "stampable": true,
+   "model": {
+    "scene": "res://assets/third_party/kaykit/furniture_bits/table_small.gltf",
+    "yaw_deg": 0
+   }
   },
   {
    "id": "piece_bed",
@@ -1360,12 +1390,12 @@
     {
      "size": [
       1,
-      0.5,
-      2
+      0.32,
+      1.9
      ],
      "center": [
       0.5,
-      0.25,
+      0.16,
       1.0
      ],
      "solid": true,
@@ -1388,14 +1418,25 @@
      "region_id": "PRIMARY",
      "shader_param": "primary_color",
      "default_dye_id": ""
-    },
-    {
-     "region_id": "SECONDARY",
-     "shader_param": "secondary_color",
-     "default_dye_id": ""
     }
    ],
-   "stampable": false
+   "stampable": false,
+   "model": {
+    "scene": "res://assets/third_party/kaykit/furniture_bits/bed_single_A.gltf",
+    "yaw_deg": 0,
+    "box": {
+     "size": [
+      1,
+      0.75,
+      2
+     ],
+     "center": [
+      0.5,
+      0.375,
+      1.0
+     ]
+    }
+   }
   },
   {
    "id": "piece_lamp",
@@ -1445,7 +1486,23 @@
    "opening": [],
    "item_id": "item_piece_lamp",
    "paint_regions": [],
-   "stampable": false
+   "stampable": false,
+   "model": {
+    "scene": "res://assets/third_party/kaykit/furniture_bits/lamp_standing.gltf",
+    "yaw_deg": 0,
+    "box": {
+     "size": [
+      0.6,
+      1.5,
+      0.6
+     ],
+     "center": [
+      0.5,
+      0.75,
+      0.5
+     ]
+    }
+   }
   },
   {
    "id": "piece_radio",
@@ -1519,13 +1576,13 @@
    "parts": [
     {
      "size": [
-      0.9,
-      0.6,
-      0.6
+      0.8,
+      0.8,
+      0.8
      ],
      "center": [
       0.5,
-      0.3,
+      0.4,
       0.5
      ],
      "solid": true,
@@ -1551,7 +1608,11 @@
      "default_dye_id": ""
     }
    ],
-   "stampable": true
+   "stampable": true,
+   "model": {
+    "scene": "res://assets/third_party/kaykit/furniture_bits/cabinet_small.gltf",
+    "yaw_deg": 0
+   }
   },
   {
    "id": "piece_pet_bed",
@@ -1651,6 +1712,517 @@
    "opening": [],
    "paint_regions": [],
    "stampable": false
+  },
+  {
+   "id": "piece_armchair",
+   "layer": "BODY",
+   "grid": "FURNITURE_0_5M",
+   "footprint": [
+    [
+     0,
+     0,
+     0
+    ]
+   ],
+   "fastener": "NONE",
+   "requires_support": true,
+   "accepts": [
+    "wall_face",
+    "floor_top",
+    "ground"
+   ],
+   "color": "#5a7aa8",
+   "parts": [
+    {
+     "size": [
+      0.9,
+      0.28,
+      0.8
+     ],
+     "center": [
+      0.5,
+      0.14,
+      0.55
+     ],
+     "solid": true,
+     "region": "PRIMARY"
+    },
+    {
+     "size": [
+      0.9,
+      0.4,
+      0.2
+     ],
+     "center": [
+      0.5,
+      0.48,
+      0.15
+     ],
+     "solid": true,
+     "region": "PRIMARY"
+    }
+   ],
+   "interactions": [
+    {
+     "kind": "SIT",
+     "seats": [
+      [
+       0.5,
+       0.28,
+       0.55
+      ]
+     ],
+     "exits": [
+      [
+       0.5,
+       0,
+       1.5
+      ]
+     ],
+     "stamina_regen_per_sec": 0.6
+    }
+   ],
+   "hits_per_socket": 0,
+   "fastener_sockets": [],
+   "provides_support": false,
+   "snap_sockets": [],
+   "opening": [],
+   "item_id": "item_piece_armchair",
+   "paint_regions": [
+    {
+     "region_id": "PRIMARY",
+     "shader_param": "primary_color",
+     "default_dye_id": ""
+    }
+   ],
+   "stampable": false,
+   "model": {
+    "scene": "res://assets/third_party/kaykit/furniture_bits/armchair.gltf",
+    "yaw_deg": 0,
+    "box": {
+     "size": [
+      1.0,
+      1.2,
+      1.0
+     ],
+     "center": [
+      0.5,
+      0.6,
+      0.5
+     ]
+    }
+   }
+  },
+  {
+   "id": "piece_bed_double",
+   "layer": "BODY",
+   "grid": "FURNITURE_0_5M",
+   "footprint": [
+    [
+     0,
+     0,
+     0
+    ],
+    [
+     1,
+     0,
+     0
+    ],
+    [
+     0,
+     0,
+     1
+    ],
+    [
+     1,
+     0,
+     1
+    ]
+   ],
+   "fastener": "NONE",
+   "requires_support": true,
+   "accepts": [
+    "wall_face",
+    "floor_top",
+    "ground"
+   ],
+   "color": "#d06a6a",
+   "parts": [
+    {
+     "size": [
+      2,
+      0.33,
+      1.9
+     ],
+     "center": [
+      1.0,
+      0.165,
+      1.0
+     ],
+     "solid": true,
+     "region": "PRIMARY"
+    }
+   ],
+   "interactions": [
+    {
+     "kind": "SLEEP"
+    }
+   ],
+   "hits_per_socket": 0,
+   "fastener_sockets": [],
+   "provides_support": false,
+   "snap_sockets": [],
+   "opening": [],
+   "item_id": "item_piece_bed_double",
+   "paint_regions": [
+    {
+     "region_id": "PRIMARY",
+     "shader_param": "primary_color",
+     "default_dye_id": ""
+    }
+   ],
+   "stampable": false,
+   "model": {
+    "scene": "res://assets/third_party/kaykit/furniture_bits/bed_double_A.gltf",
+    "yaw_deg": 0,
+    "box": {
+     "size": [
+      2,
+      0.8,
+      2
+     ],
+     "center": [
+      1.0,
+      0.4,
+      1.0
+     ]
+    }
+   }
+  },
+  {
+   "id": "piece_cabinet",
+   "layer": "BODY",
+   "grid": "FURNITURE_0_5M",
+   "footprint": [
+    [
+     0,
+     0,
+     0
+    ],
+    [
+     1,
+     0,
+     0
+    ]
+   ],
+   "fastener": "NONE",
+   "requires_support": true,
+   "accepts": [
+    "wall_face",
+    "floor_top",
+    "ground"
+   ],
+   "color": "#a07850",
+   "parts": [
+    {
+     "size": [
+      1.9,
+      0.95,
+      0.95
+     ],
+     "center": [
+      1.0,
+      0.475,
+      0.5
+     ],
+     "solid": true,
+     "region": "PRIMARY"
+    }
+   ],
+   "interactions": [
+    {
+     "kind": "STORAGE",
+     "slots": 20
+    }
+   ],
+   "hits_per_socket": 0,
+   "fastener_sockets": [],
+   "provides_support": false,
+   "snap_sockets": [],
+   "opening": [],
+   "item_id": "item_piece_cabinet",
+   "paint_regions": [
+    {
+     "region_id": "PRIMARY",
+     "shader_param": "primary_color",
+     "default_dye_id": ""
+    }
+   ],
+   "stampable": false,
+   "model": {
+    "scene": "res://assets/third_party/kaykit/furniture_bits/cabinet_medium.gltf",
+    "yaw_deg": 0
+   }
+  },
+  {
+   "id": "piece_plant",
+   "layer": "BODY",
+   "grid": "FURNITURE_0_5M",
+   "footprint": [
+    [
+     0,
+     0,
+     0
+    ]
+   ],
+   "fastener": "NONE",
+   "requires_support": true,
+   "accepts": [
+    "wall_face",
+    "floor_top",
+    "ground"
+   ],
+   "color": "#5a9a50",
+   "parts": [
+    {
+     "size": [
+      0.5,
+      0.5,
+      0.5
+     ],
+     "center": [
+      0.5,
+      0.25,
+      0.5
+     ],
+     "solid": true,
+     "region": ""
+    }
+   ],
+   "interactions": [],
+   "hits_per_socket": 0,
+   "fastener_sockets": [],
+   "provides_support": false,
+   "snap_sockets": [],
+   "opening": [],
+   "item_id": "item_piece_plant",
+   "paint_regions": [],
+   "stampable": false,
+   "model": {
+    "scene": "res://assets/third_party/kaykit/furniture_bits/cactus_medium_A.gltf",
+    "yaw_deg": 0,
+    "box": {
+     "size": [
+      0.8,
+      0.8,
+      0.8
+     ],
+     "center": [
+      0.5,
+      0.4,
+      0.5
+     ]
+    }
+   }
+  },
+  {
+   "id": "piece_counter",
+   "layer": "BODY",
+   "grid": "FURNITURE_0_5M",
+   "footprint": [
+    [
+     0,
+     0,
+     0
+    ]
+   ],
+   "fastener": "NONE",
+   "requires_support": true,
+   "accepts": [
+    "wall_face",
+    "floor_top",
+    "ground"
+   ],
+   "color": "#c8c0b0",
+   "parts": [
+    {
+     "size": [
+      1,
+      0.5,
+      1
+     ],
+     "center": [
+      0.5,
+      0.25,
+      0.5
+     ],
+     "solid": true,
+     "region": "PRIMARY"
+    }
+   ],
+   "interactions": [],
+   "hits_per_socket": 0,
+   "fastener_sockets": [],
+   "provides_support": false,
+   "snap_sockets": [],
+   "opening": [],
+   "item_id": "item_piece_counter",
+   "paint_regions": [
+    {
+     "region_id": "PRIMARY",
+     "shader_param": "primary_color",
+     "default_dye_id": ""
+    }
+   ],
+   "stampable": false,
+   "model": {
+    "scene": "res://assets/third_party/kaykit/restaurant_bits/kitchencounter_straight_A_backsplash.gltf",
+    "yaw_deg": 0,
+    "box": {
+     "size": [
+      1,
+      0.9,
+      1
+     ],
+     "center": [
+      0.5,
+      0.45,
+      0.5
+     ]
+    }
+   }
+  },
+  {
+   "id": "piece_stove",
+   "layer": "BODY",
+   "grid": "FURNITURE_0_5M",
+   "footprint": [
+    [
+     0,
+     0,
+     0
+    ]
+   ],
+   "fastener": "NONE",
+   "requires_support": true,
+   "accepts": [
+    "wall_face",
+    "floor_top",
+    "ground"
+   ],
+   "color": "#606870",
+   "parts": [
+    {
+     "size": [
+      0.9,
+      0.53,
+      0.9
+     ],
+     "center": [
+      0.5,
+      0.265,
+      0.5
+     ],
+     "solid": true,
+     "region": ""
+    }
+   ],
+   "interactions": [
+    {
+     "kind": "TOGGLE",
+     "toggle_states": 2
+    }
+   ],
+   "hits_per_socket": 0,
+   "fastener_sockets": [],
+   "provides_support": false,
+   "snap_sockets": [],
+   "opening": [],
+   "item_id": "item_piece_stove",
+   "paint_regions": [],
+   "stampable": false,
+   "model": {
+    "scene": "res://assets/third_party/kaykit/restaurant_bits/stove_single.gltf",
+    "yaw_deg": 0,
+    "box": {
+     "size": [
+      1,
+      0.9,
+      1
+     ],
+     "center": [
+      0.5,
+      0.45,
+      0.5
+     ]
+    }
+   }
+  },
+  {
+   "id": "piece_fridge",
+   "layer": "BODY",
+   "grid": "FURNITURE_0_5M",
+   "footprint": [
+    [
+     0,
+     0,
+     0
+    ]
+   ],
+   "fastener": "NONE",
+   "requires_support": true,
+   "accepts": [
+    "wall_face",
+    "floor_top",
+    "ground"
+   ],
+   "color": "#d0d8e0",
+   "parts": [
+    {
+     "size": [
+      0.9,
+      1.1,
+      0.9
+     ],
+     "center": [
+      0.5,
+      0.55,
+      0.5
+     ],
+     "solid": true,
+     "region": ""
+    }
+   ],
+   "interactions": [
+    {
+     "kind": "STORAGE",
+     "slots": 16
+    }
+   ],
+   "hits_per_socket": 0,
+   "fastener_sockets": [],
+   "provides_support": false,
+   "snap_sockets": [],
+   "opening": [],
+   "item_id": "item_piece_fridge",
+   "paint_regions": [],
+   "stampable": false,
+   "model": {
+    "scene": "res://assets/third_party/kaykit/restaurant_bits/fridge_A.gltf",
+    "yaw_deg": 0,
+    "box": {
+     "size": [
+      1,
+      1.6,
+      1
+     ],
+     "center": [
+      0.5,
+      0.8,
+      0.5
+     ]
+    }
+   }
   }
  ]
 }

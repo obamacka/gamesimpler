@@ -1,4 +1,5 @@
 ## Placeholder crop visual (spec 10.3): a box that grows with the stage; ripe crops glow.
+## A ripe crop whose produce item has a world model (spec 11.3) shows that model on top.
 ## Final art replaces the mesh with CropDef stage meshes.
 class_name CropView
 extends Node3D
@@ -21,3 +22,10 @@ func setup(def: CropDef, growth_days: int) -> void:
 		mat.emission = def.color
 		mat.emission_energy_multiplier = 0.4
 	add_child(m)
+	if ripe:
+		var produce := def.harvest_item_id
+		if Database.items.has(produce) and not Database.items[produce].world_model.is_empty():
+			var v := ItemVisual.make(produce, 0.45, def.color)
+			v.name = "Produce"
+			v.position = Vector3(0.5, h, 0.5)
+			add_child(v)

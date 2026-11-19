@@ -1714,9 +1714,11 @@ Tilling without seeds: choose HOE on the wheel Tools page (manual override, 2.6 
 - Downloads are checked before vendoring: every glTF may reference only its own `.bin` and the pack texture (no paths, no URLs, no extensions).
 
 ### 11.3 Wiring models to content
-- `BuildPieceDef.model`: `{"scene": res path, "yaw_deg": 0|90|180|270}`. The placeholder `parts` stay authoritative for collision and for the fit box; when a model exists the part meshes are hidden.
+- `BuildPieceDef.model`: `{"scene": res path, "yaw_deg": 0|90|180|270}`. The placeholder `parts` stay authoritative for collision and for the default fit box; when a model exists the part meshes are not built. Seat heights and seat parts follow the fitted model (KayKit seats are 0.5 model units high, so seat y = 0.5 x fit scale).
 - `ModelFit`: the model is turned by `yaw_deg`, scaled uniformly to fit inside the box spanned by the piece's parts, set on the floor (min y = 0) and centred in that box. Unrotated furniture faces +z with its back toward -z (spec 1.6 sockets); `yaw_deg` corrects each source model to that convention.
 - `ItemDef.world_model`: a res path used by pickups, museum displays and ripe crops; items without one keep the coloured box.
 - `MenuStation.model`: optional res path for counters and benches.
 - Paint and dye on textured models: the piece shader samples the model's albedo texture. Unpainted regions show the texture unchanged; painted regions keep the texture's shading and take the dye colour (`mix(tex, luma(tex) * dye, painted)`). Models are a single PRIMARY paint region; pieces with a model list only PRIMARY.
+- Scale: KayKit models sit on a 2-unit tile, so a 1-cell fit is about 0.5 m per unit. Fit boxes are chosen per piece (current scales 0.44 for the stove to 0.95 for the wide cabinet), so kitchen pieces read smaller than seating and cabinets; a single world scale is an open owner decision tied to the player size (PA2).
+- Pickups use a 0.3 m cube, display cases 0.3 m, ripe crops 0.45 m on top of the crop box; stations fit their `size`.
 - Structural pieces (floor, walls, doors, windows, roof, fence, stairs) keep placeholder geometry until a pack with matching 1 x 3 m wall modules is chosen.

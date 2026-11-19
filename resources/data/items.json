@@ -303,7 +303,8 @@
         "case_id": "case_produce",
         "hint_key": "Grows from carrot seeds",
         "sort_order": 21
-      }
+      },
+      "world_model": "res://assets/third_party/kaykit/restaurant_bits/food_ingredient_carrot.gltf"
     },
     {
       "id": "item_sunflower",
@@ -396,7 +397,8 @@
         "case_id": "case_produce",
         "hint_key": "Juicy and red, grows back",
         "sort_order": 26
-      }
+      },
+      "world_model": "res://assets/third_party/kaykit/restaurant_bits/food_ingredient_tomato.gltf"
     },
     {
       "id": "item_hoe_basic",
@@ -536,6 +538,55 @@
       "max_stack": 5,
       "base_value": 30,
       "piece_id": "piece_chest"
+    },
+    {
+      "id": "item_piece_armchair",
+      "category": "BUILD_PIECE",
+      "max_stack": 5,
+      "base_value": 35,
+      "piece_id": "piece_armchair"
+    },
+    {
+      "id": "item_piece_bed_double",
+      "category": "BUILD_PIECE",
+      "max_stack": 5,
+      "base_value": 80,
+      "piece_id": "piece_bed_double"
+    },
+    {
+      "id": "item_piece_cabinet",
+      "category": "BUILD_PIECE",
+      "max_stack": 5,
+      "base_value": 45,
+      "piece_id": "piece_cabinet"
+    },
+    {
+      "id": "item_piece_plant",
+      "category": "BUILD_PIECE",
+      "max_stack": 5,
+      "base_value": 12,
+      "piece_id": "piece_plant"
+    },
+    {
+      "id": "item_piece_counter",
+      "category": "BUILD_PIECE",
+      "max_stack": 5,
+      "base_value": 30,
+      "piece_id": "piece_counter"
+    },
+    {
+      "id": "item_piece_stove",
+      "category": "BUILD_PIECE",
+      "max_stack": 5,
+      "base_value": 45,
+      "piece_id": "piece_stove"
+    },
+    {
+      "id": "item_piece_fridge",
+      "category": "BUILD_PIECE",
+      "max_stack": 5,
+      "base_value": 60,
+      "piece_id": "piece_fridge"
     },
     {
       "id": "item_cotton_cloth",

@@ -7,7 +7,9 @@ extends WorldObject
 
 
 func _ready() -> void:
-	add_child(box_mesh(Vector3(0.3, 0.3, 0.3), Color(0.95, 0.85, 0.3), Vector3(0, 0.15, 0)))
+	var v := ItemVisual.make(item_id, 0.3, Color(0.95, 0.85, 0.3))
+	v.name = "Visual"
+	add_child(v)
 	make_interactable("pickup:%d" % get_instance_id(), &"PICKUP", 0.8, Vector3(0, 0.3, 0))
 
 

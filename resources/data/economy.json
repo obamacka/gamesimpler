@@ -115,6 +115,34 @@
     {
      "item": "item_piece_chest",
      "daily": 2
+    },
+    {
+     "item": "item_piece_armchair",
+     "daily": 1
+    },
+    {
+     "item": "item_piece_bed_double",
+     "daily": 1
+    },
+    {
+     "item": "item_piece_cabinet",
+     "daily": 1
+    },
+    {
+     "item": "item_piece_plant",
+     "daily": 1
+    },
+    {
+     "item": "item_piece_counter",
+     "daily": 1
+    },
+    {
+     "item": "item_piece_stove",
+     "daily": 1
+    },
+    {
+     "item": "item_piece_fridge",
+     "daily": 1
     }
    ]
   },

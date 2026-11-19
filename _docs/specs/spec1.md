@@ -2,8 +2,8 @@
 
 | Field | Value |
 |---|---|
-| Status | DRAFT rev 3.9, all decisions resolved |
-| Revision | rev 1: core systems. rev 2: kid-friendly, accessibility, forgiving logic, expression systems, integration tests. rev 3: D1 to D4 resolved (dig-anywhere blocky voxels, jump and double jump, context-aware interaction with dedicated critical states, crafting flow confirmed). rev 3.1: D16 to D19 confirmed. rev 3.2: D5 to D15 resolved (farming system added, pets on day 2, keep last tool), min-spec hardware, test command note. rev 3.3: D20 to D25 resolved (macOS min spec M1 16 GB; 30 fps on min spec, 60 fps on recommended spec). rev 3.4: D26 recommended spec. rev 3.5: Phase 2B farming details (farm events, save shape, extra 10.4 rows, Home Meadow). rev 3.6: Phase 3 build lattice layers, socket attach transforms, support rule, `build` save shape (`build_rev36` replaces the per-plot list). rev 3.7: Phase 4 `jobs` save shape (ranks nested under `jobs.jobs`, contract origin_y); job sites are build zones and flattened; starting coins 150. rev 3.8: Phase 5 details (pet settles at 80% of follow_distance; never-expire mail kinds; mail prune after delivery; NPC straight steering where no navmesh is baked; generated instrument tones; care letters signed by the best friend). rev 3.9: Phase 6 (save layout with per-slot voxel directories and epochs, schema v2 with migration from v1, zone navigation baking, level town volumes, curator Y donates, static zones drop the previous terrain) |
+| Status | DRAFT rev 3.10, all decisions resolved |
+| Revision | rev 1: core systems. rev 2: kid-friendly, accessibility, forgiving logic, expression systems, integration tests. rev 3: D1 to D4 resolved (dig-anywhere blocky voxels, jump and double jump, context-aware interaction with dedicated critical states, crafting flow confirmed). rev 3.1: D16 to D19 confirmed. rev 3.2: D5 to D15 resolved (farming system added, pets on day 2, keep last tool), min-spec hardware, test command note. rev 3.3: D20 to D25 resolved (macOS min spec M1 16 GB; 30 fps on min spec, 60 fps on recommended spec). rev 3.4: D26 recommended spec. rev 3.5: Phase 2B farming details (farm events, save shape, extra 10.4 rows, Home Meadow). rev 3.6: Phase 3 build lattice layers, socket attach transforms, support rule, `build` save shape (`build_rev36` replaces the per-plot list). rev 3.7: Phase 4 `jobs` save shape (ranks nested under `jobs.jobs`, contract origin_y); job sites are build zones and flattened; starting coins 150. rev 3.8: Phase 5 details (pet settles at 80% of follow_distance; never-expire mail kinds; mail prune after delivery; NPC straight steering where no navmesh is baked; generated instrument tones; care letters signed by the best friend). rev 3.9: Phase 6 (save layout with per-slot voxel directories and epochs, schema v2 with migration from v1, zone navigation baking, level town volumes, curator Y donates, static zones drop the previous terrain). rev 3.10: section 11 art assets (smooth low-poly, CC0 packs, model wiring) |
 | Engine | Godot 4.7 stable (4.7.2 latest patch found, 2026-08-18), GDScript |
 | Physics | Jolt Physics (built-in module) |
 | Voxels | Zylann Voxel Tools 1.7, GDExtension edition (MIT), released 2026-08-20, targets Godot 4.5+ |
@@ -1691,3 +1691,32 @@ Tilling without seeds: choose HOE on the wheel Tools page (manual override, 2.6 
 - Starter ToolBelt includes HOE and WATERING_CAN (full).
 - Day 1 welcome letter (`mail_tpl_welcome`, never expires): 5 carrot seeds, 3 sunflower seeds, and a picture guide (till, plant, water, wait).
 - Day 2: the pet adoption letter (D11).
+
+---
+
+## 11. Art Assets (owner decision 2026-11-19: smooth low-poly)
+
+### 11.1 Direction and sources
+- Style: smooth stylised low-poly with flat gradient-atlas colouring, not blocky characters. Voxel terrain stays blocky.
+- Only CC0 packs are used, so the shipped game needs no attribution (credits are still given in `CREDITS.md`).
+
+| Pack | Author | Use | Source |
+|---|---|---|---|
+| KayKit Furniture Bits 1.0 | Kay Lousberg | furniture pieces | github.com/KayKit-Game-Assets/KayKit-Furniture-Bits-1.0 |
+| KayKit Restaurant Bits 1.0 | Kay Lousberg | kitchen pieces, shop counters, benches, produce props | github.com/KayKit-Game-Assets/KayKit-Restaurant-Bits-1.0 |
+| Quaternius Universal Base Characters, Modular Character Outfits, Universal Animation Library | Quaternius | player, NPCs, outfits, animations (planned) | quaternius.com |
+| Quaternius Animated Animals, Crops Pack | Quaternius | dog and cat, crop stages (planned) | quaternius.com |
+| Kenney Survival Kit, Voxel Pack | Kenney | tool models, block textures (planned) | kenney.nl |
+
+### 11.2 Layout and provenance
+- `res://assets/third_party/<author>/<pack>/`: the glTF files, their `.bin` buffers and the pack texture, plus the pack's `LICENSE.txt` and a `SOURCE.md` (URL, version, commit or download date).
+- Only the glTF variant is vendored (no FBX/OBJ duplicates, no editor plugins). Godot's `.import` files are committed so CI and other machines import identically.
+- Downloads are checked before vendoring: every glTF may reference only its own `.bin` and the pack texture (no paths, no URLs, no extensions).
+
+### 11.3 Wiring models to content
+- `BuildPieceDef.model`: `{"scene": res path, "yaw_deg": 0|90|180|270}`. The placeholder `parts` stay authoritative for collision and for the fit box; when a model exists the part meshes are hidden.
+- `ModelFit`: the model is turned by `yaw_deg`, scaled uniformly to fit inside the box spanned by the piece's parts, set on the floor (min y = 0) and centred in that box. Unrotated furniture faces +z with its back toward -z (spec 1.6 sockets); `yaw_deg` corrects each source model to that convention.
+- `ItemDef.world_model`: a res path used by pickups, museum displays and ripe crops; items without one keep the coloured box.
+- `MenuStation.model`: optional res path for counters and benches.
+- Paint and dye on textured models: the piece shader samples the model's albedo texture. Unpainted regions show the texture unchanged; painted regions keep the texture's shading and take the dye colour (`mix(tex, luma(tex) * dye, painted)`). Models are a single PRIMARY paint region; pieces with a model list only PRIMARY.
+- Structural pieces (floor, walls, doors, windows, roof, fence, stairs) keep placeholder geometry until a pack with matching 1 x 3 m wall modules is chosen.

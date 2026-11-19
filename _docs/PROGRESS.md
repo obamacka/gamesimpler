@@ -2,10 +2,10 @@
 
 | Field | Value |
 |---|---|
-| Spec | `_docs/specs/spec1.md` rev 3.9 |
+| Spec | `_docs/specs/spec1.md` rev 3.10 |
 | Plan | `_docs/plans/plan1.md` |
-| Active phase | All six phases have their automated work done (Phases 3 to 6 started on owner request before earlier gates passed); manual checklists for Phases 1 to 6, Phase 0 hardware checks and the release-candidate checklist pending |
-| Last updated | 2026-11-16 |
+| Active phase | Phase A (art pass), PA1 KayKit in progress. All six phases have their automated work done (Phases 3 to 6 started on owner request before earlier gates passed); manual checklists for Phases 1 to 6, Phase 0 hardware checks and the release-candidate checklist pending |
+| Last updated | 2026-11-19 |
 
 ## How to update
 1. After finishing a task, tick it in `plan1.md` and in the phase table below, with the date and commit SHA.
@@ -121,6 +121,17 @@ Status values: `Not started`, `In progress`, `Blocked`, `Done`.
 | P6.14 to P6.18 Integration suites | Done | 2026-11-16 | 803e74c | Suite C 15 tests covering C1 to C17, save round trip 3, save failures 3 (B12), paint and stamp 3, real-terrain dig/place/save/reload in `test_voxel_smoke.gd` |
 | P6.19 Navigation meshes (owner request) | Done | 2026-11-16 | 803e74c | navigation suite 5 plus the real Home Meadow town bake |
 | Manual checklist and release candidate | Not started | | | donate and read the book by pad; paint and stamp a house, save, quit, reload, kill during save; exports for Windows, Linux, macOS not attempted from the cloud session |
+
+### Phase A (art pass)
+| Task | Status | Date | Commit | Notes |
+|---|---|---|---|---|
+| PA1.1 Vendor KayKit packs | In progress | | | |
+| PA1.2 ModelFit and model support | Not started | | | |
+| PA1.3 Textured paint shader | Not started | | | |
+| PA1.4 Furniture mapping and new pieces | Not started | | | |
+| PA1.5 Item and station models | Not started | | | |
+| PA1.6 Tests | Not started | | | |
+| PA2 to PA4 Quaternius, Kenney | Not started | | | |
 
 ## Test run log
 | Date | Commit | Phase | Command | Exit code | Failures | Notes |

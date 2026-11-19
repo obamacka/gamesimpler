@@ -425,6 +425,25 @@ Integration:
 - [ ] Full manual pass of all phase checklists on each OS available.
 - [ ] Spec open decisions all resolved or explicitly deferred to spec 2.
 
+## Phase A: Art Pass (owner decision 2026-11-19)
+
+**Goal:** replace placeholder boxes with CC0 smooth low-poly models (spec 11), pack by pack, without changing gameplay rules.
+**Depends on:** nothing gameplay-wise; each sub-pass keeps the full suite green.
+**Spec:** 11.
+
+### PA1 KayKit packs
+- [ ] **PA1.1** Vendor KayKit Furniture Bits and Restaurant Bits (glTF only) under `res://assets/third_party/kaykit/` with `LICENSE.txt`, `SOURCE.md`; `CREDITS.md`; committed `.import` files.
+- [ ] **PA1.2** `ModelFit` (yaw, uniform fit into the parts box, floor and centre) and model support in `BuildPieceDef`, `PieceView`, `Database` validation (model path exists).
+- [ ] **PA1.3** Piece shader samples the model texture; painting keeps shading (spec 11.3); pieces with models paint PRIMARY only.
+- [ ] **PA1.4** Map existing furniture (chair, sofa, table, bed, lamp, shelf, chest) to models; add pieces from the packs (armchair, double bed, cabinet, bookshelf, cactus plant, kitchen counter, stove, fridge) with items and shop stock.
+- [ ] **PA1.5** `ItemDef.world_model` for produce props (carrot, tomato) used by pickups, display cases and ripe crops; `MenuStation.model` for shop counters and benches.
+- [ ] **PA1.6** Tests: every model loads and fits its box; furniture backs face -z after `yaw_deg` (geometry heuristic); PieceView hides placeholder meshes but keeps collision; paint reaches model meshes; item visuals use models; full suite green.
+
+### PA2 to PA4 (next)
+- [ ] **PA2** Quaternius base characters, modular outfits and animation library for the player and NPCs (outfit slots and hidden body regions).
+- [ ] **PA3** Quaternius animated dog and cat (accessory bones per species), crops pack (stage models).
+- [ ] **PA4** Kenney Survival Kit tools in hand, Kenney Voxel Pack textures for the block library.
+
 ---
 
 ## Traceability

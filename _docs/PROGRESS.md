@@ -4,7 +4,7 @@
 |---|---|
 | Spec | `_docs/specs/spec1.md` rev 3.11 |
 | Plan | `_docs/plans/plan1.md` |
-| Active phase | Phase A (art pass): PA1 done, PA2 (characters, world scale) in progress. All six phases have their automated work done (Phases 3 to 6 started on owner request before earlier gates passed); manual checklists for Phases 1 to 6, Phase 0 hardware checks and the release-candidate checklist pending |
+| Active phase | Phase A (art pass): PA1 and PA2 done, PA3 and PA4 in progress. All six phases have their automated work done (Phases 3 to 6 started on owner request before earlier gates passed); manual checklists for Phases 1 to 6, Phase 0 hardware checks and the release-candidate checklist pending |
 | Last updated | 2026-11-20 |
 
 ## How to update
@@ -131,13 +131,13 @@ Status values: `Not started`, `In progress`, `Blocked`, `Done`.
 | PA1.4 Furniture mapping and new pieces | Done | 2026-11-19 | 44e8742 | 7 existing pieces mapped, seat parts and seats moved to the art (seat = 0.5 model units x scale); 7 new pieces with items and builder-shop stock; radio, pet bed, feed bowl and structure pieces stay placeholders |
 | PA1.5 Item and station models | Done | 2026-11-19 | 44e8742 | carrot and tomato props; 3 shop counters, workbench and tailor bench in Home Meadow (colliders resized to the models) |
 | PA1.6 Tests | Done | 2026-11-19 | 44e8742 | unit art 9 (fit, turn, orientation with a mutation check, seat heights, glTF refs, validation, item visual), integration art 5; full suite 563 cases exit 0; visual check by Xvfb renders |
-| PA2.1 World scale 0.75 | In progress | | | |
-| PA2.2 Player 1.7 m | Not started | | | |
-| PA2.3 Vendor Quaternius free packs | Not started | | | |
-| PA2.4 CharacterRig | Not started | | | |
-| PA2.5 Animation | Not started | | | |
-| PA2.6 NPC appearance | Not started | | | |
-| PA2.7 Tests | Not started | | | |
+| PA2.1 World scale 0.75 | Done | 2026-11-20 | 378b44a | ModelFit.place at 0.75 m per unit; pieces re-footprinted (kitchen modules 2x2), parts and seats (0.375 m) from the scaled models; stations size colliders from models |
+| PA2.2 Player 1.7 m | Done | 2026-11-20 | c6d2514 | PlayerConfig drives capsules, probes and camera (1.7 m, duck 0.9 m, eye 1.55 m); locomotion room tunnel is a 1 m crawl space; NPC capsule 1.7 m |
+| PA2.3 Vendor Quaternius free packs | Done | 2026-11-20 | c6d2514 | Superhero heads, hair, Peasant and Ranger parts, UAL1 and UAL2; textures 1024 px; 46 MB |
+| PA2.4 CharacterRig | Done | 2026-11-20 | c6d2514 | outfit skeleton, head cut by skin weights (custom AABB), hair, base layer, parts per slot, cloth-only dye, HAIR hiding, bone placeholders; player and wardrobe preview |
+| PA2.5 Animation | Done | 2026-11-20 | c6d2514 | CharacterAnimModel; merged library (86 clips); player updates the clip every tick |
+| PA2.6 NPC appearance | Done | 2026-11-20 | c6d2514 | appearance in npcs.json validated; NPCs face their walking direction |
+| PA2.7 Tests | Done | 2026-11-20 | c6d2514 | character anim 5, character rig 8, wardrobe updated; full suite 576 cases exit 0 |
 | PA3, PA4 Pets and crops, Kenney | Not started | | | |
 
 ## Test run log
@@ -162,6 +162,7 @@ Status values: `Not started`, `In progress`, `Blocked`, `Done`.
 | 2026-11-16 | 56d4cef | 5 | `ci/run_tests.sh` | 0 | 0 | 489 cases (Phases 0 to 5) |
 | 2026-11-16 | 803e74c | 6 | `ci/run_tests.sh` | 0 | 0 | 549 cases (Phases 0 to 6) |
 | 2026-11-19 | 44e8742 | A | `ci/run_tests.sh` | 0 | 0 | 563 cases (Phases 0 to 6, PA1) |
+| 2026-11-20 | c6d2514 | A | `ci/run_tests.sh` | 0 | 0 | 576 cases (PA2) |
 
 ## Decisions
 | ID | Status | Value |
@@ -175,6 +176,7 @@ Status values: `Not started`, `In progress`, `Blocked`, `Done`.
 ## Blockers and open issues
 | Date | Item | Owner | Status |
 |---|---|---|---|
+| 2026-11-20 | PA2 for owner review: the free Quaternius tier gives semi-realistic adult faces (Superhero heads) next to toy-like KayKit furniture; only the "Dark" skin tone exists for the Regular body; only Peasant and Ranger outfits; player body type and hair are fixed in PlayerConfig until a character creator exists; straw hat and scarf remain placeholder boxes; the free tier has no wave, pickaxe or sleep clips (substitutes in spec 11.7); kitchen modules at 2 x 2 cells leave 0.5 m gaps in a row; the 1.7 m player stands in 2-voxel tunnels and Duck now means 1-voxel crawl spaces; integration tests take about 1 s each now that every player and NPC builds a rig; headless runs log a dummy-renderer "material is null" error per rig (not seen with a real renderer) | owner review | Open |
 | 2026-11-19 | (Resolved 2026-11-20: one world scale 0.75 m per KayKit unit and a 1.7 m player, spec 11.4) PA1 for owner review: KayKit uses a 2-unit tile, so 1-cell fits run 0.44 (stove, fridge) to 0.95 (wide cabinet) while seating is about 0.6 to 0.8; the fridge is barely taller than a chair next to the 2.1 m player capsule. Shop counters face their drawers to the shopkeeper side (yaw 0) | owner review | Closed |
 | 2026-11-16 | Phase 1 manual gamepad checklist (plan Phase 1) | team | Open |
 | 2026-11-16 | Phase 2 manual checklist and min-spec performance check | team | Open |

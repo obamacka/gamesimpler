@@ -171,6 +171,7 @@ Status values: `Not started`, `In progress`, `Blocked`, `Done`.
 | 2026-11-19 | 44e8742 | A | `ci/run_tests.sh` | 0 | 0 | 563 cases (Phases 0 to 6, PA1) |
 | 2026-11-20 | c6d2514 | A | `ci/run_tests.sh` | 0 | 0 | 576 cases (PA2) |
 | 2026-11-20 | d313df0 | A | `ci/run_tests.sh` | 0 | 0 | 588 cases (PA3, PA4) |
+| 2026-11-20 | 1e66c69 | A | release workflow (GitHub Actions run 44786213773) | 0 | 0 | test gate, exports, macOS ad-hoc signing and publish all succeeded |
 
 ## Decisions
 | ID | Status | Value |
@@ -184,7 +185,7 @@ Status values: `Not started`, `In progress`, `Blocked`, `Done`.
 ## Blockers and open issues
 | Date | Item | Owner | Status |
 |---|---|---|---|
-| 2026-11-20 | Release v0.1.0 (pre-release): exports built in CI from tag; Linux export boots headless (300 frames, no errors) in the cloud session; Windows and macOS exports not launched here (no Windows or macOS machine); macOS is ad-hoc signed, not notarized; Windows is not code-signed; project setting import_etc2_astc enabled for the macOS universal export | owner review | Open |
+| 2026-11-20 | Release v0.1.0 published as a pre-release (https://github.com/obamacka/gamesimpler/releases/tag/v0.1.0, workflow run 44786213773, commit 1e66c69); exports built in CI; Linux export boots headless (300 frames, no errors) in the cloud session; Windows and macOS exports not launched here (no Windows or macOS machine); macOS is ad-hoc signed, not notarized; Windows is not code-signed; project setting import_etc2_astc enabled for the macOS universal export | owner review | Open |
 | 2026-11-20 | PA3/PA4 for owner review: sunflower uses the pack's generic blue flower and strawberry a berry bush; cotton has no model; dog and cat have only Idle and Walking clips (no sit, sleep or eat); watering can, fruit picker and screwdriver have no hand model; tool grip and angle are a fixed pose on the Idle hand; this session moved to a new personal environment "gamesimpler" (exact hosts for itch, its download mirror and opengameart.org) | owner review | Open |
 | 2026-11-20 | PA2 for owner review: the free Quaternius tier gives semi-realistic adult faces (Superhero heads) next to toy-like KayKit furniture; only the "Dark" skin tone exists for the Regular body; only Peasant and Ranger outfits; player body type and hair are fixed in PlayerConfig until a character creator exists; straw hat and scarf remain placeholder boxes; the free tier has no wave, pickaxe or sleep clips (substitutes in spec 11.7); kitchen modules at 2 x 2 cells leave 0.5 m gaps in a row; the 1.7 m player stands in 2-voxel tunnels and Duck now means 1-voxel crawl spaces; integration tests take about 1 s each now that every player and NPC builds a rig; headless runs log a dummy-renderer "material is null" error per rig (not seen with a real renderer) | owner review | Open |
 | 2026-11-19 | (Resolved 2026-11-20: one world scale 0.75 m per KayKit unit and a 1.7 m player, spec 11.4) PA1 for owner review: KayKit uses a 2-unit tile, so 1-cell fits run 0.44 (stove, fridge) to 0.95 (wide cabinet) while seating is about 0.6 to 0.8; the fridge is barely taller than a chair next to the 2.1 m player capsule. Shop counters face their drawers to the shopkeeper side (yaw 0) | owner review | Closed |

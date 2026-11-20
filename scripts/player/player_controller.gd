@@ -57,6 +57,7 @@ var _target_destroyed := false
 @onready var head_clearance: ShapeCast3D = $HeadClearance
 @onready var jump_clearance: ShapeCast3D = $JumpClearance
 @onready var visual: Node3D = $Visual
+var character: CharacterRig
 @onready var tool_selector: ToolAutoSelector = $ToolAutoSelector
 @onready var tool_detector: Area3D = $ToolDetector
 @onready var interaction_probe: Area3D = $InteractionProbe
@@ -66,6 +67,11 @@ func _ready() -> void:
 	# Zone changes freeze the player with PROCESS_MODE_DISABLED; keep the body in the physics
 	# space meanwhile so the first tick after unfreezing has a space to move in.
 	disable_mode = CollisionObject3D.DISABLE_MODE_KEEP_ACTIVE
+	apply_dimensions()
+	character = CharacterRig.new()
+	character.name = "Character"
+	visual.add_child(character)
+	character.setup(config.body, config.hair)
 	jump.configure(jump_config)
 	_air_speed = config.walk_speed
 	for s in machine.states.values():
@@ -90,6 +96,31 @@ func _ready() -> void:
 	last_safe_position = global_position
 	if GameSession.current:
 		GameSession.current.player = self
+	refresh_outfit()
+
+
+## Capsules and clearance probes from PlayerConfig (spec 1.4), so the player size has one
+## source of truth.
+func apply_dimensions() -> void:
+	var stand := CapsuleShape3D.new()
+	stand.radius = config.radius
+	stand.height = config.standing_height
+	collision_standing.shape = stand
+	collision_standing.position = Vector3(0, config.standing_height * 0.5, 0)
+	var duck := CapsuleShape3D.new()
+	duck.radius = config.radius
+	duck.height = config.ducking_height
+	collision_ducking.shape = duck
+	collision_ducking.position = Vector3(0, config.ducking_height * 0.5, 0)
+	var head := CapsuleShape3D.new()   # the standing capsule minus a 0.1 m floor gap
+	head.radius = config.radius - 0.02
+	head.height = config.standing_height - 0.1
+	head_clearance.shape = head
+	head_clearance.position = Vector3(0, config.standing_height * 0.5 + 0.05, 0)
+	var top := BoxShape3D.new()        # room above the head to start a jump
+	top.size = Vector3(config.radius * 2.0, 0.3, config.radius * 2.0)
+	jump_clearance.shape = top
+	jump_clearance.position = Vector3(0, config.standing_height + 0.2, 0)
 
 
 func apply_settings() -> void:
@@ -128,6 +159,7 @@ func _physics_process(delta: float) -> void:
 		if t.effect == PlayerTransitionTable.FX_SOFT_LAND:
 			feedback.emit(t.effect)
 	current_state().physics_tick(delta, f)
+	update_animation(f)
 	if build_active and current_state().is_airborne():
 		build_ctl.tick(delta, f, true)   # single-shot air placement (spec 4.2.1)
 
@@ -437,32 +469,28 @@ func _resolve_focus(prefer_tree: bool) -> Interactable:
 	return lookup.get(best.get("key", ""))
 
 
-const OUTFIT_NODES := {&"HEAD": "Head", &"TOP": "Top", &"BOTTOM": "Bottom", &"FEET": "Feet", &"ACCESSORY": "Accessory"}
-const OUTFIT_BOXES := {&"HEAD": [Vector3(0.45, 0.2, 0.45), 1.95], &"TOP": [Vector3(0.6, 0.6, 0.38), 1.35],
-	&"BOTTOM": [Vector3(0.58, 0.6, 0.36), 0.7], &"FEET": [Vector3(0.6, 0.15, 0.4), 0.08], &"ACCESSORY": [Vector3(0.62, 0.12, 0.42), 1.62]}
-
-
-## Placeholder outfit meshes on the OutfitSlots nodes, tinted by dye (spec 3.4, P4.8).
+## Worn outfit on the character rig (spec 3.4, 11.6).
 func refresh_outfit() -> void:
 	var s := session()
 	if s == null:
 		return
-	var slots := visual.get_node_or_null("Rig/Skeleton3D/OutfitSlots")
-	for slot in OUTFIT_NODES:
-		var mi := slots.get_node_or_null(OUTFIT_NODES[slot]) as MeshInstance3D if slots else null
-		if mi == null:
-			continue
-		if s.outfit.model.slots[slot] == null:
-			mi.mesh = null
-			continue
-		var bm := BoxMesh.new()
-		bm.size = OUTFIT_BOXES[slot][0]
-		var mat := StandardMaterial3D.new()
-		mat.albedo_color = s.outfit.model.color_of(slot)
-		bm.material = mat
-		mi.mesh = bm
-		mi.position = Vector3(0, OUTFIT_BOXES[slot][1], 0)
 	hidden_body_regions = s.outfit.model.hidden_regions()
+	character.set_outfit(CharacterRig.worn_from_slots(s.outfit.model.slots, character.body), hidden_body_regions)
+
+
+## Clip for the current state (spec 11.7). Called every physics tick; the rig ignores repeats.
+func update_animation(f: InputFrame) -> void:
+	var st := machine.current_id
+	var info := {"moving": Vector2(velocity.x, velocity.z).length() > 0.2, "working": build_active and f != null and f.use_held}
+	var tool := equipped_tool_data()
+	if tool:
+		info["tool"] = tool.tool_type
+	var cur := current_state()
+	if st == PlayerTransitionTable.EMOTE and cur.get("emote"):
+		info["emote"] = (cur.get("emote") as EmoteDef).id
+	if st == PlayerTransitionTable.INTERACT and cur.get("spec"):
+		info["interact"] = (cur.get("spec") as InteractionSpec).kind
+	character.play(CharacterAnimModel.for_player(st, info))
 
 
 ## D-pad left (spec 4.8): the wheel menu pauses; its choice is applied when it closes.

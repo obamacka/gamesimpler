@@ -12,6 +12,8 @@ extends Resource
 @export var gift_prefs: Dictionary = {}
 @export var schedule: Array = []
 @export var dialogue: Dictionary = {}
+## Character look (spec 11.6): {"body": MALE|FEMALE, "hair": hair file name, "outfit": [item ids]}
+@export var appearance: Dictionary = {}
 
 
 func preference(item_id: StringName) -> StringName:

@@ -340,6 +340,16 @@ func _validate_phase4() -> Array[String]:
 			errors.append("outfit %s has unknown slot" % id)
 		if o.default_dye_id != &"" and not dyes.has(o.default_dye_id):
 			errors.append("outfit %s default dye unknown" % id)
+		for b in o.parts:
+			if not (b in [CharacterRig.MALE, CharacterRig.FEMALE]):
+				errors.append("outfit %s has parts for unknown body %s" % [id, b])
+			for f in o.parts[b]:
+				if not ResourceLoader.exists(CharacterRig.ROOT + "outfits/%s.gltf" % f):
+					errors.append("outfit %s part %s does not exist" % [id, f])
+		if not o.texture.is_empty() and not ResourceLoader.exists(CharacterRig.ROOT + "outfits/" + o.texture):
+			errors.append("outfit %s texture %s does not exist" % [id, o.texture])
+		if not o.parts.is_empty() and (o.parts_for(CharacterRig.MALE).is_empty() or o.parts_for(CharacterRig.FEMALE).is_empty()):
+			errors.append("outfit %s needs parts for both bodies" % id)
 	for id in dyes:
 		if dyes[id].name_key == "":
 			errors.append("dye %s has no name_key" % id)
@@ -442,6 +452,9 @@ func _load_phase4(dir: String) -> void:
 		o.color = Color.html(d.get("color", "#ffffff")); o.dyeable = bool(d.get("dyeable", true))
 		o.default_dye_id = StringName(d.get("default_dye_id", ""))
 		o.hide_body_regions.assign((d.get("hide_body_regions", []) as Array).map(func(v): return StringName(v)))
+		for b in d.get("parts", {}):
+			o.parts[StringName(b)] = (d["parts"][b] as Array).map(func(v): return String(v))
+		o.texture = String(d.get("texture", ""))
 		outfits[o.id] = o
 	for d in oo.get("dyes", []):
 		var y := DyeDef.new()
@@ -462,6 +475,9 @@ func _load_phase5(dir: String) -> void:
 		n.gift_prefs = prefs
 		n.schedule = (d.get("schedule", []) as Array).map(func(e): return {"from": int(e["from"]), "marker": StringName(e["marker"])})
 		n.dialogue = d.get("dialogue", {})
+		var ap: Dictionary = d.get("appearance", {})
+		n.appearance = {"body": StringName(ap.get("body", "FEMALE")), "hair": String(ap.get("hair", "")),
+			"outfit": (ap.get("outfit", []) as Array).map(func(v): return StringName(v))}
 		npcs[n.id] = n
 	friendship = nn.get("friendship", {})
 	for k in friendship:
@@ -613,6 +629,14 @@ func _validate_phase5() -> Array[String]:
 	var errors: Array[String] = []
 	for id in npcs:
 		var n: NpcDef = npcs[id]
+		var ap: Dictionary = n.appearance
+		if not (ap.get("body", &"") in [CharacterRig.MALE, CharacterRig.FEMALE]):
+			errors.append("npc %s has unknown body" % id)
+		if not String(ap.get("hair", "")).is_empty() and not ResourceLoader.exists(CharacterRig.ROOT + "hair/%s.gltf" % ap["hair"]):
+			errors.append("npc %s hair %s does not exist" % [id, ap["hair"]])
+		for it in ap.get("outfit", []):
+			if not items.has(it) or not outfits.has(items[it].outfit_id):
+				errors.append("npc %s wears unknown outfit item %s" % [id, it])
 		if n.shop_id != &"" and not shops.has(n.shop_id):
 			errors.append("npc %s has unknown shop" % id)
 		if n.job_id != &"" and not jobs.has(n.job_id):

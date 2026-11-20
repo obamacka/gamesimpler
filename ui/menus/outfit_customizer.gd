@@ -4,6 +4,7 @@ extends MenuBase
 
 var preview: SubViewportContainer
 var turntable: Node3D
+var mannequin: CharacterRig
 var slots_col: VBoxContainer
 var items_col: VBoxContainer
 var dyes_col: VBoxContainer
@@ -33,7 +34,7 @@ func build() -> void:
 	turntable = Node3D.new()
 	vp.add_child(turntable)
 	var cam := Camera3D.new()
-	cam.position = Vector3(0, 1.2, 3.2)
+	cam.position = Vector3(0, 1.0, 2.8)
 	vp.add_child(cam)
 	var light := DirectionalLight3D.new()
 	light.rotation = Vector3(-0.7, 0.4, 0)
@@ -82,16 +83,18 @@ func refresh() -> void:
 	_rebuild_mannequin()
 
 
+## Preview (spec 11.5): the player's character rig, idling while the tree is paused.
 func _rebuild_mannequin() -> void:
-	for c in turntable.get_children():
-		c.queue_free()
 	var s := GameSession.current
-	turntable.add_child(WorldObject.box_mesh(Vector3(0.5, 1.8, 0.3), Color(0.85, 0.75, 0.65), Vector3(0, 0.9, 0)))
-	var offsets := {&"HEAD": [Vector3(0.45, 0.2, 0.45), 1.95], &"TOP": [Vector3(0.6, 0.6, 0.38), 1.35], &"BOTTOM": [Vector3(0.58, 0.6, 0.36), 0.7],
-		&"FEET": [Vector3(0.6, 0.15, 0.4), 0.08], &"ACCESSORY": [Vector3(0.62, 0.12, 0.42), 1.62]}
-	for slot in OutfitDef.SLOTS:
-		if s.outfit.model.slots[slot] != null:
-			turntable.add_child(WorldObject.box_mesh(offsets[slot][0], s.outfit.model.color_of(slot), Vector3(0, offsets[slot][1], 0)))
+	if mannequin == null:
+		var p := SceneRouter.player
+		var cfg: PlayerConfig = p.config if p is PlayerController else PlayerConfig.new()
+		mannequin = CharacterRig.new()
+		mannequin.process_mode = Node.PROCESS_MODE_ALWAYS
+		turntable.add_child(mannequin)
+		mannequin.setup(cfg.body, cfg.hair)
+		mannequin.rotation.y = 0.0   # face the preview camera (+Z)
+	mannequin.set_outfit(CharacterRig.worn_from_slots(s.outfit.model.slots, mannequin.body), s.outfit.model.hidden_regions())
 
 
 func initial_focus() -> Control:

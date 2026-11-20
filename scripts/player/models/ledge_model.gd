@@ -8,7 +8,7 @@ const MANUAL_JUMP_COOLDOWN := 0.5 # no auto-jump right after a manual jump
 
 ## step_solid: the cell in front at foot level is solid.
 ## above_free: the cell above that step is free (so it is a 1-high step).
-## clearance_free: 3 cells above the step top are free for the 2.1 m player.
+## clearance_free: the standing capsule fits above the step top (2 cells for the 1.7 m player).
 static func should_auto_jump(
 		enabled: bool, on_floor: bool, ducking: bool,
 		step_solid: bool, above_free: bool, clearance_free: bool,

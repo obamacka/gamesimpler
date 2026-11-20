@@ -15,6 +15,7 @@ var talking := false
 var last_reaction: StringName = &""
 var _react_t := 0.0
 var _talk_with: Node3D
+var character: CharacterRig
 
 
 func _ready() -> void:
@@ -23,12 +24,19 @@ func _ready() -> void:
 	collision_mask = 1 | 64
 	var shape := CollisionShape3D.new()
 	var cap := CapsuleShape3D.new()
-	cap.radius = 0.35
-	cap.height = 1.9
+	cap.radius = 0.3
+	cap.height = 1.7   # same size as the player (spec 1.4, 11.4)
 	shape.shape = cap
-	shape.position = Vector3(0, 0.95, 0)
+	shape.position = Vector3(0, 0.85, 0)
 	add_child(shape)
-	add_child(WorldObject.box_mesh(Vector3(0.6, 1.9, 0.4), def.color if def else Color.GRAY, Vector3(0, 0.95, 0)))
+	character = CharacterRig.new()
+	character.name = "Character"
+	add_child(character)
+	var ap: Dictionary = def.appearance if def else {}
+	character.setup(ap.get("body", CharacterRig.FEMALE), ap.get("hair", ""))
+	character.rotation.y = 0.0   # NPC front is +Z (look_at with use_model_front)
+	var outfit: Array = ap.get("outfit", [])
+	character.set_outfit(CharacterRig.worn_from_items(outfit, character.body), CharacterRig.hidden_from_items(outfit))
 	agent = NavigationAgent3D.new()
 	add_child(agent)
 	var i := Interactable.new()
@@ -57,6 +65,7 @@ func _physics_process(delta: float) -> void:
 		velocity = Vector3.ZERO
 		if is_instance_valid(_talk_with):
 			look_at(Vector3(_talk_with.global_position.x, global_position.y, _talk_with.global_position.z), Vector3.UP, true)
+		character.play(CharacterAnimModel.for_npc(false, true, last_reaction))
 		return
 	var m := _marker()
 	var target := m.global_position if m else global_position
@@ -74,8 +83,11 @@ func _physics_process(delta: float) -> void:
 		var v := dir.normalized() * SPEED
 		velocity.x = v.x
 		velocity.z = v.z
+		if dir.length() > 0.05:
+			look_at(global_position + dir, Vector3.UP, true)
 	velocity.y = 0.0 if is_on_floor() else velocity.y - 20.0 * delta
 	move_and_slide()
+	character.play(CharacterAnimModel.for_npc(Vector2(velocity.x, velocity.z).length() > 0.2, false, last_reaction))
 
 
 func begin_talk(with: Node3D) -> void:

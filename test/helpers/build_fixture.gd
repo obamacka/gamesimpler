@@ -15,7 +15,7 @@ static func setup(h: Phase2Harness) -> void:
 
 ## Aims from the eyes at a point (e.g. a fastener socket).
 static func aim_at_point(h: Phase2Harness, p: Vector3) -> void:
-	var eye := h.player.global_position + Vector3(0, 1.95, 0)
+	var eye := h.player.global_position + Vector3(0, h.player.config.eye_height_standing, 0)
 	h.player.tool_selector.set_aim_for_tests(eye, p - eye)
 
 

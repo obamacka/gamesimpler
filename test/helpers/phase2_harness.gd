@@ -78,12 +78,12 @@ func vid(material_id: StringName) -> int:
 
 ## Aims the tool selector from the player's eyes at the center of `cell`.
 func aim_at_cell(cell: Vector3i) -> void:
-	var eye := player.global_position + Vector3(0, 1.95, 0)
+	var eye := player.global_position + Vector3(0, player.config.eye_height_standing, 0)
 	player.tool_selector.set_aim_for_tests(eye, (Vector3(cell) + Vector3(0.5, 0.5, 0.5)) - eye)
 
 
 func aim_at_sky() -> void:
-	player.tool_selector.set_aim_for_tests(player.global_position + Vector3(0, 1.95, 0), Vector3.UP)
+	player.tool_selector.set_aim_for_tests(player.global_position + Vector3(0, player.config.eye_height_standing, 0), Vector3.UP)
 
 
 func place(pos: Vector3) -> void:

@@ -202,7 +202,7 @@ func test_f9_refill() -> void:
 	_farm().model.can_water = 0
 	h.place(Vector3(-4.5, 0, 11.5))
 	await h.frames(2)
-	var eye := h.player.global_position + Vector3(0, 1.95, 0)
+	var eye := h.player.global_position + Vector3(0, h.player.config.eye_height_standing, 0)
 	h.player.tool_selector.set_aim_for_tests(eye, Vector3(-4.5, 1.2, 8.5) - eye)
 	await h.frames(14)
 	assert_str(h.player.tool_selector.best()["target_kind"]).is_equal(&"refill")
@@ -267,7 +267,7 @@ func test_f13_auto_tool_farm_rules() -> void:
 	assert_str(h.player.prompt_target()["primary"].kind).is_equal(&"HARVEST")
 	h.place(Vector3(-4.5, 0, 11.5))
 	await h.frames(2)
-	var eye := h.player.global_position + Vector3(0, 1.95, 0)
+	var eye := h.player.global_position + Vector3(0, h.player.config.eye_height_standing, 0)
 	h.player.tool_selector.set_aim_for_tests(eye, Vector3(-4.5, 1.2, 8.5) - eye)
 	await h.frames(14)
 	assert_str(h.session.toolbelt.model.equipped).is_equal(ToolTypes.WATERING_CAN)

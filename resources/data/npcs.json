@@ -41,6 +41,13 @@
      "Have you seen the sunflowers?",
      "My cat loves sunny windows."
     ]
+   },
+   "appearance": {
+    "body": "FEMALE",
+    "hair": "Hair_Buns",
+    "outfit": [
+     "item_outfit_shirt_cotton"
+    ]
    }
   },
   {
@@ -82,6 +89,14 @@
      "Walls hold roofs, floors hold chairs.",
      "A good fence makes a good neighbor."
     ]
+   },
+   "appearance": {
+    "body": "MALE",
+    "hair": "Hair_Beard",
+    "outfit": [
+     "item_outfit_overalls",
+     "item_outfit_boots_rain"
+    ]
    }
   },
   {
@@ -122,6 +137,14 @@
      "Cotton becomes cloth at my bench.",
      "Pets look sweet in bandanas.",
      "Colors make everyone smile."
+    ]
+   },
+   "appearance": {
+    "body": "FEMALE",
+    "hair": "Hair_Long",
+    "outfit": [
+     "item_outfit_raincoat",
+     "item_outfit_pauldron"
     ]
    }
   },
@@ -166,6 +189,14 @@
      "Did you hear the birds this morning?",
      "Wave at me any time!"
     ]
+   },
+   "appearance": {
+    "body": "MALE",
+    "hair": "Hair_SimpleParted",
+    "outfit": [
+     "item_outfit_shirt_cotton",
+     "item_outfit_hat_straw"
+    ]
    }
   },
   {
@@ -201,6 +232,16 @@
      "The museum opens soon.",
      "Geodes hide crystals inside.",
      "Every find has a story."
+    ]
+   },
+   "appearance": {
+    "body": "MALE",
+    "hair": "Hair_Buzzed",
+    "outfit": [
+     "item_outfit_raincoat",
+     "item_outfit_overalls",
+     "item_outfit_boots_rain",
+     "item_outfit_hood_ranger"
     ]
    }
   }

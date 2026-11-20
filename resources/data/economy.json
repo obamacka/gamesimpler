@@ -170,6 +170,14 @@
     {
      "item": "item_outfit_scarf",
      "daily": 1
+    },
+    {
+     "item": "item_outfit_hood_ranger",
+     "daily": 1
+    },
+    {
+     "item": "item_outfit_pauldron",
+     "daily": 1
     }
    ]
   }

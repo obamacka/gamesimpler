@@ -650,6 +650,22 @@
       "outfit_id": "outfit_raincoat"
     },
     {
+      "id": "item_outfit_hood_ranger",
+      "category": "OUTFIT",
+      "max_stack": 1,
+      "base_value": 40,
+      "has_instance_data": true,
+      "outfit_id": "outfit_hood_ranger"
+    },
+    {
+      "id": "item_outfit_pauldron",
+      "category": "OUTFIT",
+      "max_stack": 1,
+      "base_value": 35,
+      "has_instance_data": true,
+      "outfit_id": "outfit_pauldron"
+    },
+    {
       "id": "item_petacc_bandana",
       "category": "PET_ACCESSORY",
       "max_stack": 1,

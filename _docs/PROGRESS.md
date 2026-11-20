@@ -2,10 +2,10 @@
 
 | Field | Value |
 |---|---|
-| Spec | `_docs/specs/spec1.md` rev 3.10 |
+| Spec | `_docs/specs/spec1.md` rev 3.11 |
 | Plan | `_docs/plans/plan1.md` |
-| Active phase | Phase A (art pass): PA1 KayKit done, PA2 to PA4 next. All six phases have their automated work done (Phases 3 to 6 started on owner request before earlier gates passed); manual checklists for Phases 1 to 6, Phase 0 hardware checks and the release-candidate checklist pending |
-| Last updated | 2026-11-19 |
+| Active phase | Phase A (art pass): PA1 done, PA2 (characters, world scale) in progress. All six phases have their automated work done (Phases 3 to 6 started on owner request before earlier gates passed); manual checklists for Phases 1 to 6, Phase 0 hardware checks and the release-candidate checklist pending |
+| Last updated | 2026-11-20 |
 
 ## How to update
 1. After finishing a task, tick it in `plan1.md` and in the phase table below, with the date and commit SHA.
@@ -131,7 +131,14 @@ Status values: `Not started`, `In progress`, `Blocked`, `Done`.
 | PA1.4 Furniture mapping and new pieces | Done | 2026-11-19 | 44e8742 | 7 existing pieces mapped, seat parts and seats moved to the art (seat = 0.5 model units x scale); 7 new pieces with items and builder-shop stock; radio, pet bed, feed bowl and structure pieces stay placeholders |
 | PA1.5 Item and station models | Done | 2026-11-19 | 44e8742 | carrot and tomato props; 3 shop counters, workbench and tailor bench in Home Meadow (colliders resized to the models) |
 | PA1.6 Tests | Done | 2026-11-19 | 44e8742 | unit art 9 (fit, turn, orientation with a mutation check, seat heights, glTF refs, validation, item visual), integration art 5; full suite 563 cases exit 0; visual check by Xvfb renders |
-| PA2 to PA4 Quaternius, Kenney | Not started | | | |
+| PA2.1 World scale 0.75 | In progress | | | |
+| PA2.2 Player 1.7 m | Not started | | | |
+| PA2.3 Vendor Quaternius free packs | Not started | | | |
+| PA2.4 CharacterRig | Not started | | | |
+| PA2.5 Animation | Not started | | | |
+| PA2.6 NPC appearance | Not started | | | |
+| PA2.7 Tests | Not started | | | |
+| PA3, PA4 Pets and crops, Kenney | Not started | | | |
 
 ## Test run log
 | Date | Commit | Phase | Command | Exit code | Failures | Notes |
@@ -168,7 +175,7 @@ Status values: `Not started`, `In progress`, `Blocked`, `Done`.
 ## Blockers and open issues
 | Date | Item | Owner | Status |
 |---|---|---|---|
-| 2026-11-19 | PA1 for owner review: KayKit uses a 2-unit tile, so 1-cell fits run 0.44 (stove, fridge) to 0.95 (wide cabinet) while seating is about 0.6 to 0.8; the fridge is barely taller than a chair next to the 2.1 m player capsule. Options: 2-cell kitchen pieces, one world scale with a smaller player when Quaternius characters land (PA2), or accept. Shop counters face their drawers to the shopkeeper side (yaw 0) | owner review | Open |
+| 2026-11-19 | (Resolved 2026-11-20: one world scale 0.75 m per KayKit unit and a 1.7 m player, spec 11.4) PA1 for owner review: KayKit uses a 2-unit tile, so 1-cell fits run 0.44 (stove, fridge) to 0.95 (wide cabinet) while seating is about 0.6 to 0.8; the fridge is barely taller than a chair next to the 2.1 m player capsule. Shop counters face their drawers to the shopkeeper side (yaw 0) | owner review | Closed |
 | 2026-11-16 | Phase 1 manual gamepad checklist (plan Phase 1) | team | Open |
 | 2026-11-16 | Phase 2 manual checklist and min-spec performance check | team | Open |
 | 2026-11-16 | Phase 2 choices for owner review: JSON content authoring (spec 3 conventions updated); care-letter snack rule compares against the collapse day (spec 6.2 corrected, the old rule could never trigger); `player_woke` emitted just before the transition pause is released (spec 6.2 diagram updated to match Suite B); Bed and Mine Entrance act without the confirm dialog until Phase 3 adds menus; SafeGround uses the standing-capsule clearance as the "3 free voxels" check; prompt occlusion implemented in 5ac70f4 | owner review | Open |

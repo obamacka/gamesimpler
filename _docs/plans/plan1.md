@@ -440,8 +440,15 @@ Integration:
 - [x] **PA1.6** Tests: every model loads and fits its box; furniture backs face -z after `yaw_deg` (geometry heuristic); PieceView hides placeholder meshes but keeps collision; paint reaches model meshes; item visuals use models; full suite green.
 
 ### PA2 to PA4 (next)
-- [ ] **PA2** Quaternius base characters, modular outfits and animation library for the player and NPCs (outfit slots and hidden body regions).
-- [ ] **PA3** Quaternius animated dog and cat (accessory bones per species), crops pack (stage models).
+- [ ] **PA2** Characters and world scale (owner decisions 2026-11-20: option 2, Quaternius free tier, 0.75 m per KayKit unit; spec 11.4 to 11.7):
+  - [ ] **PA2.1** World scale: `ModelFit.WORLD_SCALE` placement; pieces re-footprinted (overhang at most 0.2 m), parts and seats from the scaled models; stations sized from their models.
+  - [ ] **PA2.2** Player 1.7 m: `PlayerConfig` drives capsules, probes and camera height; Duck 0.9 m; auto-jump clearance 2 cells; NPC capsule 1.7 m; tests updated.
+  - [ ] **PA2.3** Vendor Quaternius Standard packs (Superhero heads, hair, eyes; Peasant and Ranger parts; UAL1 and UAL2) with textures at most 1024 px, LICENSE, SOURCE; CREDITS.
+  - [ ] **PA2.4** `CharacterRig`: outfit skeleton, head cut by skin weights, hair, base layer, outfit parts per slot, dye on cloth, HAIR hiding, placeholder bone attachments; player and wardrobe preview use it.
+  - [ ] **PA2.5** `CharacterAnimModel` and merged clip library; player states drive clips.
+  - [ ] **PA2.6** NPC appearance in `npcs.json`; NPCs use `CharacterRig` (idle, walk, talk, reactions).
+  - [ ] **PA2.7** Tests: scale and footprint rules, head cut, rig composition per slot, dye, HAIR hiding, clip mapping, player size probes; full suite green.
+- [ ] **PA3** Animated dog and cat (accessory bones per species), crops pack (stage models).
 - [ ] **PA4** Kenney Survival Kit tools in hand, Kenney Voxel Pack textures for the block library.
 
 ---

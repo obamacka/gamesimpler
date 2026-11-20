@@ -2,8 +2,8 @@
 
 | Field | Value |
 |---|---|
-| Status | DRAFT rev 3.10, all decisions resolved |
-| Revision | rev 1: core systems. rev 2: kid-friendly, accessibility, forgiving logic, expression systems, integration tests. rev 3: D1 to D4 resolved (dig-anywhere blocky voxels, jump and double jump, context-aware interaction with dedicated critical states, crafting flow confirmed). rev 3.1: D16 to D19 confirmed. rev 3.2: D5 to D15 resolved (farming system added, pets on day 2, keep last tool), min-spec hardware, test command note. rev 3.3: D20 to D25 resolved (macOS min spec M1 16 GB; 30 fps on min spec, 60 fps on recommended spec). rev 3.4: D26 recommended spec. rev 3.5: Phase 2B farming details (farm events, save shape, extra 10.4 rows, Home Meadow). rev 3.6: Phase 3 build lattice layers, socket attach transforms, support rule, `build` save shape (`build_rev36` replaces the per-plot list). rev 3.7: Phase 4 `jobs` save shape (ranks nested under `jobs.jobs`, contract origin_y); job sites are build zones and flattened; starting coins 150. rev 3.8: Phase 5 details (pet settles at 80% of follow_distance; never-expire mail kinds; mail prune after delivery; NPC straight steering where no navmesh is baked; generated instrument tones; care letters signed by the best friend). rev 3.9: Phase 6 (save layout with per-slot voxel directories and epochs, schema v2 with migration from v1, zone navigation baking, level town volumes, curator Y donates, static zones drop the previous terrain). rev 3.10: section 11 art assets (smooth low-poly, CC0 packs, model wiring) |
+| Status | DRAFT rev 3.11, all decisions resolved |
+| Revision | rev 1: core systems. rev 2: kid-friendly, accessibility, forgiving logic, expression systems, integration tests. rev 3: D1 to D4 resolved (dig-anywhere blocky voxels, jump and double jump, context-aware interaction with dedicated critical states, crafting flow confirmed). rev 3.1: D16 to D19 confirmed. rev 3.2: D5 to D15 resolved (farming system added, pets on day 2, keep last tool), min-spec hardware, test command note. rev 3.3: D20 to D25 resolved (macOS min spec M1 16 GB; 30 fps on min spec, 60 fps on recommended spec). rev 3.4: D26 recommended spec. rev 3.5: Phase 2B farming details (farm events, save shape, extra 10.4 rows, Home Meadow). rev 3.6: Phase 3 build lattice layers, socket attach transforms, support rule, `build` save shape (`build_rev36` replaces the per-plot list). rev 3.7: Phase 4 `jobs` save shape (ranks nested under `jobs.jobs`, contract origin_y); job sites are build zones and flattened; starting coins 150. rev 3.8: Phase 5 details (pet settles at 80% of follow_distance; never-expire mail kinds; mail prune after delivery; NPC straight steering where no navmesh is baked; generated instrument tones; care letters signed by the best friend). rev 3.9: Phase 6 (save layout with per-slot voxel directories and epochs, schema v2 with migration from v1, zone navigation baking, level town volumes, curator Y donates, static zones drop the previous terrain). rev 3.10: section 11 art assets (smooth low-poly, CC0 packs, model wiring). rev 3.11 (owner 2026-11-20): one world scale 0.75 m per KayKit unit, player 1.7 m, Quaternius free characters (11.4 to 11.7) |
 | Engine | Godot 4.7 stable (4.7.2 latest patch found, 2026-08-18), GDScript |
 | Physics | Jolt Physics (built-in module) |
 | Voxels | Zylann Voxel Tools 1.7, GDExtension edition (MIT), released 2026-08-20, targets Godot 4.5+ |
@@ -134,7 +134,7 @@ None. All decisions D1 to D26 are resolved (0.4).
 20. **Navigation on editable voxels is unsolved upstream.** Pet uses `VoxelAStarGrid3D` (fits its 1x2 agent assumption) with teleport fallback; NPCs are confined to protected areas with baked navmeshes and never path across dug terrain.
 21. **Headless voxel behavior is unverified** (meshing, collision, worker threads with the headless display server). All gameplay talks to terrain through `IVoxelWorld`; tests use `FakeVoxelWorld` (9.7). One real-terrain smoke suite, tagged `@voxel_real`, must pass in the spike.
 22. **Two-file save consistency.** JSON state and the voxel SQLite file can diverge after a crash. Slot files change only at explicit saves through a working copy, with an epoch check (9.6). Copying the SQLite file while the stream holds it open after the save tracker completes is **unverified**; the spike confirms it or switches to a fresh `database_path` per save.
-23. **Tall player on a 1 m grid.** The 2.1 m standing height needs 3 free voxels; 2-voxel tunnels force Duck; jumps need headroom. Level generation and auto-jump checks use these numbers.
+23. **Player height on a 1 m grid.** The 1.7 m standing height (rev 3.11) needs 2 free voxels; 1-voxel crawl spaces force Duck (0.9 m); jumps need headroom. Level generation and auto-jump checks use these numbers.
 24. **Kids digging deep pits.** A double jump clears 2 voxels; deeper pits need stairs. Digging the voxel directly under your feet is blocked (9.3 P6), and Go Home (D19) guarantees escape.
 25. **Floating trees and structures.** Support voxels under fruit trees, interactables, placed pieces and spawn points are protected (9.3 P3, P4).
 26. **Farming makes soil targets ambiguous.** Aiming at grass could mean dig (shovel) or till (hoe). Rule: the selected hotbar item decides; seeds selected means till-and-plant, otherwise dig (10.4). Tilling without seeds needs a manual HOE pick on the wheel.
@@ -260,8 +260,9 @@ Main (Node)                                   PAUSABLE
 ### 1.4 Player (`res://scenes/player/player.tscn`)
 | Parameter | Value |
 |---|---|
-| Standing capsule height / radius | 2.10 m / 0.35 m (needs 3 free voxels) |
-| Ducking capsule height | 1.30 m (fits 2-voxel tunnels) |
+| Standing capsule height / radius | 1.70 m / 0.30 m (needs 2 free voxels; rev 3.11, was 2.10 m / 0.35 m) |
+| Ducking capsule height | 0.90 m (fits 1-voxel crawl spaces; was 1.30 m) |
+| Eye height standing / ducking | 1.55 m / 0.75 m |
 | Walk / Run / Duck-walk speed | 2.2 / 5.0 / 1.2 m/s |
 | Gravity | 24 m/s^2 |
 | Jump | apex 1.30 m (clears a 1-voxel step), initial vertical velocity 7.9 m/s |
@@ -307,7 +308,7 @@ Services do not reference each other, except `TransactionCoordinator` (Economy),
 - Custom grid (GridMap cannot hold per-piece state). 1.0 m structure cells, 0.5 m furniture sub-grid, 90-degree rotations. `BuildService` holds `Dictionary[Vector3i, PieceInstance]` plus footprint occupancy. Snap assist in 2.7.
 - Build cells and voxels share one lattice: cell `(x, y, z)` spans `[x, x+1) x [y, y+1) x [z, z+1)` meters.
 - A cell holds a voxel **or** part of a build piece footprint, never both. `TerrainService` and `BuildService` both consult the shared occupancy check.
-- Storey height 3 cells (3.0 m), clearing the 2.1 m player and 2.4 m doors.
+- Storey height 3 cells (3.0 m), clearing the 1.7 m player and 2.4 m doors.
 - Occupancy layers (rev 3.6): a cell holds at most one FLOOR slab, one BODY piece (furniture, stairs) and one WALL piece per face. Walls sit on a cell face and are keyed by the canonical face, so two walls on the same edge collide while a floor, a wall and a chair can share one cell. Voxels still exclude every layer.
 - Snap sockets carry the attach transform: `attach_offset` (cell offset of the attaching piece's anchor) and `attach_rot`, both rotated with the providing piece. Tags in use: `floor_next`, `wall_slot`, `floor_top`, `wall_end`, `wall_top`, `roof_slot`, `wall_face`, `ground`.
 - Support (rev 3.6): at least one bottom footprint cell must stand on a solid voxel, on a FASTENED `provides_support` piece in the cell below, or (for non-floor pieces) on a FASTENED floor slab in the same cell.
@@ -1719,6 +1720,39 @@ Tilling without seeds: choose HOE on the wheel Tools page (manual override, 2.6 
 - `ItemDef.world_model`: a res path used by pickups, museum displays and ripe crops; items without one keep the coloured box.
 - `MenuStation.model`: optional res path for counters and benches.
 - Paint and dye on textured models: the piece shader samples the model's albedo texture. Unpainted regions show the texture unchanged; painted regions keep the texture's shading and take the dye colour (`mix(tex, luma(tex) * dye, painted)`). Models are a single PRIMARY paint region; pieces with a model list only PRIMARY.
-- Scale: KayKit models sit on a 2-unit tile, so a 1-cell fit is about 0.5 m per unit. Fit boxes are chosen per piece (current scales 0.44 for the stove to 0.95 for the wide cabinet), so kitchen pieces read smaller than seating and cabinets; a single world scale is an open owner decision tied to the player size (PA2).
+- Scale: superseded by 11.4 (one world scale).
 - Pickups use a 0.3 m cube, display cases 0.3 m, ripe crops 0.45 m on top of the crop box; stations fit their `size`.
 - Structural pieces (floor, walls, doors, windows, roof, fence, stairs) keep placeholder geometry until a pack with matching 1 x 3 m wall modules is chosen.
+
+### 11.4 World scale (owner decision 2026-11-20)
+- Every KayKit furniture and station model is shown at one scale: **0.75 m per KayKit unit** (`ModelFit.WORLD_SCALE`). A KayKit 2-unit tile is 1.5 m. Seats sit at 0.375 m, counters and tables at 0.75 m, the fridge at 1.9 m.
+- Pieces place the model at that scale, centred in the footprint, floor at the footprint bottom (or at `model.box` bottom for wall-mounted pieces). The footprint is the smallest set of cells that leaves at most 0.2 m of model overhang per side; larger models take more cells (kitchen modules 2 x 2, so a row of counters has 0.5 m gaps; owner review).
+- Collision parts follow the scaled model. Seats sit on the seat top (0.5 model units x 0.75).
+- Stations with a model take their collider size from the scaled model.
+- Small props (pickups, display items, ripe produce) are fitted into a cube as before; they are not furniture.
+- Player and NPC characters are scaled to 1.7 m (1.4).
+
+### 11.5 Characters (owner decision 2026-11-20: Quaternius free tier)
+Sources, all CC0, Standard (free) editions only:
+- Universal Base Characters: Superhero male and female (only these bodies are free), hairstyles rigged to the head bone, eyes and eyebrows.
+- Modular Character Outfits - Fantasy: Peasant and Ranger outfits, male and female, as modular parts (Body, Arms, Legs, Feet, Ranger Hood and Pauldrons) on the Regular-proportion body. The parts include the exposed skin of that body; they have no head.
+- Universal Animation Library 1 and 2: 86 clips on the same 65-bone humanoid rig (rotation tracks plus pelvis position), so clips retarget to either body by bone name.
+Composition (`CharacterRig`):
+- The skeleton comes from the outfit pack (Regular proportions), so outfit parts fit.
+- The head is cut from the Superhero body by skin weights: triangles whose three vertices are dominated by the `Head` or `neck_01` bones. The rest of the Superhero body is never shown (its proportions clip through the outfits). Eyes and eyebrows come from the same file.
+- Hair is a separate head-bone mesh; worn pieces with `HAIR` in `hide_body_regions` hide it.
+- Body type MALE or FEMALE picks the matching parts. Skin is the packs' "Dark" tone (the only Regular skin texture in the free tier).
+- Base layer: every slot without a worn piece shows a base part (TOP Peasant Body and Arms in the alternate texture, BOTTOM Peasant Legs, FEET Peasant Feet), so the body is never bare.
+- Character height is scaled to 1.7 m. The rig is turned to face -Z (Godot forward).
+
+### 11.6 Outfit parts
+- `OutfitDef.parts`: `{"MALE": [res paths], "FEMALE": [res paths]}` and optional `texture` (an alternate base-colour texture of the same pack). Pieces without parts keep a coloured placeholder box attached to the slot's bone (HEAD: `Head`, ACCESSORY: `neck_01`).
+- Dye: the cloth surface (not the skin surface) gets its albedo multiplied by the dye colour (lightened 30% toward white so dark dyes do not go black).
+- Mapping (free tier): cotton shirt = Peasant Body and Arms; raincoat = Ranger Body and Arms; overalls = Ranger Legs; rain boots = Ranger Feet; new ranger hood (HEAD, hides HAIR) and pauldron (ACCESSORY) items at the tailor; straw hat and scarf stay placeholders.
+- The player's body type and hair come from `PlayerConfig` (default FEMALE, `Hair_SimpleParted`) until a character creator exists (owner review). NPCs set `appearance` in `npcs.json` (body, hair, outfit item ids).
+
+### 11.7 Animation
+- One merged `AnimationLibrary` (UAL1 + UAL2, loaded once). Godot's importer strips the `_Loop` suffix and marks those clips looping.
+- `CharacterAnimModel` (pure) maps a player state, plus tool, emote or interaction kind, to a clip: idle `Idle`, walk `Walk`, run `Jog_Fwd`, duck `Crouch_Idle` or `Crouch_Fwd`, jump `Jump_Start` then `Jump`, fall `Jump`, mine by tool (pickaxe and shovel `TreeChopping`, hoe `Farm_PlantSeed`, watering can `Farm_Watering`, picker `Farm_Harvest`), interact `Interact` (chest `Chest_Open`, eat `Consume`), sleep `LayToIdle` held on its first frame, build `Fixing_Kneeling` while fastening otherwise locomotion, sit `Sitting_Enter` then `Sitting_Idle`, craft `Fixing_Kneeling`, talk `Idle_Talking`, emotes (wave `Interact`, dance `Dance`, cheer `Yes`, clap `Idle_FoldArms`, heart `Idle_Talking`, sleepy `Idle_No`, laugh `Idle_Talking`, point `Interact`), play instrument `Idle_Lantern`. The free tier has no wave, pickaxe or sleeping clip; these are the closest substitutes (owner review).
+- Clips cross-fade over 0.15 s. Gameplay timing never waits on a clip.
+- Vendored textures are downscaled to at most 1024 px (Lanczos) to keep the repository small; `SOURCE.md` records it.

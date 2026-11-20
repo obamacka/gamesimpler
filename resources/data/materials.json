@@ -9,7 +9,12 @@
       "drop": "loot_dirt",
       "placeable": false,
       "stamina_cost": 1,
-      "color": "#5cae4c"
+      "color": "#5cae4c",
+      "tiles": {
+        "top": "grass_top.png",
+        "side": "dirt_grass.png",
+        "bottom": "dirt.png"
+      }
     },
     {
       "id": "mat_dirt",
@@ -20,7 +25,10 @@
       "drop": "loot_dirt",
       "placeable": true,
       "stamina_cost": 1,
-      "color": "#7b5534"
+      "color": "#7b5534",
+      "tiles": {
+        "side": "dirt.png"
+      }
     },
     {
       "id": "mat_sand",
@@ -31,7 +39,10 @@
       "drop": "loot_sand",
       "placeable": true,
       "stamina_cost": 1,
-      "color": "#e0cf8e"
+      "color": "#e0cf8e",
+      "tiles": {
+        "side": "sand.png"
+      }
     },
     {
       "id": "mat_clay",
@@ -42,7 +53,10 @@
       "drop": "loot_clay",
       "placeable": true,
       "stamina_cost": 1,
-      "color": "#b57a62"
+      "color": "#b57a62",
+      "tiles": {
+        "side": "redsand.png"
+      }
     },
     {
       "id": "mat_stone",
@@ -53,7 +67,10 @@
       "drop": "loot_stone",
       "placeable": true,
       "stamina_cost": 2,
-      "color": "#8a8a90"
+      "color": "#8a8a90",
+      "tiles": {
+        "side": "stone.png"
+      }
     },
     {
       "id": "mat_stone_hard",
@@ -64,7 +81,10 @@
       "drop": "loot_stone",
       "placeable": false,
       "stamina_cost": 2,
-      "color": "#5d5d66"
+      "color": "#5d5d66",
+      "tiles": {
+        "side": "greystone.png"
+      }
     },
     {
       "id": "mat_copper_ore",
@@ -75,7 +95,10 @@
       "drop": "loot_copper",
       "placeable": false,
       "stamina_cost": 2,
-      "color": "#c47a3e"
+      "color": "#c47a3e",
+      "tiles": {
+        "side": "stone_browniron.png"
+      }
     },
     {
       "id": "mat_iron_ore",
@@ -86,7 +109,10 @@
       "drop": "loot_iron",
       "placeable": false,
       "stamina_cost": 2,
-      "color": "#b9a089"
+      "color": "#b9a089",
+      "tiles": {
+        "side": "stone_iron.png"
+      }
     },
     {
       "id": "mat_quartz_ore",
@@ -97,7 +123,10 @@
       "drop": "loot_quartz",
       "placeable": false,
       "stamina_cost": 2,
-      "color": "#e8e4f0"
+      "color": "#e8e4f0",
+      "tiles": {
+        "side": "stone_silver.png"
+      }
     },
     {
       "id": "mat_geode_rock",
@@ -109,7 +138,10 @@
       "special": "GEODE",
       "placeable": false,
       "stamina_cost": 2,
-      "color": "#6b5a8a"
+      "color": "#6b5a8a",
+      "tiles": {
+        "side": "greystone_ruby.png"
+      }
     },
     {
       "id": "mat_chest_block",
@@ -121,7 +153,10 @@
       "special": "CHEST",
       "placeable": false,
       "stamina_cost": 1,
-      "color": "#a0702a"
+      "color": "#a0702a",
+      "tiles": {
+        "side": "wood.png"
+      }
     },
     {
       "id": "mat_bedrock",
@@ -133,7 +168,11 @@
       "special": "BEDROCK",
       "placeable": false,
       "stamina_cost": 0,
-      "color": "#222228"
+      "color": "#222228",
+      "tiles": {
+        "side": "rock.png"
+      },
+      "tint": "#4a4a50"
     },
     {
       "id": "mat_farmland",
@@ -144,7 +183,11 @@
       "drop": "loot_dirt",
       "placeable": false,
       "stamina_cost": 1,
-      "color": "#5a3a22"
+      "color": "#5a3a22",
+      "tiles": {
+        "side": "dirt.png"
+      },
+      "tint": "#8a6a58"
     }
   ]
 }

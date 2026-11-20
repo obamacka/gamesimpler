@@ -23,3 +23,11 @@ const SPECIAL_BEDROCK := &"BEDROCK"
 ## Soft materials are dug with the shovel, hard ones with the pickaxe (spec 2.6).
 func is_hard() -> bool:
 	return preferred_tool == ToolTypes.PICKAXE
+## Block tiles (spec 11.10): {"top", "side", "bottom"} file names in the Voxel Pack folder; side
+## stands in for missing entries. tint multiplies the tiles.
+@export var tiles: Dictionary = {}
+@export var tint := Color.WHITE
+
+
+func tile(face: String) -> String:
+	return String(tiles.get(face, tiles.get("side", "")))

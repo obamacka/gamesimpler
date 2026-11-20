@@ -142,7 +142,8 @@
         "power": 1,
         "strike_interval_sec": 0.45,
         "stamina_cost": 0
-      }
+      },
+      "world_model": "res://assets/third_party/kenney/survival_kit/tool-shovel.glb"
     },
     {
       "id": "item_pickaxe_basic",
@@ -156,7 +157,8 @@
         "power": 1,
         "strike_interval_sec": 0.5,
         "stamina_cost": 0
-      }
+      },
+      "world_model": "res://assets/third_party/kenney/survival_kit/tool-pickaxe.glb"
     },
     {
       "id": "item_pickaxe_copper",
@@ -170,7 +172,8 @@
         "power": 1,
         "strike_interval_sec": 0.45,
         "stamina_cost": 0
-      }
+      },
+      "world_model": "res://assets/third_party/kenney/survival_kit/tool-pickaxe-upgraded.glb"
     },
     {
       "id": "item_pickaxe_iron",
@@ -184,7 +187,8 @@
         "power": 1,
         "strike_interval_sec": 0.4,
         "stamina_cost": 0
-      }
+      },
+      "world_model": "res://assets/third_party/kenney/survival_kit/tool-pickaxe-upgraded.glb"
     },
     {
       "id": "item_axe_basic",
@@ -198,7 +202,8 @@
         "power": 1,
         "strike_interval_sec": 0.55,
         "stamina_cost": 2
-      }
+      },
+      "world_model": "res://assets/third_party/kenney/survival_kit/tool-axe.glb"
     },
     {
       "id": "item_picker_basic",
@@ -226,7 +231,8 @@
         "power": 1,
         "strike_interval_sec": 0.35,
         "stamina_cost": 1
-      }
+      },
+      "world_model": "res://assets/third_party/kenney/survival_kit/tool-hammer.glb"
     },
     {
       "id": "item_screwdriver_basic",
@@ -321,7 +327,8 @@
         "case_id": "case_produce",
         "hint_key": "Tall and yellow",
         "sort_order": 22
-      }
+      },
+      "world_model": "res://assets/third_party/quaternius/crops/Flowers_Crop.fbx"
     },
     {
       "id": "item_pumpkin",
@@ -338,7 +345,8 @@
         "case_id": "case_produce",
         "hint_key": "Big, round and orange",
         "sort_order": 23
-      }
+      },
+      "world_model": "res://assets/third_party/quaternius/crops/Pumpkin_Crop.fbx"
     },
     {
       "id": "item_cotton",
@@ -376,7 +384,8 @@
         "case_id": "case_produce",
         "hint_key": "Sweet red berries that grow back",
         "sort_order": 25
-      }
+      },
+      "world_model": "res://assets/third_party/quaternius/crops/BushBerries_Crop.fbx"
     },
     {
       "id": "item_tomato",
@@ -412,7 +421,8 @@
         "power": 1,
         "strike_interval_sec": 0.5,
         "stamina_cost": 1
-      }
+      },
+      "world_model": "res://assets/third_party/kenney/survival_kit/tool-hoe.glb"
     },
     {
       "id": "item_watering_can_basic",

@@ -10,9 +10,9 @@
    "wander_after": 6.0,
    "wander_radius": 4.0,
    "accessory_bones": {
-    "HEAD": "head",
-    "NECK": "neck",
-    "BODY": "body"
+    "HEAD": "Bone.003",
+    "NECK": "Bone.002",
+    "BODY": "Bone.001"
    },
    "favorite_food_tags": [
     "meaty"
@@ -26,7 +26,17 @@
     0.5,
     0.6,
     0.9
-   ]
+   ],
+   "model": {
+    "scene": "res://assets/third_party/quaternius/animals/Dog.fbx",
+    "yaw_deg": 90,
+    "coat_materials": [
+     "Dog"
+    ],
+    "material_colors": {},
+    "anim_idle": "DogArmature|Idle",
+    "anim_walk": "DogArmature|Walking"
+   }
   },
   {
    "id": "pet_cat",
@@ -38,9 +48,9 @@
    "wander_after": 6.0,
    "wander_radius": 3.0,
    "accessory_bones": {
-    "HEAD": "head",
-    "NECK": "neck",
-    "BODY": "body"
+    "HEAD": "Bone.003",
+    "NECK": "Bone.002",
+    "BODY": "Bone.001"
    },
    "favorite_food_tags": [
     "fishy"
@@ -54,7 +64,20 @@
     0.35,
     0.45,
     0.7
-   ]
+   ],
+   "model": {
+    "scene": "res://assets/third_party/quaternius/animals/Cat.fbx",
+    "yaw_deg": 90,
+    "coat_materials": [
+     "Grey"
+    ],
+    "material_colors": {
+     "White": "#f4f2ee",
+     "Pink": "#f0a0b8"
+    },
+    "anim_idle": "CatArmature|Idle",
+    "anim_walk": "CatArmature|Walking"
+   }
   }
  ],
  "accessories": [

@@ -34,7 +34,10 @@ var anim: AnimationPlayer
 var hair: MeshInstance3D
 var slot_nodes := {}          # slot -> Array[Node3D] (meshes or bone attachments)
 var current_clip: StringName = &""
+var held_path := ""
+var held: BoneAttachment3D        # right-hand attachment for the equipped tool (spec 11.10)
 var _next: StringName = &""
+var _hand_ref := Transform3D()    # hand_r pose in skeleton space on Idle frame 0
 
 
 ## Builds the body. Call once, before set_outfit.
@@ -73,6 +76,8 @@ func setup(p_body: StringName, p_hair: String) -> void:
 	anim.animation_finished.connect(_on_finished)
 	set_outfit({}, [])
 	play({"clip": CharacterAnimModel.IDLE})
+	anim.seek(0.0, true)
+	_hand_ref = skeleton.get_bone_global_pose(skeleton.find_bone("hand_r"))
 
 
 ## worn: slot -> {"parts": Array[String] (outfit file names), "texture": String, "tint": Color}
@@ -141,6 +146,38 @@ static func hidden_from_items(item_ids: Array) -> Array:
 		if def:
 			out.append_array(def.hide_body_regions)
 	return out
+
+
+const HELD_LENGTH := 0.6   # metres from grip to tool head
+const HELD_DIRECTION := Vector3(0, 0.35, 1)   # skeleton space: forward and a little up
+
+## Shows `path` (a tool model, spec 11.10) in the right hand, or nothing for "". Repeats are ignored.
+func set_held(path: String) -> void:
+	if path == held_path:
+		return
+	held_path = path
+	if held:
+		held.get_parent().remove_child(held)
+		held.queue_free()
+		held = null
+	var m := ModelFit.instantiate(path)
+	if m == null:
+		return
+	held = BoneAttachment3D.new()
+	held.name = "Held"
+	held.bone_name = "hand_r"
+	skeleton.add_child(held)
+	var pivot := Node3D.new()
+	held.add_child(pivot)
+	pivot.add_child(m)
+	# Model: handle along +Y from y = 0. Fit to HELD_LENGTH tall (in metres, so undo the rig scale).
+	var len := HELD_LENGTH / scale.x
+	ModelFit.fit(m, AABB(Vector3(-len, -len * 0.15, -len), Vector3(len * 2.0, len, len * 2.0)), 0)
+	# Point +Y along HELD_DIRECTION at the Idle hand pose, expressed in the hand bone's frame.
+	var up := HELD_DIRECTION.normalized()
+	var side := Vector3.RIGHT
+	var want := Basis(side, up, side.cross(up).normalized()).orthonormalized()
+	pivot.transform = _hand_ref.affine_inverse() * Transform3D(want, _hand_ref.origin)
 
 
 ## Plays {"clip", "then", "hold"} from CharacterAnimModel; repeated requests are ignored.

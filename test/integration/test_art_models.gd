@@ -112,13 +112,17 @@ func test_pickup_and_ripe_crop_use_produce_models() -> void:
 	stone.item_id = &"item_stone"
 	SceneRouter.current_zone.add_child(stone)
 	assert_bool(stone.get_node("Visual") is MeshInstance3D).is_true()
+	# carrot has stage models (spec 11.9): no produce prop on top of the plant
 	var crop: CropDef = Database.crops[&"crop_carrot"]
 	var ripe: CropView = auto_free(CropView.new())
 	ripe.setup(crop, 999)
 	assert_bool(ripe.ripe).is_true()
-	assert_object(ripe.get_node_or_null("Produce")).is_not_null()
-	var young: CropView = auto_free(CropView.new())
-	young.setup(crop, 0)
-	assert_object(young.get_node_or_null("Produce")).is_null()
+	assert_object(ripe.get_node_or_null("Produce")).is_null()
+	assert_object(ripe.model).is_not_null()
+	# cotton has no models: the box, and no produce model either
+	var cotton: CropView = auto_free(CropView.new())
+	cotton.setup(Database.crops[&"crop_cotton"], 999)
+	assert_object(cotton.model).is_null()
+	assert_object(cotton.get_node_or_null("Produce")).is_null()
 	p.queue_free()
 	stone.queue_free()

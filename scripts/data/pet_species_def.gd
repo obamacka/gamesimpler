@@ -14,3 +14,10 @@ extends Resource
 @export var favorite_food_tags: Array[StringName] = []
 @export var variants: Array[Color] = []
 @export var size := Vector3(0.5, 0.6, 0.9)
+## Art model (spec 11.8): scene, turn so the model faces -Z, colours by material name, clips.
+@export var model := ""
+@export var model_yaw_deg := 0
+@export var coat_materials: Array[String] = []       # take the colour variant
+@export var material_colors: Dictionary = {}         # material name -> Color
+@export var anim_idle: StringName = &""
+@export var anim_walk: StringName = &""

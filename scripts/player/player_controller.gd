@@ -478,6 +478,15 @@ func refresh_outfit() -> void:
 	character.set_outfit(CharacterRig.worn_from_slots(s.outfit.model.slots, character.body), hidden_body_regions)
 
 
+## World model of the equipped tool item (spec 11.10), or "".
+func _equipped_model() -> String:
+	var s := session()
+	if s == null or s.toolbelt.model.equipped == ToolTypes.NONE:
+		return ""
+	var it: ItemDef = Database.items.get(s.toolbelt.model.owned.get(s.toolbelt.model.equipped, &""))
+	return it.world_model if it else ""
+
+
 ## Clip for the current state (spec 11.7). Called every physics tick; the rig ignores repeats.
 func update_animation(f: InputFrame) -> void:
 	var st := machine.current_id
@@ -485,6 +494,7 @@ func update_animation(f: InputFrame) -> void:
 	var tool := equipped_tool_data()
 	if tool:
 		info["tool"] = tool.tool_type
+	character.set_held(_equipped_model())
 	var cur := current_state()
 	if st == PlayerTransitionTable.EMOTE and cur.get("emote"):
 		info["emote"] = (cur.get("emote") as EmoteDef).id

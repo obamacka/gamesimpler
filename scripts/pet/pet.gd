@@ -20,6 +20,9 @@ var _repath_t := 0.0
 var _wander_t := 0.0
 var _wander_target := Vector3.ZERO
 var bowl_target: Variant = null
+var model: Node3D                 # species art model (spec 11.8), or null for the placeholder box
+var anim: AnimationPlayer
+var _bone_space_scale := 1.0
 
 
 static func create(s: GameSession, pet_state: Dictionary) -> Pet:
@@ -45,20 +48,12 @@ func _build() -> void:
 	var visual := Node3D.new()
 	visual.name = "Visual"
 	add_child(visual)
-	var rig := Node3D.new()
-	rig.name = "Rig"
-	visual.add_child(rig)
-	skeleton = Skeleton3D.new()
-	skeleton.name = "Skeleton3D"
-	rig.add_child(skeleton)
-	var h := species.size.y
-	var bones := {"body": Vector3(0, h * 0.6, 0), "neck": Vector3(0, h * 0.85, -species.size.z * 0.35), "head": Vector3(0, h * 1.05, -species.size.z * 0.45)}
-	for b in ["body", "neck", "head"]:
-		var idx := skeleton.add_bone(b)
-		skeleton.set_bone_rest(idx, Transform3D(Basis(), bones[b]))
-		skeleton.set_bone_pose_position(idx, bones[b])
 	var color: Color = species.variants[clampi(int(state["color_variant"]), 0, species.variants.size() - 1)] if not species.variants.is_empty() else Color.WHITE
-	skeleton.add_child(WorldObject.box_mesh(species.size, color, Vector3(0, h * 0.5, 0)))
+	model = ModelFit.instantiate(species.model)
+	if model:
+		_build_model(visual, color)
+	else:
+		_build_placeholder(visual, color)
 	for slot in PetAccessoryDef.SLOTS:
 		var att := BoneAttachment3D.new()
 		att.name = String(slot)
@@ -74,6 +69,67 @@ func _build() -> void:
 	refresh_accessories()
 
 
+## Spec 11.8: the species model fitted to its size box, coloured by material name.
+func _build_model(visual: Node3D, coat: Color) -> void:
+	model.name = "Model"
+	visual.add_child(model)
+	ModelFit.fit(model, AABB(Vector3(-species.size.x * 0.5, 0, -species.size.z * 0.5), species.size), species.model_yaw_deg)
+	skeleton = model.find_children("*", "Skeleton3D", true, false)[0]
+	var k := model.transform.basis.get_scale().x * (skeleton.get_parent() as Node3D).transform.basis.get_scale().x
+	_bone_space_scale = k if k > 0.0 else 1.0
+	for mi in ModelFit.mesh_instances(model):
+		for i in mi.mesh.get_surface_count():
+			var m := mi.mesh.surface_get_material(i) as BaseMaterial3D
+			if m == null:
+				continue
+			var c: Variant = coat if m.resource_name in species.coat_materials else species.material_colors.get(m.resource_name)
+			if c != null:
+				var d := m.duplicate() as BaseMaterial3D
+				d.albedo_color = c
+				mi.set_surface_override_material(i, d)
+	anim = model.find_children("*", "AnimationPlayer", true, false)[0] if not model.find_children("*", "AnimationPlayer", true, false).is_empty() else null
+	if anim:
+		for a in [species.anim_idle, species.anim_walk]:
+			if anim.has_animation(a):
+				anim.get_animation(a).loop_mode = Animation.LOOP_LINEAR
+		_play(species.anim_idle, 1.0)
+
+
+func _build_placeholder(visual: Node3D, color: Color) -> void:
+	var rig := Node3D.new()
+	rig.name = "Rig"
+	visual.add_child(rig)
+	skeleton = Skeleton3D.new()
+	skeleton.name = "Skeleton3D"
+	rig.add_child(skeleton)
+	var h := species.size.y
+	var bones := {"body": Vector3(0, h * 0.6, 0), "neck": Vector3(0, h * 0.85, -species.size.z * 0.35), "head": Vector3(0, h * 1.05, -species.size.z * 0.45)}
+	for b in ["body", "neck", "head"]:
+		var idx := skeleton.add_bone(b)
+		skeleton.set_bone_rest(idx, Transform3D(Basis(), bones[b]))
+		skeleton.set_bone_pose_position(idx, bones[b])
+	skeleton.add_child(WorldObject.box_mesh(species.size, color, Vector3(0, h * 0.5, 0)))
+
+
+func _play(clip: StringName, speed: float) -> void:
+	if anim == null or not anim.has_animation(clip):
+		return
+	if anim.current_animation != clip:
+		anim.play(clip, 0.2)
+	anim.speed_scale = speed
+
+
+## Clip and facing from the velocity (spec 11.8).
+func _update_visual(delta: float) -> void:
+	var v := Vector2(velocity.x, velocity.z)
+	if v.length() > 0.3:
+		var visual: Node3D = get_node("Visual")
+		visual.rotation.y = lerp_angle(visual.rotation.y, atan2(-v.x, -v.y), clampf(10.0 * delta, 0.0, 1.0))
+		_play(species.anim_walk, clampf(v.length() / maxf(species.walk_speed, 0.1), 0.6, 2.2))
+	else:
+		_play(species.anim_idle, 1.0)
+
+
 func refresh_accessories() -> void:
 	for slot in attachments:
 		var att: BoneAttachment3D = attachments[slot]
@@ -85,6 +141,7 @@ func refresh_accessories() -> void:
 			continue
 		var m := WorldObject.box_mesh(Vector3(0.3, 0.12, 0.3) if slot == &"HEAD" else Vector3(0.36, 0.1, 0.36), PetAccessoryModel.color_of(st))
 		m.name = "Accessory"
+		m.scale = Vector3.ONE / _bone_space_scale   # model skeletons are scaled; keep the box size in metres
 		att.add_child(m)
 
 
@@ -142,6 +199,7 @@ func _physics_process(delta: float) -> void:
 		session.pets.eat_from_bowl()
 	velocity.y = 0.0 if is_on_floor() else velocity.y - 20.0 * delta
 	move_and_slide()
+	_update_visual(delta)
 	session.terrain.rules.pet_cells = [IVoxelWorld.cell_of(global_position + Vector3(0, 0.1, 0))]
 
 

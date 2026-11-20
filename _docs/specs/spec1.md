@@ -1765,8 +1765,9 @@ Composition (`CharacterRig`):
 - Clip: walk when the pet moves faster than 0.3 m/s, otherwise idle; walk speed scales with velocity / walk_speed.
 
 ### 11.9 Crops (PA3)
-- Source: Quaternius "Nature Crops Pack" (CC0, OpenGameArt): per crop 4 growth models `_1` to `_4`, a ripe model `_Crop` and for some a `_Harvested` model. FBX.
-- `CropDef.models`: `{"stages": [4 paths], "ripe": path, "height": metres}`. Stage i of n growth stages shows model `floor(i * 4 / n)`; ripe shows `ripe`. All models of a crop use one scale: the ripe model fitted to 0.9 x height x 0.9, so growth reads as growth.
+- Source: Quaternius "Nature Crops Pack" (CC0, OpenGameArt): per crop growth models `_1` to `_4` (`_4` is the grown plant), the harvested produce `_Crop`, and for some a `_Harvested` plant. FBX.
+- `CropDef.models`: `{"stages": [_1, _2, _3], "ripe": _4, "height": metres}`. Stage i of n growth stages shows stage model `floor(i * 3 / n)`; ripe shows `_4`. All models of a crop use one scale: the ripe model fitted to 0.9 x height x 0.9, so growth reads as growth.
+- The `_Crop` produce models are the `world_model` (11.3) of strawberry (BushBerries), pumpkin and sunflower (Flowers); carrot and tomato keep the KayKit produce.
 - Mapping: carrot, tomato, pumpkin to their models; strawberry to `BushBerries`; sunflower to `Flower`. Cotton has no model and keeps the placeholder box.
 - A ripe crop with models gets a soft emission overlay in its crop colour (spec 10.3 glow); the produce prop of 11.3 is not added on top of a crop model.
 

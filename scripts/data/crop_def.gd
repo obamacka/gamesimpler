@@ -11,6 +11,22 @@ extends Resource
 @export var yield_max := 1
 @export var seed_return_pct := 0
 @export var color := Color.GREEN
+## Stage models (spec 11.9): {"stages": [3 scene paths], "ripe": path, "height": metres}.
+@export var models: Dictionary = {}
+
+
+func has_models() -> bool:
+	return not models.is_empty()
+
+
+## Scene for a growth stage (0 .. stage_count - 1) or the ripe model.
+func model_for(stage: int, is_ripe_now: bool) -> String:
+	if not has_models():
+		return ""
+	if is_ripe_now:
+		return models["ripe"]
+	var stages: Array = models["stages"]
+	return stages[clampi(stage * stages.size() / maxi(stage_count(), 1), 0, stages.size() - 1)]
 
 
 func stage_count() -> int:

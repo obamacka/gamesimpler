@@ -114,6 +114,9 @@ func load_all(dir: String) -> void:
 		c.days_per_stage.assign((d["days_per_stage"] as Array).map(func(v): return int(v)))
 		c.regrow_stage = int(d.get("regrow_stage", -1)); c.yield_min = int(d.get("yield_min", 1)); c.yield_max = int(d.get("yield_max", 1))
 		c.seed_return_pct = int(d.get("seed_return_pct", 0)); c.color = Color.html(d.get("color", "#40a040"))
+		if d.has("models"):
+			c.models = {"stages": (d["models"]["stages"] as Array).map(func(v): return String(v)), "ripe": String(d["models"]["ripe"]),
+				"height": float(d["models"].get("height", 0.8))}
 		crops[c.id] = c
 	for d in _read(dir.path_join("pieces.json")).get("pieces", []):
 		var p := _piece(d)
@@ -494,6 +497,12 @@ func _load_phase5(dir: String) -> void:
 		sp.favorite_food_tags.assign((d.get("favorite_food_tags", []) as Array).map(func(v): return StringName(v)))
 		sp.variants.assign((d.get("variants", []) as Array).map(func(v): return Color.html(v)))
 		sp.size = _v3(d.get("size", [0.5, 0.6, 0.9]))
+		var md: Dictionary = d.get("model", {})
+		sp.model = String(md.get("scene", "")); sp.model_yaw_deg = int(md.get("yaw_deg", 0))
+		sp.coat_materials.assign(md.get("coat_materials", []))
+		for k in md.get("material_colors", {}):
+			sp.material_colors[String(k)] = Color.html(md["material_colors"][k])
+		sp.anim_idle = StringName(md.get("anim_idle", "")); sp.anim_walk = StringName(md.get("anim_walk", ""))
 		pet_species[sp.id] = sp
 	for d in pp.get("accessories", []):
 		var a := PetAccessoryDef.new()
@@ -606,6 +615,17 @@ func _validate_phase6() -> Array[String]:
 				errors.append("piece %s has a model, so it paints PRIMARY only" % id)
 			if not p.placement_box().has_volume():
 				errors.append("piece %s has a model but no placement box" % id)
+	for id in materials:
+		var vm: VoxelMaterialDef = materials[id]
+		for face in ["top", "side", "bottom"]:
+			if not vm.tiles.is_empty() and not ResourceLoader.exists(VoxelLibraryBuilder.TILE_DIR + vm.tile(face)):
+				errors.append("material %s tile %s does not exist" % [id, vm.tile(face)])
+	for id in crops:
+		var cd: CropDef = crops[id]
+		if cd.has_models():
+			for f in (cd.models["stages"] as Array) + [cd.models["ripe"]]:
+				if not ResourceLoader.exists(f):
+					errors.append("crop %s model %s does not exist" % [id, f])
 	for id in items:
 		if not items[id].world_model.is_empty() and not ResourceLoader.exists(items[id].world_model):
 			errors.append("item %s world model %s does not exist" % [id, items[id].world_model])
@@ -734,4 +754,5 @@ func _material(d: Dictionary) -> VoxelMaterialDef:
 	m.preferred_tool = StringName(d.get("preferred_tool", "SHOVEL")); m.drop = StringName(d.get("drop", ""))
 	m.special = StringName(d.get("special", "NONE")); m.placeable = bool(d.get("placeable", false))
 	m.stamina_cost = int(d.get("stamina_cost", 1)); m.color = Color.html(d.get("color", "#ffffff"))
+	m.tiles = d.get("tiles", {}); m.tint = Color.html(d.get("tint", "#ffffff"))
 	return m

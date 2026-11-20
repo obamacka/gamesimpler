@@ -13,7 +13,16 @@
       "yield_min": 1,
       "yield_max": 2,
       "seed_return_pct": 25,
-      "color": "#f08a24"
+      "color": "#f08a24",
+      "models": {
+        "stages": [
+          "res://assets/third_party/quaternius/crops/Carrot_1.fbx",
+          "res://assets/third_party/quaternius/crops/Carrot_2.fbx",
+          "res://assets/third_party/quaternius/crops/Carrot_3.fbx"
+        ],
+        "ripe": "res://assets/third_party/quaternius/crops/Carrot_4.fbx",
+        "height": 0.6
+      }
     },
     {
       "id": "crop_sunflower",
@@ -29,7 +38,16 @@
       "yield_min": 1,
       "yield_max": 1,
       "seed_return_pct": 40,
-      "color": "#f2cf1d"
+      "color": "#f2cf1d",
+      "models": {
+        "stages": [
+          "res://assets/third_party/quaternius/crops/Flower_1.fbx",
+          "res://assets/third_party/quaternius/crops/Flower_2.fbx",
+          "res://assets/third_party/quaternius/crops/Flower_3.fbx"
+        ],
+        "ripe": "res://assets/third_party/quaternius/crops/Flower_4.fbx",
+        "height": 1.1
+      }
     },
     {
       "id": "crop_pumpkin",
@@ -46,7 +64,16 @@
       "yield_min": 1,
       "yield_max": 1,
       "seed_return_pct": 20,
-      "color": "#e07018"
+      "color": "#e07018",
+      "models": {
+        "stages": [
+          "res://assets/third_party/quaternius/crops/Pumpkin_1.fbx",
+          "res://assets/third_party/quaternius/crops/Pumpkin_2.fbx",
+          "res://assets/third_party/quaternius/crops/Pumpkin_3.fbx"
+        ],
+        "ripe": "res://assets/third_party/quaternius/crops/Pumpkin_4.fbx",
+        "height": 0.6
+      }
     },
     {
       "id": "crop_cotton",
@@ -78,7 +105,16 @@
       "yield_min": 2,
       "yield_max": 4,
       "seed_return_pct": 0,
-      "color": "#d8283a"
+      "color": "#d8283a",
+      "models": {
+        "stages": [
+          "res://assets/third_party/quaternius/crops/BushBerries_1.fbx",
+          "res://assets/third_party/quaternius/crops/BushBerries_2.fbx",
+          "res://assets/third_party/quaternius/crops/BushBerries_3.fbx"
+        ],
+        "ripe": "res://assets/third_party/quaternius/crops/BushBerries_4.fbx",
+        "height": 0.7
+      }
     },
     {
       "id": "crop_tomato",
@@ -94,7 +130,16 @@
       "yield_min": 2,
       "yield_max": 3,
       "seed_return_pct": 0,
-      "color": "#d8402a"
+      "color": "#d8402a",
+      "models": {
+        "stages": [
+          "res://assets/third_party/quaternius/crops/Tomato_1.fbx",
+          "res://assets/third_party/quaternius/crops/Tomato_2.fbx",
+          "res://assets/third_party/quaternius/crops/Tomato_3.fbx"
+        ],
+        "ripe": "res://assets/third_party/quaternius/crops/Tomato_4.fbx",
+        "height": 1.1
+      }
     }
   ]
 }

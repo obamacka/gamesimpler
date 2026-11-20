@@ -9,5 +9,9 @@ Third-party assets are vendored under `assets/third_party/`. Each pack folder ke
 | Universal Base Characters (Standard) | Quaternius (quaternius.com) | CC0 1.0 | `assets/third_party/quaternius/characters/`, `hair/` |
 | Modular Character Outfits - Fantasy (Standard) | Quaternius | CC0 1.0 | `assets/third_party/quaternius/outfits/` |
 | Universal Animation Library 1 and 2 (Standard) | Quaternius | CC0 1.0 | `assets/third_party/quaternius/animations/` |
+| Animal Pack Vol.2 | Quaternius | CC0 1.0 | `assets/third_party/quaternius/animals/` |
+| Nature Crops Pack | Quaternius | CC0 1.0 | `assets/third_party/quaternius/crops/` |
+| Survival Kit | Kenney (kenney.nl) | CC0 1.0 | `assets/third_party/kenney/survival_kit/` |
+| Voxel Pack | Kenney | CC0 1.0 | `assets/third_party/kenney/voxel_pack/` |
 
 Tools: Godot Engine (MIT), gdUnit4 (MIT), Voxel Tools by Zylann (MIT).

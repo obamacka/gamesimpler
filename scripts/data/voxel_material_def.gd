@@ -24,7 +24,8 @@ const SPECIAL_BEDROCK := &"BEDROCK"
 func is_hard() -> bool:
 	return preferred_tool == ToolTypes.PICKAXE
 ## Block tiles (spec 11.10): {"top", "side", "bottom"} file names in the Voxel Pack folder; side
-## stands in for missing entries. tint multiplies the tiles.
+## stands in for missing entries; optional "top_tint" multiplies the top tile only. tint
+## multiplies all three.
 @export var tiles: Dictionary = {}
 @export var tint := Color.WHITE
 

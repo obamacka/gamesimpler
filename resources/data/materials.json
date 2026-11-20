@@ -13,7 +13,8 @@
       "tiles": {
         "top": "grass_top.png",
         "side": "dirt_grass.png",
-        "bottom": "dirt.png"
+        "bottom": "dirt.png",
+        "top_tint": "#6aa84f"
       }
     },
     {

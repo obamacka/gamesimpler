@@ -56,6 +56,9 @@ static func atlas_for(def: VoxelMaterialDef) -> ImageTexture:
 		if img.is_compressed():
 			img.decompress()
 		img.convert(Image.FORMAT_RGBA8)
+		if def.tiles.has("top_tint") and face != "bottom":
+			# the whole top tile; on the side tile only the green fringe
+			_recolor(img, Color.html(def.tiles["top_tint"]), face == "side")
 		imgs.append(img)
 	var w := imgs[0].get_width()
 	var h := imgs[0].get_height()
@@ -67,3 +70,16 @@ static func atlas_for(def: VoxelMaterialDef) -> ImageTexture:
 	atlas.generate_mipmaps()
 	_atlases[def.id] = ImageTexture.create_from_image(atlas)
 	return _atlases[def.id]
+
+
+## Keeps the tile's brightness pattern in colour c (spec 11.10). green_only: just the pixels
+## where green clearly leads (the grass fringe on a side tile).
+static func _recolor(img: Image, c: Color, green_only: bool = false) -> void:
+	for y in img.get_height():
+		for x in img.get_width():
+			var p := img.get_pixel(x, y)
+			if green_only and not (p.g > p.r + 0.1 and p.g > p.b):
+				continue
+			var l := p.r * 0.299 + p.g * 0.587 + p.b * 0.114
+			var k := 0.45 + 0.6 * l
+			img.set_pixel(x, y, Color(clampf(c.r * k, 0, 1), clampf(c.g * k, 0, 1), clampf(c.b * k, 0, 1), p.a))

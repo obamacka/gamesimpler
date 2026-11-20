@@ -448,16 +448,16 @@ Integration:
   - [x] **PA2.5** `CharacterAnimModel` and merged clip library; player states drive clips.
   - [x] **PA2.6** NPC appearance in `npcs.json`; NPCs use `CharacterRig` (idle, walk, talk, reactions).
   - [x] **PA2.7** Tests: scale and footprint rules, head cut, rig composition per slot, dye, HAIR hiding, clip mapping, player size probes; full suite green.
-- [ ] **PA3** Pets and crops (spec 11.8, 11.9):
-  - [ ] **PA3.1** Vendor Quaternius Dog and Cat and the crop models used (FBX), LICENSE, SOURCE, CREDITS.
-  - [ ] **PA3.2** Pet model: species model, yaw, colours by material name, accessory bones, idle and walk clips, facing.
-  - [ ] **PA3.3** Crop stage models with one scale per crop and a ripe glow; cotton placeholder.
-  - [ ] **PA3.4** Tests: species and crop model data, pet build and accessories on model bones, stage to model mapping, ripe overlay.
-- [ ] **PA4** Tools and block textures (spec 11.10):
-  - [ ] **PA4.1** Vendor Kenney Survival Kit tool models and Voxel Pack tiles used, LICENSE, SOURCE, CREDITS.
-  - [ ] **PA4.2** Tool world models; equipped tool in the character's right hand.
-  - [ ] **PA4.3** Block tiles in `materials.json`; `VoxelLibraryBuilder` per-material atlas.
-  - [ ] **PA4.4** Tests: tool models and hand attachment, tile files exist, library atlas and tiles, full suite green.
+- [x] **PA3** Pets and crops (spec 11.8, 11.9):
+  - [x] **PA3.1** Vendor Quaternius Dog and Cat and the crop models used (FBX), LICENSE, SOURCE, CREDITS.
+  - [x] **PA3.2** Pet model: species model, yaw, colours by material name, accessory bones, idle and walk clips, facing.
+  - [x] **PA3.3** Crop stage models with one scale per crop and a ripe glow; cotton placeholder.
+  - [x] **PA3.4** Tests: species and crop model data, pet build and accessories on model bones, stage to model mapping, ripe overlay.
+- [x] **PA4** Tools and block textures (spec 11.10):
+  - [x] **PA4.1** Vendor Kenney Survival Kit tool models and Voxel Pack tiles used, LICENSE, SOURCE, CREDITS.
+  - [x] **PA4.2** Tool world models; equipped tool in the character's right hand.
+  - [x] **PA4.3** Block tiles in `materials.json`; `VoxelLibraryBuilder` per-material atlas.
+  - [x] **PA4.4** Tests: tool models and hand attachment, tile files exist, library atlas and tiles, full suite green.
 
 ---
 

@@ -4,7 +4,7 @@
 |---|---|
 | Spec | `_docs/specs/spec1.md` rev 3.12 |
 | Plan | `_docs/plans/plan1.md` |
-| Active phase | Phase A (art pass): PA1 and PA2 done, PA3 and PA4 in progress. All six phases have their automated work done (Phases 3 to 6 started on owner request before earlier gates passed); manual checklists for Phases 1 to 6, Phase 0 hardware checks and the release-candidate checklist pending |
+| Active phase | Phase A (art pass) automated work done (PA1 to PA4); owner review items open All six phases have their automated work done (Phases 3 to 6 started on owner request before earlier gates passed); manual checklists for Phases 1 to 6, Phase 0 hardware checks and the release-candidate checklist pending |
 | Last updated | 2026-11-20 |
 
 ## How to update
@@ -138,14 +138,14 @@ Status values: `Not started`, `In progress`, `Blocked`, `Done`.
 | PA2.5 Animation | Done | 2026-11-20 | c6d2514 | CharacterAnimModel; merged library (86 clips); player updates the clip every tick |
 | PA2.6 NPC appearance | Done | 2026-11-20 | c6d2514 | appearance in npcs.json validated; NPCs face their walking direction |
 | PA2.7 Tests | Done | 2026-11-20 | c6d2514 | character anim 5, character rig 8, wardrobe updated; full suite 576 cases exit 0 |
-| PA3.1 Vendor animals and crops | In progress | | | |
-| PA3.2 Pet model | Not started | | | |
-| PA3.3 Crop stage models | Not started | | | |
-| PA3.4 Tests | Not started | | | |
-| PA4.1 Vendor Kenney tools and tiles | Not started | | | |
-| PA4.2 Tools in hand | Not started | | | |
-| PA4.3 Block textures | Not started | | | |
-| PA4.4 Tests | Not started | | | |
+| PA3.1 Vendor animals and crops | Done | 2026-11-20 | 91fe7bf | Quaternius Animal Pack Vol.2 (Dog, Cat FBX) and 25 Nature Crops Pack FBX from OpenGameArt, LICENSE (CC0 per page), SOURCE |
+| PA3.2 Pet model | Done | 2026-11-20 | 91fe7bf | species model fitted to the size box, coat by material name (FBX colours are grey), accessories on Bone.001 to Bone.003 at true size, Idle/Walking, faces velocity |
+| PA3.3 Crop stage models | Done | 2026-11-20 | 91fe7bf | stages _1 to _3, ripe _4 (the _Crop files are produce), one scale per crop, ripe glow overlay; produce props for strawberry, pumpkin, sunflower; cotton stays a box |
+| PA3.4 Tests | Done | 2026-11-20 | d313df0 | data 7 (crops, pets, tools, tiles, validation), visuals 5 (pet colours, accessory size, walk and facing, crop stages and glow, held tool) |
+| PA4.1 Vendor Kenney tools and tiles | Done | 2026-11-20 | 91fe7bf | Survival Kit tool glb (5 plus upgraded) from itch, Voxel Pack tiles (13) from OpenGameArt |
+| PA4.2 Tools in hand | Done | 2026-11-20 | 91fe7bf | tool world_model (upgraded for tier 2+); hand_r attachment, 0.6 m, oriented on the Idle hand pose |
+| PA4.3 Block textures | Done | 2026-11-20 | d313df0 | per-material 3 x 1 atlas; grass top and side fringe recoloured to meadow green; bedrock and farmland tinted |
+| PA4.4 Tests | Done | 2026-11-20 | d313df0 | full suite 588 cases exit 0 |
 
 ## Test run log
 | Date | Commit | Phase | Command | Exit code | Failures | Notes |
@@ -170,6 +170,7 @@ Status values: `Not started`, `In progress`, `Blocked`, `Done`.
 | 2026-11-16 | 803e74c | 6 | `ci/run_tests.sh` | 0 | 0 | 549 cases (Phases 0 to 6) |
 | 2026-11-19 | 44e8742 | A | `ci/run_tests.sh` | 0 | 0 | 563 cases (Phases 0 to 6, PA1) |
 | 2026-11-20 | c6d2514 | A | `ci/run_tests.sh` | 0 | 0 | 576 cases (PA2) |
+| 2026-11-20 | d313df0 | A | `ci/run_tests.sh` | 0 | 0 | 588 cases (PA3, PA4) |
 
 ## Decisions
 | ID | Status | Value |
@@ -183,6 +184,7 @@ Status values: `Not started`, `In progress`, `Blocked`, `Done`.
 ## Blockers and open issues
 | Date | Item | Owner | Status |
 |---|---|---|---|
+| 2026-11-20 | PA3/PA4 for owner review: sunflower uses the pack's generic blue flower and strawberry a berry bush; cotton has no model; dog and cat have only Idle and Walking clips (no sit, sleep or eat); watering can, fruit picker and screwdriver have no hand model; tool grip and angle are a fixed pose on the Idle hand; this session moved to a new personal environment "gamesimpler" (exact hosts for itch, its download mirror and opengameart.org) | owner review | Open |
 | 2026-11-20 | PA2 for owner review: the free Quaternius tier gives semi-realistic adult faces (Superhero heads) next to toy-like KayKit furniture; only the "Dark" skin tone exists for the Regular body; only Peasant and Ranger outfits; player body type and hair are fixed in PlayerConfig until a character creator exists; straw hat and scarf remain placeholder boxes; the free tier has no wave, pickaxe or sleep clips (substitutes in spec 11.7); kitchen modules at 2 x 2 cells leave 0.5 m gaps in a row; the 1.7 m player stands in 2-voxel tunnels and Duck now means 1-voxel crawl spaces; integration tests take about 1 s each now that every player and NPC builds a rig; headless runs log a dummy-renderer "material is null" error per rig (not seen with a real renderer) | owner review | Open |
 | 2026-11-19 | (Resolved 2026-11-20: one world scale 0.75 m per KayKit unit and a 1.7 m player, spec 11.4) PA1 for owner review: KayKit uses a 2-unit tile, so 1-cell fits run 0.44 (stove, fridge) to 0.95 (wide cabinet) while seating is about 0.6 to 0.8; the fridge is barely taller than a chair next to the 2.1 m player capsule. Shop counters face their drawers to the shopkeeper side (yaw 0) | owner review | Closed |
 | 2026-11-16 | Phase 1 manual gamepad checklist (plan Phase 1) | team | Open |

@@ -2,7 +2,7 @@
 
 | Field | Value |
 |---|---|
-| Spec | `_docs/specs/spec1.md` rev 3.11 |
+| Spec | `_docs/specs/spec1.md` rev 3.12 |
 | Plan | `_docs/plans/plan1.md` |
 | Active phase | Phase A (art pass): PA1 and PA2 done, PA3 and PA4 in progress. All six phases have their automated work done (Phases 3 to 6 started on owner request before earlier gates passed); manual checklists for Phases 1 to 6, Phase 0 hardware checks and the release-candidate checklist pending |
 | Last updated | 2026-11-20 |
@@ -138,7 +138,14 @@ Status values: `Not started`, `In progress`, `Blocked`, `Done`.
 | PA2.5 Animation | Done | 2026-11-20 | c6d2514 | CharacterAnimModel; merged library (86 clips); player updates the clip every tick |
 | PA2.6 NPC appearance | Done | 2026-11-20 | c6d2514 | appearance in npcs.json validated; NPCs face their walking direction |
 | PA2.7 Tests | Done | 2026-11-20 | c6d2514 | character anim 5, character rig 8, wardrobe updated; full suite 576 cases exit 0 |
-| PA3, PA4 Pets and crops, Kenney | Not started | | | |
+| PA3.1 Vendor animals and crops | In progress | | | |
+| PA3.2 Pet model | Not started | | | |
+| PA3.3 Crop stage models | Not started | | | |
+| PA3.4 Tests | Not started | | | |
+| PA4.1 Vendor Kenney tools and tiles | Not started | | | |
+| PA4.2 Tools in hand | Not started | | | |
+| PA4.3 Block textures | Not started | | | |
+| PA4.4 Tests | Not started | | | |
 
 ## Test run log
 | Date | Commit | Phase | Command | Exit code | Failures | Notes |

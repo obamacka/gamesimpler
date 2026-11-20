@@ -34,3 +34,4 @@ mono_crash.*.json
 
 # Benchmark downloads and logs (ci/run_benchmark.*)
 /.bench/
+/dist/

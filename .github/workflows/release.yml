@@ -1,0 +1,115 @@
+name: release
+
+# Builds Windows, Linux and macOS exports and publishes them as a GitHub release.
+# Trigger: push a tag such as v0.1.0. Tags with a hyphen (v0.2.0-beta) are marked pre-release,
+# and so is every 0.x version until the release-candidate checklist in _docs/plans/plan1.md passes.
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+env:
+  GODOT_VERSION: 4.7.2-stable
+  GODOT_ZIP: Godot_v4.7.2-stable_linux.x86_64.zip
+  # From https://github.com/godotengine/godot-builds/releases/download/4.7.2-stable/SHA512-SUMS.txt
+  GODOT_SHA512: 9aa00f7a605200940bce3027a567b782f49bd8e940dd06ae9e987bd65aee1b1467edd56ed84fcdcbdd44354bf613bdbb4e5d2913e925850368e150c59ed54c65
+  TEMPLATES_TPZ: Godot_v4.7.2-stable_export_templates.tpz
+  TEMPLATES_SHA512: ca4d71c4d7b81dfc15d1a98baa07534aa95b03fdda78a0075b06672e1648d2e5f40980c9adc28d23e1b92e732ee7bf3461997aa804af74ec2fcd7a93ccb84079
+  GODOT_BIN: /home/runner/godot/Godot_v4.7.2-stable_linux.x86_64
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Cache Godot and export templates
+        id: cache-godot
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/godot
+            ~/.local/share/godot/export_templates/4.7.2.stable
+          key: godot-${{ env.GODOT_VERSION }}-linux-x86_64-templates
+
+      - name: Download and verify Godot and export templates
+        if: steps.cache-godot.outputs.cache-hit != 'true'
+        run: |
+          mkdir -p ~/godot ~/.local/share/godot/export_templates
+          cd ~/godot
+          curl -sSL -o "$GODOT_ZIP" "https://github.com/godotengine/godot-builds/releases/download/${GODOT_VERSION}/${GODOT_ZIP}"
+          echo "${GODOT_SHA512}  ${GODOT_ZIP}" | sha512sum -c -
+          unzip -q "$GODOT_ZIP" && rm "$GODOT_ZIP"
+          chmod +x Godot_v4.7.2-stable_linux.x86_64
+          curl -sSL -o "$TEMPLATES_TPZ" "https://github.com/godotengine/godot-builds/releases/download/${GODOT_VERSION}/${TEMPLATES_TPZ}"
+          echo "${TEMPLATES_SHA512}  ${TEMPLATES_TPZ}" | sha512sum -c -
+          unzip -q "$TEMPLATES_TPZ" -d tpl && rm "$TEMPLATES_TPZ"
+          mv tpl/templates ~/.local/share/godot/export_templates/4.7.2.stable
+
+      - name: Fetch Voxel Tools GDExtension
+        run: ci/fetch_voxel.sh
+
+      - name: Run gdUnit4 headless (gate)
+        run: ci/run_tests.sh
+
+      - name: Export Windows, Linux, macOS
+        run: GODOT_BIN="$GODOT_BIN" ci/export_release.sh "${GITHUB_REF_NAME}"
+
+      - name: Upload packages
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist/
+          if-no-files-found: error
+
+  # Godot's built-in signer cannot sign the nested Voxel Tools framework, so the macOS app is
+  # exported unsigned and ad-hoc signed here with Apple's codesign (Apple Silicon needs a
+  # signature to launch). Not notarized: no Apple Developer account.
+  sign-macos:
+    needs: build
+    runs-on: macos-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist
+      - name: Ad-hoc sign the app bundle
+        run: |
+          set -euo pipefail
+          ZIP=$(ls dist/*-macos-universal.zip)
+          mkdir app && ditto -x -k "$ZIP" app
+          APP=$(ls -d app/*.app)
+          xattr -cr "$APP"
+          codesign --force --deep --sign - "$APP"
+          codesign --verify --deep --strict --verbose=2 "$APP"
+          rm "$ZIP"
+          ditto -c -k --keepParent "$APP" "$ZIP"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dist-signed
+          path: dist/
+          if-no-files-found: error
+
+  publish:
+    needs: sign-macos
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: dist-signed
+          path: dist
+      - name: Create GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          TAG="${GITHUB_REF_NAME}"
+          FLAGS=""
+          case "$TAG" in v0.*|*-*) FLAGS="--prerelease" ;; esac
+          gh release create "$TAG" dist/*.zip dist/*.tar.gz $FLAGS --title "Gamesimpler ${TAG}" --notes-file dist/RELEASE_NOTES.md

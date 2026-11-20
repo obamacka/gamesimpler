@@ -421,6 +421,7 @@ Integration:
 - [x] **P6.19** `ZoneNavigation`: bake on zone load from static colliders and voxel top faces (STATIC zones: bounds; overworld: TOWN volumes, generated level); NPCs on `NavigationAgent3D`, pet on navmesh in STATIC zones; tests for detours, NPC routing around a wall, the museum, the real Home Meadow town, and face winding.
 
 ### Release-candidate checklist (end of Phase 6)
+- [x] Release pipeline (owner request 2026-11-20): `export_presets.cfg` (Windows x86_64, Linux x86_64, macOS universal), `ci/export_release.sh`, `.github/workflows/release.yml` (tag `v*`: tests, export, ad-hoc macOS signing on a macOS runner, GitHub release; 0.x tags are pre-releases).
 - [ ] Exports for Windows x86_64, Linux x86_64, macOS (universal) launch, save and load.
 - [ ] Full manual pass of all phase checklists on each OS available.
 - [ ] Spec open decisions all resolved or explicitly deferred to spec 2.

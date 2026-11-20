@@ -12,7 +12,8 @@ const MENUS := {&"DONATE": &"donation", &"SHOP": &"shop", &"JOB_BOARD": &"job_bo
 @export var plot_id: StringName = &""
 @export var color := Color(0.6, 0.45, 0.3)
 @export var size := Vector3(1.6, 1.1, 0.8)
-## Optional art model (spec 11.3) fitted into `size`; the box collider stays.
+## Optional art model (spec 11.3, 11.4) shown at ModelFit.WORLD_SCALE; the box collider then
+## takes the model's size, otherwise `size`.
 @export_file("*.gltf", "*.glb", "*.tscn") var model := ""
 @export var model_yaw_deg := 0
 
@@ -24,11 +25,13 @@ func _ready() -> void:
 	if visual:
 		visual.name = "Model"
 		add_child(visual)
-		ModelFit.fit(visual, AABB(Vector3(-size.x * 0.5, 0, -size.z * 0.5), size), model_yaw_deg)
+		var b := ModelFit.place(visual, AABB(), model_yaw_deg)
+		size = b.size
+		add_static_box(self, size, b.get_center())
 	else:
 		visual = box_mesh(size, color, Vector3(0, size.y * 0.5, 0))
 		add_child(visual)
-	add_static_box(self, size, Vector3(0, size.y * 0.5, 0))
+		add_static_box(self, size, Vector3(0, size.y * 0.5, 0))
 	make_interactable(String(name), kind, 1.6)
 
 

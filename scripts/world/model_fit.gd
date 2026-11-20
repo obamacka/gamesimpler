@@ -4,6 +4,11 @@
 class_name ModelFit
 extends RefCounted
 
+## One world scale for KayKit furniture and station models (spec 11.4): metres per model unit.
+const WORLD_SCALE := 0.75
+## Largest model overhang past its footprint per side (spec 11.4).
+const MAX_OVERHANG := 0.2
+
 
 ## Loads and instantiates a model scene; null if the path is empty or not a PackedScene.
 static func instantiate(path: String) -> Node3D:
@@ -60,3 +65,16 @@ static func fit(model: Node3D, box: AABB, yaw_deg: int) -> float:
 	var have := Vector3(scaled.get_center().x, scaled.position.y, scaled.get_center().z)
 	model.transform = Transform3D(basis.scaled(Vector3.ONE * s), target - have)
 	return s
+
+
+## Places a model at a fixed uniform scale (spec 11.4): turned by yaw_deg, centred in `box`
+## in x and z, standing on the box floor. Returns the model's AABB in the parent's space.
+static func place(model: Node3D, box: AABB, yaw_deg: int, scale: float = WORLD_SCALE) -> AABB:
+	var src := local_aabb(model)
+	var basis := Basis(Vector3.UP, deg_to_rad(float(yaw_deg)))
+	var turned: AABB = Transform3D(basis, Vector3.ZERO) * src
+	var scaled := AABB(turned.position * scale, turned.size * scale)
+	var target := Vector3(box.get_center().x, box.position.y, box.get_center().z)
+	var have := Vector3(scaled.get_center().x, scaled.position.y, scaled.get_center().z)
+	model.transform = Transform3D(basis.scaled(Vector3.ONE * scale), target - have)
+	return AABB(scaled.position + target - have, scaled.size)

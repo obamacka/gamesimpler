@@ -588,8 +588,8 @@ func _validate_phase6() -> Array[String]:
 				errors.append("piece %s model yaw %d is not a quarter turn" % [id, p.model_yaw_deg])
 			if p.paint_regions.any(func(r): return r["region_id"] != &"PRIMARY"):
 				errors.append("piece %s has a model, so it paints PRIMARY only" % id)
-			if not p.fit_box().has_volume():
-				errors.append("piece %s has a model but no fit box" % id)
+			if not p.placement_box().has_volume():
+				errors.append("piece %s has a model but no placement box" % id)
 	for id in items:
 		if not items[id].world_model.is_empty() and not ResourceLoader.exists(items[id].world_model):
 			errors.append("item %s world model %s does not exist" % [id, items[id].world_model])

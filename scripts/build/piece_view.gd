@@ -1,6 +1,6 @@
 ## Piece visual and collision (plan P3.1): boxes from BuildPieceDef.parts on the build_pieces
 ## layer, a loose-piece ToolTargetZone (P3.9) and furniture interactables (P3.12). Pieces with
-## a model (spec 11.3) show it fitted to the parts box instead of the placeholder boxes; the
+## a model (spec 11.3, 11.4) show it at the world scale instead of the placeholder boxes; the
 ## parts still give the collision.
 class_name PieceView
 extends Node3D
@@ -90,9 +90,9 @@ func _build_model() -> void:
 		return
 	model.name = "Model"
 	add_child(model)
-	var box := def.fit_box()
+	var box := def.placement_box()
 	box.position -= Vector3(0.5, 0, 0.5)
-	ModelFit.fit(model, box, def.model_yaw_deg)
+	ModelFit.place(model, box, def.model_yaw_deg)
 	var region := REGION_INDEX[&"PRIMARY"] if def.region_param(&"PRIMARY") != &"" else 0
 	var lighten := 0.0 if state == &"FASTENED" else 0.45
 	for mi in ModelFit.mesh_instances(model):

@@ -36,8 +36,8 @@ const SCREWS := &"SCREWS"
 ## [{"region_id": PRIMARY|SECONDARY|TRIM, "shader_param": StringName, "default_dye_id"}] (max 3)
 @export var paint_regions: Array = []
 @export var stampable := false
-## Art model (spec 11.3): glTF scene, turn in degrees, and an optional fit box (size 0 = the
-## box spanned by `parts`). Parts stay authoritative for collision.
+## Art model (spec 11.3, 11.4): glTF scene, turn in degrees, and an optional placement box
+## (size 0 = the footprint cells). Shown at ModelFit.WORLD_SCALE; parts give the collision.
 @export var model_scene := ""
 @export var model_yaw_deg := 0
 @export var model_box := AABB()
@@ -64,8 +64,19 @@ func parts_box() -> AABB:
 	return out
 
 
-func fit_box() -> AABB:
-	return model_box if model_box.has_volume() else parts_box()
+## Box spanned by the footprint cells, in the anchor cell's unrotated local frame.
+func footprint_box() -> AABB:
+	var lo := Vector3(footprint[0])
+	var hi := Vector3(footprint[0]) + Vector3.ONE
+	for c in footprint:
+		lo = lo.min(Vector3(c))
+		hi = hi.max(Vector3(c) + Vector3.ONE)
+	return AABB(lo, hi - lo)
+
+
+## Where the model stands (spec 11.4): the model box if given, else the footprint.
+func placement_box() -> AABB:
+	return model_box if model_box.has_volume() else footprint_box()
 
 
 func is_furniture() -> bool:

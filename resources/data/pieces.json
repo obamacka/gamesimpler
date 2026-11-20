@@ -1027,13 +1027,13 @@
    "hits_per_socket": 1,
    "fastener_sockets": [
     [
-     0.2,
-     1.2,
+     0.25,
+     1.4,
      0.2
     ],
     [
-     0.8,
-     1.2,
+     0.75,
+     1.4,
      0.2
     ]
    ],
@@ -1049,13 +1049,13 @@
    "parts": [
     {
      "size": [
-      1,
-      0.7,
-      0.35
+      0.75,
+      0.759,
+      0.429
      ],
      "center": [
       0.5,
-      1.25,
+      1.579,
       0.33
      ],
      "solid": true,
@@ -1074,17 +1074,17 @@
    ],
    "stampable": false,
    "model": {
-    "scene": "res://assets/third_party/kaykit/furniture_bits/shelf_B_large_decorated.gltf",
+    "scene": "res://assets/third_party/kaykit/furniture_bits/shelf_B_small_decorated.gltf",
     "yaw_deg": 0,
     "box": {
      "size": [
       1,
-      0.7,
-      0.35
+      0.8,
+      0.43
      ],
      "center": [
       0.5,
-      1.25,
+      1.6,
       0.33
      ]
     }
@@ -1112,28 +1112,28 @@
    "parts": [
     {
      "size": [
-      0.6,
-      0.38,
-      0.6
+      0.562,
+      0.375,
+      0.475
      ],
      "center": [
       0.5,
-      0.19,
-      0.55
+      0.188,
+      0.579
      ],
      "solid": true,
      "region": "PRIMARY"
     },
     {
      "size": [
-      0.6,
-      0.6,
-      0.1
+      0.562,
+      0.944,
+      0.158
      ],
      "center": [
       0.5,
-      0.68,
-      0.25
+      0.472,
+      0.262
      ],
      "solid": true,
      "region": "PRIMARY"
@@ -1145,15 +1145,15 @@
      "seats": [
       [
        0.5,
-       0.38,
-       0.55
+       0.375,
+       0.579
       ]
      ],
      "exits": [
       [
        0.5,
        0,
-       1.5
+       1.417
       ]
      ],
      "stamina_regen_per_sec": 0.5
@@ -1205,28 +1205,28 @@
    "parts": [
     {
      "size": [
-      2,
-      0.31,
-      0.8
+      2.25,
+      0.375,
+      0.9
      ],
      "center": [
       1.0,
-      0.155,
-      0.55
+      0.188,
+      0.65
      ],
      "solid": true,
      "region": "PRIMARY"
     },
     {
      "size": [
-      2,
-      0.45,
-      0.2
+      2.25,
+      0.918,
+      0.3
      ],
      "center": [
       1.0,
-      0.535,
-      0.15
+      0.459,
+      0.05
      ],
      "solid": true,
      "region": "PRIMARY"
@@ -1237,26 +1237,26 @@
      "kind": "SIT",
      "seats": [
       [
-       0.5,
-       0.31,
-       0.55
+       0.437,
+       0.375,
+       0.65
       ],
       [
-       1.5,
-       0.31,
-       0.55
+       1.563,
+       0.375,
+       0.65
       ]
      ],
      "exits": [
       [
-       0.5,
+       0.437,
        0,
-       1.5
+       1.7
       ],
       [
-       1.5,
+       1.563,
        0,
-       1.5
+       1.7
       ]
      ],
      "stamina_regen_per_sec": 0.6
@@ -1278,19 +1278,7 @@
    "stampable": false,
    "model": {
     "scene": "res://assets/third_party/kaykit/furniture_bits/couch.gltf",
-    "yaw_deg": 0,
-    "box": {
-     "size": [
-      1.95,
-      1.0,
-      1.0
-     ],
-     "center": [
-      1.0,
-      0.5,
-      0.5
-     ]
-    }
+    "yaw_deg": 0
    }
   },
   {
@@ -1315,27 +1303,13 @@
    "parts": [
     {
      "size": [
-      0.9,
-      0.08,
-      0.9
-     ],
-     "center": [
-      0.5,
       0.75,
-      0.5
-     ],
-     "solid": true,
-     "region": "PRIMARY"
-    },
-    {
-     "size": [
-      0.12,
-      0.72,
-      0.12
+      0.75,
+      0.75
      ],
      "center": [
       0.5,
-      0.36,
+      0.375,
       0.5
      ],
      "solid": true,
@@ -1389,13 +1363,13 @@
    "parts": [
     {
      "size": [
-      1,
-      0.32,
-      1.9
+      1.2,
+      0.375,
+      2.25
      ],
      "center": [
       0.5,
-      0.16,
+      0.188,
       1.0
      ],
      "solid": true,
@@ -1423,19 +1397,7 @@
    "stampable": false,
    "model": {
     "scene": "res://assets/third_party/kaykit/furniture_bits/bed_single_A.gltf",
-    "yaw_deg": 0,
-    "box": {
-     "size": [
-      1,
-      0.75,
-      2
-     ],
-     "center": [
-      0.5,
-      0.375,
-      1.0
-     ]
-    }
+    "yaw_deg": 0
    }
   },
   {
@@ -1460,13 +1422,13 @@
    "parts": [
     {
      "size": [
-      0.3,
-      1.4,
-      0.3
+      0.75,
+      1.89,
+      0.75
      ],
      "center": [
       0.5,
-      0.7,
+      0.945,
       0.5
      ],
      "solid": true,
@@ -1489,19 +1451,7 @@
    "stampable": false,
    "model": {
     "scene": "res://assets/third_party/kaykit/furniture_bits/lamp_standing.gltf",
-    "yaw_deg": 0,
-    "box": {
-     "size": [
-      0.6,
-      1.5,
-      0.6
-     ],
-     "center": [
-      0.5,
-      0.75,
-      0.5
-     ]
-    }
+    "yaw_deg": 0
    }
   },
   {
@@ -1576,13 +1526,13 @@
    "parts": [
     {
      "size": [
-      0.8,
-      0.8,
-      0.8
+      0.75,
+      0.75,
+      0.751
      ],
      "center": [
       0.5,
-      0.4,
+      0.375,
       0.5
      ],
      "solid": true,
@@ -1735,28 +1685,28 @@
    "parts": [
     {
      "size": [
-      0.9,
-      0.28,
-      0.8
+      1.35,
+      0.375,
+      0.9
      ],
      "center": [
       0.5,
-      0.14,
-      0.55
+      0.188,
+      0.65
      ],
      "solid": true,
      "region": "PRIMARY"
     },
     {
      "size": [
-      0.9,
-      0.4,
-      0.2
+      1.35,
+      0.918,
+      0.3
      ],
      "center": [
       0.5,
-      0.48,
-      0.15
+      0.459,
+      0.05
      ],
      "solid": true,
      "region": "PRIMARY"
@@ -1768,15 +1718,15 @@
      "seats": [
       [
        0.5,
-       0.28,
-       0.55
+       0.375,
+       0.65
       ]
      ],
      "exits": [
       [
        0.5,
        0,
-       1.5
+       1.7
       ]
      ],
      "stamina_regen_per_sec": 0.6
@@ -1798,19 +1748,7 @@
    "stampable": false,
    "model": {
     "scene": "res://assets/third_party/kaykit/furniture_bits/armchair.gltf",
-    "yaw_deg": 0,
-    "box": {
-     "size": [
-      1.0,
-      1.2,
-      1.0
-     ],
-     "center": [
-      0.5,
-      0.6,
-      0.5
-     ]
-    }
+    "yaw_deg": 0
    }
   },
   {
@@ -1850,13 +1788,13 @@
    "parts": [
     {
      "size": [
-      2,
-      0.33,
-      1.9
+      2.325,
+      0.375,
+      2.25
      ],
      "center": [
       1.0,
-      0.165,
+      0.188,
       1.0
      ],
      "solid": true,
@@ -1884,19 +1822,7 @@
    "stampable": false,
    "model": {
     "scene": "res://assets/third_party/kaykit/furniture_bits/bed_double_A.gltf",
-    "yaw_deg": 0,
-    "box": {
-     "size": [
-      2,
-      0.8,
-      2
-     ],
-     "center": [
-      1.0,
-      0.4,
-      1.0
-     ]
-    }
+    "yaw_deg": 0
    }
   },
   {
@@ -1926,13 +1852,13 @@
    "parts": [
     {
      "size": [
-      1.9,
-      0.95,
-      0.95
+      1.5,
+      0.75,
+      0.751
      ],
      "center": [
       1.0,
-      0.475,
+      0.375,
       0.5
      ],
      "solid": true,
@@ -1986,13 +1912,13 @@
    "parts": [
     {
      "size": [
-      0.5,
-      0.5,
-      0.5
+      0.66,
+      0.62,
+      0.628
      ],
      "center": [
       0.5,
-      0.25,
+      0.31,
       0.5
      ],
      "solid": true,
@@ -2010,19 +1936,7 @@
    "stampable": false,
    "model": {
     "scene": "res://assets/third_party/kaykit/furniture_bits/cactus_medium_A.gltf",
-    "yaw_deg": 0,
-    "box": {
-     "size": [
-      0.8,
-      0.8,
-      0.8
-     ],
-     "center": [
-      0.5,
-      0.4,
-      0.5
-     ]
-    }
+    "yaw_deg": 0
    }
   },
   {
@@ -2034,6 +1948,21 @@
      0,
      0,
      0
+    ],
+    [
+     1,
+     0,
+     0
+    ],
+    [
+     0,
+     0,
+     1
+    ],
+    [
+     1,
+     0,
+     1
     ]
    ],
    "fastener": "NONE",
@@ -2047,14 +1976,14 @@
    "parts": [
     {
      "size": [
-      1,
-      0.5,
-      1
+      1.5,
+      0.9,
+      1.531
      ],
      "center": [
-      0.5,
-      0.25,
-      0.5
+      1.0,
+      0.45,
+      1.0
      ],
      "solid": true,
      "region": "PRIMARY"
@@ -2077,19 +2006,7 @@
    "stampable": false,
    "model": {
     "scene": "res://assets/third_party/kaykit/restaurant_bits/kitchencounter_straight_A_backsplash.gltf",
-    "yaw_deg": 0,
-    "box": {
-     "size": [
-      1,
-      0.9,
-      1
-     ],
-     "center": [
-      0.5,
-      0.45,
-      0.5
-     ]
-    }
+    "yaw_deg": 0
    }
   },
   {
@@ -2101,6 +2018,21 @@
      0,
      0,
      0
+    ],
+    [
+     1,
+     0,
+     0
+    ],
+    [
+     0,
+     0,
+     1
+    ],
+    [
+     1,
+     0,
+     1
     ]
    ],
    "fastener": "NONE",
@@ -2114,14 +2046,14 @@
    "parts": [
     {
      "size": [
-      0.9,
-      0.53,
-      0.9
+      1.5,
+      0.906,
+      1.716
      ],
      "center": [
-      0.5,
-      0.265,
-      0.5
+      1.0,
+      0.453,
+      1.0
      ],
      "solid": true,
      "region": ""
@@ -2143,19 +2075,7 @@
    "stampable": false,
    "model": {
     "scene": "res://assets/third_party/kaykit/restaurant_bits/stove_single.gltf",
-    "yaw_deg": 0,
-    "box": {
-     "size": [
-      1,
-      0.9,
-      1
-     ],
-     "center": [
-      0.5,
-      0.45,
-      0.5
-     ]
-    }
+    "yaw_deg": 0
    }
   },
   {
@@ -2167,6 +2087,21 @@
      0,
      0,
      0
+    ],
+    [
+     1,
+     0,
+     0
+    ],
+    [
+     0,
+     0,
+     1
+    ],
+    [
+     1,
+     0,
+     1
     ]
    ],
    "fastener": "NONE",
@@ -2180,14 +2115,14 @@
    "parts": [
     {
      "size": [
-      0.9,
-      1.1,
-      0.9
+      1.5,
+      1.875,
+      1.68
      ],
      "center": [
-      0.5,
-      0.55,
-      0.5
+      1.0,
+      0.938,
+      1.0
      ],
      "solid": true,
      "region": ""
@@ -2209,19 +2144,7 @@
    "stampable": false,
    "model": {
     "scene": "res://assets/third_party/kaykit/restaurant_bits/fridge_A.gltf",
-    "yaw_deg": 0,
-    "box": {
-     "size": [
-      1,
-      1.6,
-      1
-     ],
-     "center": [
-      0.5,
-      0.8,
-      0.5
-     ]
-    }
+    "yaw_deg": 0
    }
   }
  ]

@@ -12,7 +12,7 @@ func _fitted(def: BuildPieceDef) -> Node3D:
 	var holder: Node3D = auto_free(Node3D.new())
 	var m := ModelFit.instantiate(def.model_scene)
 	holder.add_child(m)
-	ModelFit.fit(m, def.fit_box(), def.model_yaw_deg)
+	ModelFit.place(m, def.placement_box(), def.model_yaw_deg)
 	return holder
 
 
@@ -29,21 +29,28 @@ func test_kaykit_furniture_is_wired() -> void:
 	assert_bool(Database.pieces[&"piece_wall"].has_model()).is_false()
 
 
-func test_every_model_loads_and_fits_its_box() -> void:
+## Spec 11.4: one world scale; the model stands on its placement floor, overhangs its
+## footprint by at most MAX_OVERHANG per side, and the collision parts cover it in x and z.
+func test_every_model_is_at_world_scale_inside_its_footprint() -> void:
 	assert_int(_modelled().size()).is_greater_equal(14)
 	for def: BuildPieceDef in _modelled():
 		var holder := _fitted(def)
+		var m: Node3D = holder.get_child(0)
 		var b := _bounds(holder)
-		var box := def.fit_box()
-		var msg := "%s fits %s in %s" % [def.id, b, box]
-		assert_bool(b.has_volume()).override_failure_message(msg).is_true()
-		assert_bool(b.position.x >= box.position.x - EPS and b.end.x <= box.end.x + EPS).override_failure_message(msg).is_true()
-		assert_bool(b.position.z >= box.position.z - EPS and b.end.z <= box.end.z + EPS).override_failure_message(msg).is_true()
-		assert_bool(b.end.y <= box.end.y + EPS).override_failure_message(msg).is_true()
-		assert_float(b.position.y).override_failure_message(msg).is_equal_approx(box.position.y, EPS)
-		# touches the box on at least one axis: the fit is as large as allowed
-		var touches := absf(b.size.x - box.size.x) < EPS or absf(b.size.y - box.size.y) < EPS or absf(b.size.z - box.size.z) < EPS
-		assert_bool(touches).override_failure_message(msg).is_true()
+		var fp := def.footprint_box()
+		var msg := "%s model %s footprint %s" % [def.id, b, fp]
+		assert_float(m.transform.basis.get_scale().x).override_failure_message(msg).is_equal_approx(ModelFit.WORLD_SCALE, 0.0001)
+		assert_float(b.position.y).override_failure_message(msg).is_equal_approx(def.placement_box().position.y, EPS)
+		for axis in [0, 2]:
+			assert_bool(b.position[axis] >= fp.position[axis] - ModelFit.MAX_OVERHANG - EPS).override_failure_message(msg).is_true()
+			assert_bool(b.end[axis] <= fp.end[axis] + ModelFit.MAX_OVERHANG + EPS).override_failure_message(msg).is_true()
+			# the footprint is the smallest one allowed: one cell fewer would overhang too far
+			if fp.size[axis] > 1.0:
+				assert_bool(b.size[axis] - (fp.size[axis] - 1.0) > 2.0 * ModelFit.MAX_OVERHANG).override_failure_message(msg).is_true()
+		var pb := def.parts_box()
+		for axis in [0, 2]:
+			assert_float(pb.position[axis]).override_failure_message(msg).is_equal_approx(b.position[axis], 0.01)
+			assert_float(pb.end[axis]).override_failure_message(msg).is_equal_approx(b.end[axis], 0.01)
 
 
 func test_models_only_use_their_own_buffers_and_pack_texture() -> void:
@@ -94,10 +101,12 @@ func _rel(root: Node3D, n: Node3D) -> Transform3D:
 	return t
 
 
+## KayKit seats are 0.5 model units high (spec 11.4).
 func test_seat_heights_match_the_seat_parts() -> void:
 	for def: BuildPieceDef in _modelled():
 		var sit := def.interaction(&"SIT")
 		for s in sit.get("seats", []):
+			assert_float(s.y).override_failure_message(String(def.id)).is_equal_approx(0.5 * ModelFit.WORLD_SCALE, 0.001)
 			var top := 0.0
 			for p in def.parts:
 				var lo: Vector3 = p["center"] - p["size"] * 0.5

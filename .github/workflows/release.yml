@@ -1,12 +1,15 @@
 name: release
 
 # Builds Windows, Linux and macOS exports and publishes them as a GitHub release.
-# Trigger: push a tag such as v0.1.0. Tags with a hyphen (v0.2.0-beta) are marked pre-release,
-# and so is every 0.x version until the release-candidate checklist in _docs/plans/plan1.md passes.
+# Trigger: a push that changes VERSION (or a manual run once this file is on the default branch).
+# The workflow creates the tag v<VERSION> on the pushed commit itself. Versions with a hyphen
+# (0.2.0-beta) are pre-releases, and so is every 0.x version until the release-candidate
+# checklist in _docs/plans/plan1.md passes. An existing release for the version stops the run.
 
 on:
   push:
-    tags: ["v*"]
+    paths: ["VERSION"]
+  workflow_dispatch:
 
 permissions:
   contents: write
@@ -24,8 +27,23 @@ jobs:
   build:
     runs-on: ubuntu-latest
     timeout-minutes: 90
+    outputs:
+      tag: ${{ steps.version.outputs.tag }}
     steps:
       - uses: actions/checkout@v4
+
+      - name: Version and duplicate check
+        id: version
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          TAG="v$(tr -d '[:space:]' < VERSION)"
+          if gh release view "$TAG" > /dev/null 2>&1; then
+            echo "Release $TAG already exists; bump VERSION for a new one." >&2
+            exit 1
+          fi
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
 
       - name: Cache Godot and export templates
         id: cache-godot
@@ -57,7 +75,7 @@ jobs:
         run: ci/run_tests.sh
 
       - name: Export Windows, Linux, macOS
-        run: GODOT_BIN="$GODOT_BIN" ci/export_release.sh "${GITHUB_REF_NAME}"
+        run: GODOT_BIN="$GODOT_BIN" ci/export_release.sh "${{ steps.version.outputs.tag }}"
 
       - name: Upload packages
         uses: actions/upload-artifact@v4
@@ -96,7 +114,7 @@ jobs:
           if-no-files-found: error
 
   publish:
-    needs: sign-macos
+    needs: [build, sign-macos]
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
@@ -109,7 +127,8 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
         run: |
-          TAG="${GITHUB_REF_NAME}"
+          TAG="${{ needs.build.outputs.tag }}"
           FLAGS=""
           case "$TAG" in v0.*|*-*) FLAGS="--prerelease" ;; esac
-          gh release create "$TAG" dist/*.zip dist/*.tar.gz $FLAGS --title "Gamesimpler ${TAG}" --notes-file dist/RELEASE_NOTES.md
+          gh release create "$TAG" dist/*.zip dist/*.tar.gz $FLAGS --target "$GITHUB_SHA" \
+            --title "Gamesimpler ${TAG}" --notes-file dist/RELEASE_NOTES.md

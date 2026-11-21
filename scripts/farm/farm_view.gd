@@ -72,7 +72,7 @@ func rebuild() -> void:
 	for k in farm.sprinklers:
 		if String(k).begins_with(prefix):
 			var sp: Node3D = Node3D.new()
-			if WorldObject.add_art(sp, "res://assets/third_party/kaykit/hexagon/bucket_water.gltf", AABB(Vector3(0.25, 0, 0.25), Vector3(0.5, 0.5, 0.5))) == null:
+			if WorldObject.add_art(sp, ArtPaths.PROPS + "Bucket_Wooden_1.gltf", AABB(Vector3(0.25, 0, 0.25), Vector3(0.5, 0.5, 0.5))) == null:
 				sp.free()
 				sp = WorldObject.box_mesh(Vector3(0.35, 0.5, 0.35), Color(0.6, 0.65, 0.7), Vector3(0.5, 0.25, 0.5))
 			sp.add_to_group(&"farm_sprinkler")

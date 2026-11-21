@@ -45,8 +45,8 @@ func refresh() -> void:
 	if shell:
 		shell.queue_free()
 	var width := maxf(1.2, entries.size() * 0.6)
-	# spec 12.3: a KayKit cabinet, darkened while the case is locked
-	shell = add_art(self, "res://assets/third_party/kaykit/furniture_bits/cabinet_medium.gltf", AABB(Vector3(-0.3, 0, -0.4), Vector3(width, 1.0, 0.8)))
+	# spec 12.8: a cabinet, darkened while the case is locked
+	shell = add_art(self, ArtPaths.PROPS + "Cabinet.gltf", AABB(Vector3(-0.3, 0, -0.4), Vector3(width, 1.0, 0.8)))
 	if shell:
 		if not unlocked():
 			var dark := StandardMaterial3D.new()

@@ -83,7 +83,7 @@ func test_every_scene_model_property_follows_its_script() -> void:
 func test_decor_prop_fits_collides_and_protects_its_ground() -> void:
 	var d := DecorProp.new()
 	d.name = "TestTree"
-	d.model = DecorProp.HEX + "tree_single_A.gltf"
+	d.model = ArtPaths.tree(0)
 	d.size = Vector3(2.6, 4.8, 2.6)
 	SceneRouter.current_zone.add_child(d)
 	await get_tree().process_frame
@@ -93,7 +93,7 @@ func test_decor_prop_fits_collides_and_protects_its_ground() -> void:
 	assert_float(b.position.y).is_equal_approx(0.0, 0.01)
 	assert_bool(d.get_children().any(func(c): return c is StaticBody3D)).is_true()
 	var furniture := DecorProp.new()
-	furniture.model = "res://assets/third_party/kaykit/furniture_bits/chair_A.gltf"
+	furniture.model = "res://assets/third_party/quaternius/props/Chair_1.gltf"
 	furniture.use_world_scale = true
 	SceneRouter.current_zone.add_child(furniture)
 	assert_float((furniture.art.get_child(0) as Node3D).transform.basis.get_scale().x).is_equal_approx(ModelFit.WORLD_SCALE, 0.0001)
@@ -111,13 +111,21 @@ func test_world_objects_use_models() -> void:
 	zone.add_child(chest)
 	assert_object(chest.get_node_or_null("Art")).is_not_null()
 	var shell := BuildingShell.new()
-	shell.model = DecorProp.HEX + "building_home_A_blue.gltf"
+	shell.model = ArtPaths.PROPS + "Crate_Wooden.gltf"
 	shell.size = Vector3(7, 6, 6)
 	zone.add_child(shell)
 	assert_object(shell.art).is_not_null()
 	var body: StaticBody3D = shell.get_children().filter(func(c): return c is StaticBody3D)[0]
 	var col := (body.get_child(0) as CollisionShape3D).shape as BoxShape3D
 	assert_bool(col.size.is_equal_approx(WorldObject.art_bounds(shell.art).size)).is_true()   # collider follows the model
+	# a village house at 1 m per unit: the collider is its walls, not the roof overhang (spec 12.8)
+	var house := BuildingShell.new()
+	house.model = ArtPaths.BUILDINGS + "cabin.tscn"
+	house.model_scale = 1.0
+	zone.add_child(house)
+	var hbody: StaticBody3D = house.get_children().filter(func(c): return c is StaticBody3D)[0]
+	assert_vector(((hbody.get_child(0) as CollisionShape3D).shape as BoxShape3D).size).is_equal_approx(Vector3(6, 3, 4), Vector3.ONE * 0.01)
+	house.queue_free()
 	var door := MineEntrance.new()
 	door.target_zone = &"zone_starter_cabin"
 	zone.add_child(door)

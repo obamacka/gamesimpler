@@ -67,7 +67,7 @@ func test_inventory_backpack_is_a_grid_of_slots() -> void:
 func test_sitting_on_a_room_chair() -> void:
 	var chair := DecorProp.new()
 	chair.name = "RoomChair"
-	chair.model = "res://assets/third_party/kaykit/furniture_bits/chair_A.gltf"
+	chair.model = "res://assets/third_party/quaternius/props/Chair_1.gltf"
 	chair.use_world_scale = true
 	chair.seat_count = 1
 	SceneRouter.current_zone.add_child(chair)
@@ -82,7 +82,7 @@ func test_sitting_on_a_room_chair() -> void:
 			c.free()
 	chair._make_seats()
 	assert_int(chair.seats.size()).is_equal(1)
-	assert_float(chair.seats[0].y - chair.global_position.y).is_equal_approx(0.5 * ModelFit.WORLD_SCALE, 0.001)
+	assert_float(chair.seats[0].y - chair.global_position.y).is_equal_approx(0.503, 0.01)   # Chair_1 seat top
 	h.aim_at_sky()
 	await h.frames(4)
 	h.press("interact_pressed")

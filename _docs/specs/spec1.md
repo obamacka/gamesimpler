@@ -1703,8 +1703,8 @@ Tilling without seeds: choose HOE on the wheel Tools page (manual override, 2.6 
 
 | Pack | Author | Use | Source |
 |---|---|---|---|
-| KayKit Furniture Bits 1.0 | Kay Lousberg | furniture pieces | github.com/KayKit-Game-Assets/KayKit-Furniture-Bits-1.0 |
-| KayKit Restaurant Bits 1.0 | Kay Lousberg | kitchen pieces, shop counters, benches, produce props | github.com/KayKit-Game-Assets/KayKit-Restaurant-Bits-1.0 |
+| KayKit Furniture Bits 1.0 | Kay Lousberg | furniture pieces (removed in rev 3.15, see 12.8) | github.com/KayKit-Game-Assets/KayKit-Furniture-Bits-1.0 |
+| KayKit Restaurant Bits 1.0 | Kay Lousberg | kitchen pieces, shop counters, benches, produce props (removed in rev 3.15, see 12.8) | github.com/KayKit-Game-Assets/KayKit-Restaurant-Bits-1.0 |
 | Quaternius Universal Base Characters, Modular Character Outfits, Universal Animation Library | Quaternius | player, NPCs, outfits, animations (planned) | quaternius.com |
 | Quaternius Animated Animals, Crops Pack | Quaternius | dog and cat, crop stages (planned) | quaternius.com |
 | Kenney Survival Kit, Voxel Pack | Kenney | tool models, block textures (planned) | kenney.nl |
@@ -1800,7 +1800,7 @@ Players are young children who cannot read well yet. Everything a child must cho
 - Every spawn marker sets the player's facing (marker rotation), and the camera starts behind the player, so the camera never starts inside a wall.
 
 ### 12.3 Dressed world
-Source: KayKit Medieval Hexagon Pack 1.0 (CC0, GitHub), same toy style and texture atlas as the furniture. World objects keep their gameplay colliders and interactions; only the visual changes. Models are fitted (11.3 fit rule) to a per-object size, not the furniture world scale, because the hex pack is tabletop scale.
+Source: KayKit Medieval Hexagon Pack 1.0 (CC0, GitHub), same toy style and texture atlas as the furniture (replaced by the Quaternius kits in rev 3.15, 12.8; the table below is the rev 3.13 mapping). World objects keep their gameplay colliders and interactions; only the visual changes. Models are fitted (11.3 fit rule) to a per-object size, not the furniture world scale, because the hex pack is tabletop scale.
 | Object | Model |
 |---|---|
 | Cabin exterior (BuildingShell) | `building_home_A_blue`, collider from the fitted model |
@@ -1867,9 +1867,9 @@ Vendoring (11.2 rules): only the glTF files used, their `.bin` and textures. Tex
 **Furniture pieces (11.3, 11.4 at 1 m per unit).** Item ids and interactions stay; names follow the new pictures.
 | Piece | Model | Footprint (cells) | Notes |
 |---|---|---|---|
-| chair | `Chair_1` | 1 x 1 | seat 0.50 m |
-| sofa (now "Bench") | `Bench` | 3 x 1 | 3 seats at 0.51 m, no backrest |
-| armchair (now "Stool") | `Stool` | 1 x 1 | seat 0.58 m, no backrest |
+| chair | `Chair_1` | 1 x 1 | seat 0.51 m |
+| sofa (now "Bench") | `Bench` | 3 x 1 | 3 seats at 0.52 m, no backrest |
+| armchair (now "Stool") | `Stool` | 1 x 1 | seat 0.59 m, no backrest |
 | table | `Table_Large` | 3 x 1 | |
 | bed / double bed | `Bed_Twin1` / `Bed_Twin2` | 2 x 2 | |
 | lamp (now "Candle stand") | `CandleStick_Stand` | 1 x 1 | toggles its light |
@@ -1879,14 +1879,14 @@ Vendoring (11.2 rules): only the glTF files used, their `.bin` and textures. Tex
 | plant | Nature `Plant_1` | 1 x 1 | |
 | counter (now "Workbench") | `Workbench` | 2 x 1 | |
 | stove (now "Cauldron") | `Cauldron` | 1 x 1 | toggles |
-| fridge (now "Bookcase") | `Bookcase_2` | per overhang rule | storage |
+| fridge (now "Bookcase") | `Bookcase_2` | 1 x 1 | storage |
 - `ModelFit.MAX_OVERHANG` becomes 0.25 m (the beds are 2.41 m long: 0.205 m per side over two cells).
-- Seat heights come from the model (the highest vertex over the front 40% of the seat), stored in the piece's seats; the seat part top equals the seat height. The backrest check (backs toward -Z) applies to pieces with a backrest part.
+- Seat heights come from the model (`ModelFit.seat_height`: the highest vertex over the front 40% of the model's depth, above its floor), stored in the piece's seats; the seat part top equals the seat height. Room decor seats (12.6) use the same rule. The backrest check (backs toward -Z) applies to pieces with a backrest part.
 - Structural pieces (walls, floors, doors, roofs) keep placeholder geometry: the Village walls are 2 x 3 m modules, while the build lattice uses 1 m cells (owner review).
 
-**World objects and props.** Sprinkler `Bucket_Wooden_1`; treasure chest `Chest_Wood`; cabin bed `Bed_Twin2`; museum pedestal `Table_Large`, display case `Cabinet`; shop counters (general store, builder supply, tailor) `Stall_Empty`; workbench `Workbench`; tailor bench `Table_Large`; barrels `Barrel` and `Barrel_Apples`; crates `Crate_Wooden`, `FarmCrate_Apple`, `FarmCrate_Carrot`; sacks `Bag`; wheelbarrow `Prop_Wagon`; flags `Banner_1`; fences `Prop_WoodenFence_Single`; carrot produce Props `Carrot`, tomato produce Quaternius crops `Tomato_Crop`. Signposts (Kenney) stay until a matching sign exists (owner review).
+**World objects and props.** Sprinkler `Bucket_Wooden_1`; treasure chest `Chest_Wood`; cabin bed `Bed_Twin2`; museum pedestal `Crate_Wooden`, display case `Cabinet`, donation desk `Workbench`; shop counters (general store, builder supply, tailor) `Stall_Empty`; workbench `Workbench`; tailor bench `Table_Large`; barrels `Barrel` and `Barrel_Apples`; crates `Crate_Wooden`, `FarmCrate_Apple`, `FarmCrate_Carrot` (in place of the wheelbarrow); sacks `Bag`; the lumber pile is three bark-textured logs; the town flag becomes a flowering bush; museum banners `Banner_1` hang beside the door; fences `Prop_WoodenFence_Single` (title backdrop); carrot produce Props `Carrot`, tomato produce Quaternius crops `Tomato_Crop`. Signposts (Kenney) stay until a matching sign exists (owner review).
 
 **Nature.** Timber trees `CommonTree_1` to `_5` (by key hash), fitted to 4 x 7 x 4 m with a 0.6 m trunk collider; fallen log: a bark-textured cylinder (Nature `Bark_NormalTree`), 2 m by 0.5 m; town and wilderness trees `CommonTree_*` and `Pine_*`; rocks `Rock_Medium_1` to `_3`; bushes, flowers and ferns as decoration without colliders.
 
-**Rooms.** Cabin and museum walls use the Village plaster and brick textures, floors the dark wood planks texture (world-space UVs at 2 m, matching the modules); furniture decor uses the pieces above.
+**Rooms.** Cabin and museum walls use the Village plaster and uneven brick textures with their normal maps (world-space triplanar, about 2.5 m per repeat). The Village wood is a trim sheet, not a tiling texture, so floors are dressed with Village floor modules (`ModuleFloor`: `Floor_WoodDark` in the cabin, `Floor_Brick` in the museum) over the collision floor. The doorway panel (12.7) takes the wall material with a Village door on its inside face. Furniture decor uses the models above (wardrobe `Bookcase_2`, table `Table_Large`, chairs `Chair_1`, candle stand, wall shelf `Shelf_Arch`, plant, barrel side table with a candle); the rugs are removed (no rug in the kits).
 

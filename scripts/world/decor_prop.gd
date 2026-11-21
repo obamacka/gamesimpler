@@ -5,8 +5,6 @@
 class_name DecorProp
 extends WorldObject
 
-const HEX := "res://assets/third_party/kaykit/hexagon/"
-
 @export_file("*.gltf", "*.glb", "*.fbx", "*.tscn") var model := ""
 @export var size := Vector3(1, 1, 1)
 @export var yaw_deg := 0
@@ -53,11 +51,12 @@ func _ready() -> void:
 		_make_seats()
 
 
-## Seats over the front three quarters (in front of the backrest), at the KayKit seat height
-## (0.5 model units) for world-scale models, else 40% of the model height; exits 0.6 m ahead.
+## Seats over the front three quarters (in front of the backrest), at the model's seat height
+## (spec 12.8: highest point over the front 40%); exits 0.6 m ahead.
 func _make_seats() -> void:
 	var b := art_bounds(art)
-	var y := 0.5 * ModelFit.WORLD_SCALE if use_world_scale else b.size.y * 0.4
+	var m: Node3D = art.get_child(0)
+	var y := ModelFit.seat_height(m, art.transform * m.transform)
 	var z := b.position.z + b.size.z * 0.625
 	for i in seat_count:
 		var x := b.position.x + b.size.x * (i + 0.5) / seat_count

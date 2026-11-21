@@ -1,0 +1,28 @@
+[gd_scene format=3]
+
+[ext_resource type="Texture2D" path="res://assets/third_party/quaternius/nature/Bark_NormalTree.png" id="1"]
+
+[sub_resource type="StandardMaterial3D" id="bark"]
+albedo_texture = ExtResource("1")
+uv1_scale = Vector3(2, 1, 1)
+
+[sub_resource type="CylinderMesh" id="log"]
+material = SubResource("bark")
+top_radius = 0.22
+bottom_radius = 0.22
+height = 2.0
+radial_segments = 14
+
+[node name="LogPile" type="Node3D"]
+
+[node name="A" type="MeshInstance3D" parent="."]
+transform = Transform3D(0, -1, 0, 1, 0, 0, 0, 0, 1, 0, 0.22, -0.23)
+mesh = SubResource("log")
+
+[node name="B" type="MeshInstance3D" parent="."]
+transform = Transform3D(0, -1, 0, 1, 0, 0, 0, 0, 1, 0.1, 0.22, 0.23)
+mesh = SubResource("log")
+
+[node name="C" type="MeshInstance3D" parent="."]
+transform = Transform3D(0, -1, 0, 1, 0, 0, 0, 0, 1, 0.05, 0.6, 0)
+mesh = SubResource("log")

@@ -7,17 +7,14 @@
 [ext_resource type="Script" path="res://scripts/world/menu_station.gd" id="5_station"]
 [ext_resource type="Script" path="res://scripts/npc/npc.gd" id="6_npc"]
 [ext_resource type="Script" path="res://scripts/world/decor_prop.gd" id="90_decor"]
-[ext_resource type="Texture2D" path="res://assets/third_party/kenney/voxel_pack/stone.png" id="91_floor_tex"]
-[ext_resource type="Texture2D" path="res://assets/third_party/kenney/voxel_pack/brick_grey.png" id="92_wall_tex"]
+[ext_resource type="Texture2D" path="res://assets/third_party/quaternius/village/T_WoodTrim_BaseColor.png" id="91_floor_tex"]
+[ext_resource type="Texture2D" path="res://assets/third_party/quaternius/village/T_UnevenBrick_BaseColor.png" id="92_wall_tex"]
 [ext_resource type="Script" path="res://scripts/safety/safety_volume.gd" id="93_safety"]
+[ext_resource type="Texture2D" path="res://assets/third_party/quaternius/village/T_UnevenBrick_Normal.png" id="94_wall_nrm"]
+[ext_resource type="Script" path="res://scripts/world/module_floor.gd" id="95_floor"]
+[ext_resource type="PackedScene" path="res://assets/third_party/quaternius/village/Door_1_Round.gltf" id="96_door"]
 
 
-[sub_resource type="StandardMaterial3D" id="door_mat"]
-albedo_texture = ExtResource("91_floor_tex")
-albedo_color = Color(0.72, 0.52, 0.36, 1)
-uv1_triplanar = true
-uv1_world_triplanar = true
-texture_filter = 4
 [sub_resource type="StandardMaterial3D" id="floor_mat"]
 albedo_texture = ExtResource("91_floor_tex")
 uv1_triplanar = true
@@ -26,9 +23,11 @@ texture_filter = 4
 
 [sub_resource type="StandardMaterial3D" id="wall_mat"]
 albedo_texture = ExtResource("92_wall_tex")
+normal_enabled = true
+normal_texture = ExtResource("94_wall_nrm")
+uv1_scale = Vector3(0.35, 0.35, 0.35)
 uv1_triplanar = true
 uv1_world_triplanar = true
-texture_filter = 4
 
 [sub_resource type="BoxShape3D" id="floor_shape"]
 size = Vector3(24, 1, 24)
@@ -56,7 +55,7 @@ size = Vector3(11.0, 4, 0.3)
 size = Vector3(2, 4, 0.3)
 
 [sub_resource type="BoxMesh" id="door_mesh"]
-material = SubResource("door_mat")
+material = SubResource("wall_mat")
 size = Vector3(2, 4, 0.24)
 
 [sub_resource type="BoxShape3D" id="room_kill_shape"]
@@ -153,7 +152,7 @@ trophy_id = &"trophy_all"
 [node name="DonationDesk" type="Node3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 2)
 script = ExtResource("5_station")
-model = "res://assets/third_party/kaykit/restaurant_bits/kitchencounter_straight_B.gltf"
+model = "res://assets/third_party/quaternius/props/Workbench.gltf"
 model_fit_size = Vector3(2.2, 1.1, 1.0)
 kind = &"DONATE"
 color = Color(0.4, 0.3, 0.5, 1)
@@ -187,43 +186,35 @@ shape = SubResource("south_shape")
 [node name="Mesh" type="MeshInstance3D" parent="WallSouthEast"]
 mesh = SubResource("south_mesh")
 
-[node name="Rug" type="Node3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, -0, 0, 1, 0, 0, 6.5)
-script = ExtResource("90_decor")
-model = "res://assets/third_party/kaykit/furniture_bits/rug_rectangle_A.gltf"
-yaw_deg = 0
-size = Vector3(4, 0.1, 2.8)
-solid = false
-
 [node name="PlantW" type="Node3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, -0, 0, 1, -10.8, 0, 10.5)
 script = ExtResource("90_decor")
-model = "res://assets/third_party/kaykit/furniture_bits/cactus_medium_A.gltf"
+model = "res://assets/third_party/quaternius/nature/Plant_1_Big.gltf"
 yaw_deg = 0
 use_world_scale = true
 
 [node name="PlantE" type="Node3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, -0, 0, 1, 10.8, 0, 10.5)
 script = ExtResource("90_decor")
-model = "res://assets/third_party/kaykit/furniture_bits/cactus_medium_A.gltf"
+model = "res://assets/third_party/quaternius/nature/Plant_1_Big.gltf"
 yaw_deg = 0
 use_world_scale = true
 
 [node name="FlagW" type="Node3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, -0, 0, 1, -2.2, 0, 10.8)
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, -2.2, 3, 11.75)
 script = ExtResource("90_decor")
-model = "res://assets/third_party/kaykit/hexagon/flag_green.gltf"
+model = "res://assets/third_party/quaternius/props/Banner_1.gltf"
 yaw_deg = 0
-size = Vector3(0.8, 2.4, 0.8)
 solid = false
+model_scale = 1.0
 
 [node name="FlagE" type="Node3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, -0, 0, 1, 2.2, 0, 10.8)
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, 3.8, 3, 11.75)
 script = ExtResource("90_decor")
-model = "res://assets/third_party/kaykit/hexagon/flag_green.gltf"
+model = "res://assets/third_party/quaternius/props/Banner_1.gltf"
 yaw_deg = 0
-size = Vector3(0.8, 2.4, 0.8)
 solid = false
+model_scale = 1.0
 
 [node name="DoorPanel" type="StaticBody3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, 12)
@@ -234,9 +225,17 @@ shape = SubResource("door_shape")
 [node name="Mesh" type="MeshInstance3D" parent="DoorPanel"]
 mesh = SubResource("door_mesh")
 
+[node name="Door" parent="DoorPanel" instance=ExtResource("96_door")]
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, 0.51, -2.0, -0.19)
+
 [node name="KillPlane" type="Area3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -12, 0)
 script = ExtResource("93_safety")
 
 [node name="Shape" type="CollisionShape3D" parent="KillPlane"]
 shape = SubResource("room_kill_shape")
+
+[node name="FloorTiles" type="Node3D" parent="."]
+script = ExtResource("95_floor")
+piece = "Floor_Brick"
+tiles = Vector2i(12, 12)

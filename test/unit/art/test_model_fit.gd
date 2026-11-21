@@ -22,7 +22,7 @@ func _bounds(holder: Node3D) -> AABB:
 	return m.transform * ModelFit.local_aabb(m)
 
 
-func test_kaykit_furniture_is_wired() -> void:
+func test_furniture_is_wired() -> void:
 	for id in [&"piece_chair", &"piece_sofa", &"piece_table", &"piece_bed", &"piece_lamp", &"piece_shelf", &"piece_chest",
 			&"piece_armchair", &"piece_bed_double", &"piece_cabinet", &"piece_plant", &"piece_counter", &"piece_stove", &"piece_fridge"]:
 		assert_bool(Database.pieces[id].has_model()).override_failure_message(String(id)).is_true()
@@ -72,6 +72,8 @@ func test_seating_and_beds_face_plus_z() -> void:
 	for def: BuildPieceDef in _modelled():
 		if def.interaction(&"SIT").is_empty() and def.interaction(&"SLEEP").is_empty():
 			continue
+		if not def.interaction(&"SIT").is_empty() and def.parts.size() < 2:
+			continue   # benches and stools have no backrest (spec 12.8)
 		var holder := _fitted(def)
 		var m: Node3D = holder.get_child(0)
 		var b := _bounds(holder)
@@ -89,7 +91,7 @@ func test_seating_and_beds_face_plus_z() -> void:
 		var top_z := acc.z / float(n)
 		assert_bool(top_z < b.get_center().z - 0.05).override_failure_message("%s back at z %.2f, centre %.2f" % [def.id, top_z, b.get_center().z]).is_true()
 		checked += 1
-	assert_int(checked).is_greater_equal(5)
+	assert_int(checked).is_greater_equal(3)
 
 
 func _rel(root: Node3D, n: Node3D) -> Transform3D:
@@ -101,12 +103,19 @@ func _rel(root: Node3D, n: Node3D) -> Transform3D:
 	return t
 
 
-## KayKit seats are 0.5 model units high (spec 11.4).
+## Seats sit on the model's seat (spec 12.8: highest point over the front 40%), at a
+## sitting height, on top of the seat part.
 func test_seat_heights_match_the_seat_parts() -> void:
 	for def: BuildPieceDef in _modelled():
 		var sit := def.interaction(&"SIT")
+		if sit.is_empty():
+			continue
+		var holder := _fitted(def)
+		var m: Node3D = holder.get_child(0)
+		var want := ModelFit.seat_height(m, m.transform)
 		for s in sit.get("seats", []):
-			assert_float(s.y).override_failure_message(String(def.id)).is_equal_approx(0.5 * ModelFit.WORLD_SCALE, 0.001)
+			assert_float(s.y).override_failure_message(String(def.id)).is_equal_approx(want, 0.002)
+			assert_bool(s.y > 0.35 and s.y < 0.65).override_failure_message(String(def.id)).is_true()
 			var top := 0.0
 			for p in def.parts:
 				var lo: Vector3 = p["center"] - p["size"] * 0.5
@@ -117,13 +126,13 @@ func test_seat_heights_match_the_seat_parts() -> void:
 
 
 func test_fit_turns_and_scales() -> void:
-	var m := ModelFit.instantiate("res://assets/third_party/kaykit/furniture_bits/couch.gltf")
+	var m := ModelFit.instantiate("res://assets/third_party/quaternius/props/Bench.gltf")
 	var holder: Node3D = auto_free(Node3D.new())
 	holder.add_child(m)
 	var s := ModelFit.fit(m, AABB(Vector3(-1, 0, -1), Vector3(2, 2, 2)), 90)
 	var b := _bounds(holder)
-	# the 3.0 x 1.6 couch turned a quarter: its long side runs along z
-	assert_float(s).is_equal_approx(2.0 / 3.0, 0.001)
+	# the 2.78 m bench turned a quarter: its long side runs along z
+	assert_float(s).is_equal_approx(2.0 / 2.777, 0.002)
 	assert_float(b.size.z).is_equal_approx(2.0, EPS)
 	assert_bool(b.size.x < b.size.z).is_true()
 	assert_float(b.position.y).is_equal_approx(0.0, EPS)
@@ -155,7 +164,7 @@ func test_modelled_pieces_paint_primary_only() -> void:
 
 func test_item_visual_uses_world_model_or_box() -> void:
 	var carrot: Node3D = auto_free(ItemVisual.make(&"item_carrot", 0.4, Color.RED))
-	assert_str(String(carrot.get_meta(ItemVisual.MODEL_META, ""))).contains("food_ingredient_carrot")
+	assert_str(String(carrot.get_meta(ItemVisual.MODEL_META, ""))).contains("props/Carrot")
 	var b: AABB = (carrot.get_child(0) as Node3D).transform * ModelFit.local_aabb(carrot.get_child(0))
 	assert_float(maxf(b.size.x, maxf(b.size.y, b.size.z))).is_equal_approx(0.4, EPS)
 	assert_float(b.position.y).is_equal_approx(0.0, EPS)

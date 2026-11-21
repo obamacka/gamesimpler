@@ -91,7 +91,7 @@ func test_town_stations_show_models_over_box_colliders() -> void:
 	for n in ["GeneralStore", "BuilderSupply", "TailorShop", "Workbench", "TailorBench"]:   # furniture-scale counters
 		var st := _town_station(n)
 		assert_object(st).override_failure_message(n).is_not_null()
-		assert_str(st.model).override_failure_message(n).contains("kaykit/restaurant_bits")
+		assert_str(st.model).override_failure_message(n).contains("quaternius/props")
 		assert_str(st.visual.name).override_failure_message(n).is_equal("Model")
 		assert_bool(st.get_children().any(func(c): return c is StaticBody3D)).is_true()
 		var b: AABB = st.visual.transform * ModelFit.local_aabb(st.visual)
@@ -110,7 +110,7 @@ func test_pickup_and_ripe_crop_use_produce_models() -> void:
 	var p := Pickup.new()
 	p.item_id = &"item_carrot"
 	SceneRouter.current_zone.add_child(p)
-	assert_str(String(p.get_node("Visual").get_meta(ItemVisual.MODEL_META, ""))).contains("food_ingredient_carrot")
+	assert_str(String(p.get_node("Visual").get_meta(ItemVisual.MODEL_META, ""))).contains("props/Carrot")
 	var stone := Pickup.new()
 	stone.item_id = &"item_stone"
 	SceneRouter.current_zone.add_child(stone)

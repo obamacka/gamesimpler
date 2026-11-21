@@ -4,10 +4,11 @@
 class_name ModelFit
 extends RefCounted
 
-## One world scale for KayKit furniture and station models (spec 11.4): metres per model unit.
-const WORLD_SCALE := 0.75
-## Largest model overhang past its footprint per side (spec 11.4).
-const MAX_OVERHANG := 0.2
+## One world scale for furniture and station models (spec 11.4, 12.8): metres per model unit.
+## The Quaternius kits are metric.
+const WORLD_SCALE := 1.0
+## Largest model overhang past its footprint per side (spec 11.4, 12.8).
+const MAX_OVERHANG := 0.25
 
 
 ## Loads and instantiates a model scene; null if the path is empty or not a PackedScene.
@@ -78,3 +79,35 @@ static func place(model: Node3D, box: AABB, yaw_deg: int, scale: float = WORLD_S
 	var have := Vector3(scaled.get_center().x, scaled.position.y, scaled.get_center().z)
 	model.transform = Transform3D(basis.scaled(Vector3.ONE * scale), target - have)
 	return AABB(scaled.position + target - have, scaled.size)
+
+
+## Seat height (spec 12.8): the highest vertex over the front 40% of the model's depth (+Z is
+## the front), in the space `xf` maps the root into. 0 for a model without vertices.
+static func seat_height(root: Node3D, xf: Transform3D) -> float:
+	var verts: PackedVector3Array = []
+	for mi in mesh_instances(root):
+		var t := xf * _relative(root, mi)
+		for s in mi.mesh.get_surface_count():
+			for v in mi.mesh.surface_get_arrays(s)[Mesh.ARRAY_VERTEX]:
+				verts.append(t * v)
+	if verts.is_empty():
+		return 0.0
+	var z0 := INF
+	var z1 := -INF
+	for v in verts:
+		z0 = minf(z0, v.z)
+		z1 = maxf(z1, v.z)
+	var top := -INF
+	for v in verts:
+		if (v.z - z0) / maxf(0.001, z1 - z0) > 0.6:
+			top = maxf(top, v.y)
+	return top
+
+
+static func _relative(root: Node3D, n: Node3D) -> Transform3D:
+	var t := Transform3D.IDENTITY
+	var cur: Node = n
+	while cur != root:
+		t = (cur as Node3D).transform * t
+		cur = cur.get_parent()
+	return t

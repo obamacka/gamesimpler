@@ -236,7 +236,14 @@ static func item_color(item_id: StringName) -> Color:
 
 ## Short caption for an item: "item_piece_wall_door" -> "Wall door" (spec 12.4: captions are
 ## extras under pictures, so short and plain).
+## Pieces whose picture changed with the Quaternius art (spec 12.8): the caption follows the picture.
+const RENAMED := {&"item_piece_sofa": "Bench", &"item_piece_armchair": "Stool", &"item_piece_lamp": "Candle stand",
+	&"item_piece_counter": "Workbench", &"item_piece_stove": "Cauldron", &"item_piece_fridge": "Bookcase"}
+
+
 static func item_name(item_id: StringName) -> String:
+	if RENAMED.has(item_id):
+		return RENAMED[item_id]
 	var s := String(item_id).trim_prefix("item_")
 	for p in ["piece_", "outfit_", "petacc_", "seed_"]:
 		if s.begins_with(p):

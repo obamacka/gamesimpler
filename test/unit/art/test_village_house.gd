@@ -74,3 +74,20 @@ func test_house_in_tree_builds_and_reports_its_box() -> void:
 	# the roof overhangs the walls; the collider must not
 	var b := ModelFit.local_aabb(h)
 	assert_float(b.size.x).is_greater(6.5)
+
+
+## Spec 12.8: the KayKit packs are gone; no scene, script or data file may point at them.
+func test_nothing_references_kaykit() -> void:
+	var hits: Array[String] = []
+	for root in ["res://scenes", "res://scripts", "res://ui", "res://resources"]:
+		_scan(root, hits)
+	assert_array(hits).is_empty()
+
+
+func _scan(dir: String, hits: Array[String]) -> void:
+	for f in DirAccess.get_files_at(dir):
+		if f.get_extension() in ["gd", "tscn", "tres", "json"]:
+			if FileAccess.get_file_as_string(dir.path_join(f)).contains("third_party/kaykit"):
+				hits.append(dir.path_join(f))
+	for d in DirAccess.get_directories_at(dir):
+		_scan(dir.path_join(d), hits)

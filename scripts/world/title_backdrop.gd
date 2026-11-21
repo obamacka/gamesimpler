@@ -1,9 +1,8 @@
-## Title screen backdrop (spec 12.1): a small meadow vista with a KayKit house, trees, the
+## Title screen backdrop (spec 12.1, 12.8): a small meadow vista with a village house, trees, the
 ## player character and the dog; the camera slowly circles (still with reduce_motion).
 class_name TitleBackdrop
 extends Node3D
 
-const HEX := "res://assets/third_party/kaykit/hexagon/"
 const ORBIT_SPEED := 0.06   # radians per second
 
 var camera: Camera3D
@@ -27,12 +26,13 @@ func _ready() -> void:
 		mat.albedo_color = Color(0.42, 0.66, 0.31)
 	ground.material_override = mat
 	add_child(ground)
-	_prop(HEX + "building_home_A_blue.gltf", Vector3(-3.2, 0, -2.0), Vector3(5, 6, 5), 20)
-	_prop(HEX + "tree_single_A.gltf", Vector3(2.8, 0, -3.0), Vector3(2.4, 5, 2.4), 0)
-	_prop(HEX + "tree_single_B.gltf", Vector3(4.6, 0, -0.5), Vector3(2.0, 4, 2.0), 40)
-	_prop(HEX + "building_windmill_yellow.gltf", Vector3(9, 0, -9), Vector3(6, 9, 6), -30)
-	_prop(HEX + "rock_single_A.gltf", Vector3(1.6, 0, 1.4), Vector3(0.9, 0.4, 0.9), 0)
-	_prop(HEX + "fence_wood_straight.gltf", Vector3(-0.5, 0, 2.6), Vector3(3, 1, 0.4), 0)
+	_place(ArtPaths.BUILDINGS + "cabin.tscn", Vector3(-4.2, 0, -3.2), 20)
+	_place(ArtPaths.BUILDINGS + "tower.tscn", Vector3(9, 0, -10), -30)
+	_prop(ArtPaths.tree(0), Vector3(3.4, 0, -3.6), Vector3(3.6, 6.5, 3.6), 0)
+	_prop(ArtPaths.tree(2), Vector3(5.6, 0, -0.8), Vector3(3.0, 5.5, 3.0), 40)
+	_prop(ArtPaths.NATURE + "Rock_Medium_2.gltf", Vector3(1.8, 0, 1.6), Vector3(0.9, 0.5, 0.9), 0)
+	_prop(ArtPaths.NATURE + "Bush_Common_Flowers.gltf", Vector3(-1.4, 0, 0.4), Vector3(1.2, 0.9, 1.2), 0)
+	_prop(ArtPaths.VILLAGE + "Prop_WoodenFence_Single.gltf", Vector3(-0.5, 0, 2.6), Vector3(2.1, 0.9, 0.2), 0)
 	character = CharacterRig.new()
 	add_child(character)
 	character.setup(&"FEMALE", "Hair_SimpleParted")
@@ -63,6 +63,17 @@ static func grass_top() -> Texture2D:
 	var top := img.get_region(Rect2i(0, 0, img.get_width() / VoxelLibraryBuilder.ATLAS.x, img.get_height()))
 	top.generate_mipmaps()
 	return ImageTexture.create_from_image(top)
+
+
+## A model at 1 m per unit with its own pivot (assembled houses).
+func _place(path: String, pos: Vector3, yaw_deg: float) -> void:
+	var holder := Node3D.new()
+	holder.position = pos
+	holder.rotation.y = deg_to_rad(yaw_deg)
+	add_child(holder)
+	var m := ModelFit.instantiate(path)
+	if m:
+		holder.add_child(m)
 
 
 func _prop(path: String, pos: Vector3, size: Vector3, yaw_deg: float) -> void:

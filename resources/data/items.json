@@ -310,7 +310,7 @@
         "hint_key": "Grows from carrot seeds",
         "sort_order": 21
       },
-      "world_model": "res://assets/third_party/kaykit/restaurant_bits/food_ingredient_carrot.gltf"
+      "world_model": "res://assets/third_party/quaternius/props/Carrot.gltf"
     },
     {
       "id": "item_sunflower",
@@ -407,7 +407,7 @@
         "hint_key": "Juicy and red, grows back",
         "sort_order": 26
       },
-      "world_model": "res://assets/third_party/kaykit/restaurant_bits/food_ingredient_tomato.gltf"
+      "world_model": "res://assets/third_party/quaternius/crops/Tomato_Crop.fbx"
     },
     {
       "id": "item_hoe_basic",

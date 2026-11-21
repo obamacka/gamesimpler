@@ -79,7 +79,7 @@ func _town_station(node_name: String) -> MenuStation:
 		var st := MenuStation.new()
 		for k in state.get_node_property_count(i):
 			var prop := state.get_node_property_name(i, k)
-			if prop in [&"kind", &"shop_id", &"model", &"model_yaw_deg", &"size", &"color"]:
+			if prop in [&"kind", &"shop_id", &"model", &"model_yaw_deg", &"model_fit_size", &"size", &"color"]:
 				st.set(prop, state.get_node_property_value(i, k))
 		st.name = node_name
 		SceneRouter.current_zone.add_child(st)
@@ -88,7 +88,7 @@ func _town_station(node_name: String) -> MenuStation:
 
 
 func test_town_stations_show_models_over_box_colliders() -> void:
-	for n in ["GeneralStore", "BuilderSupply", "TailorShop", "Workbench", "TailorBench"]:
+	for n in ["GeneralStore", "BuilderSupply", "TailorShop", "Workbench", "TailorBench"]:   # furniture-scale counters
 		var st := _town_station(n)
 		assert_object(st).override_failure_message(n).is_not_null()
 		assert_str(st.model).override_failure_message(n).contains("kaykit/restaurant_bits")
@@ -98,8 +98,11 @@ func test_town_stations_show_models_over_box_colliders() -> void:
 		assert_float(st.visual.transform.basis.get_scale().x).is_equal_approx(ModelFit.WORLD_SCALE, 0.0001)
 		assert_bool(st.size.is_equal_approx(b.size)).override_failure_message(n).is_true()
 		st.queue_free()
+	# spec 12.3: the job board is a Survival Kit signpost fitted into its box
 	var board := _town_station("JobBoard")
-	assert_bool(board.visual is MeshInstance3D and (board.visual as MeshInstance3D).mesh is BoxMesh).is_true()
+	assert_str(board.visual.name).is_equal("Model")
+	var bb: AABB = board.visual.transform * ModelFit.local_aabb(board.visual)
+	assert_bool(bb.size.x <= board.model_fit_size.x + 0.01 and bb.size.y <= board.model_fit_size.y + 0.01).is_true()
 	board.queue_free()
 
 

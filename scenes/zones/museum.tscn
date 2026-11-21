@@ -10,6 +10,18 @@
 [ext_resource type="Texture2D" path="res://assets/third_party/kenney/voxel_pack/stone.png" id="91_floor_tex"]
 [ext_resource type="Texture2D" path="res://assets/third_party/kenney/voxel_pack/brick_grey.png" id="92_wall_tex"]
 
+[sub_resource type="StandardMaterial3D" id="floor_mat"]
+albedo_texture = ExtResource("91_floor_tex")
+uv1_triplanar = true
+uv1_world_triplanar = true
+texture_filter = 4
+
+[sub_resource type="StandardMaterial3D" id="wall_mat"]
+albedo_texture = ExtResource("92_wall_tex")
+uv1_triplanar = true
+uv1_world_triplanar = true
+texture_filter = 4
+
 [sub_resource type="BoxShape3D" id="floor_shape"]
 size = Vector3(24, 1, 24)
 
@@ -23,18 +35,6 @@ size = Vector3(24, 4, 0.3)
 [sub_resource type="BoxMesh" id="wall_mesh"]
 material = SubResource("wall_mat")
 size = Vector3(24, 4, 0.3)
-
-[sub_resource type="StandardMaterial3D" id="floor_mat"]
-albedo_texture = ExtResource("91_floor_tex")
-uv1_triplanar = true
-uv1_world_triplanar = true
-texture_filter = 4
-
-[sub_resource type="StandardMaterial3D" id="wall_mat"]
-albedo_texture = ExtResource("92_wall_tex")
-uv1_triplanar = true
-uv1_world_triplanar = true
-texture_filter = 4
 
 [sub_resource type="BoxShape3D" id="south_shape"]
 size = Vector3(11.0, 4, 0.3)
@@ -133,10 +133,10 @@ script = ExtResource("4_trophy")
 trophy_id = &"trophy_all"
 
 [node name="DonationDesk" type="Node3D" parent="."]
-model = "res://assets/third_party/kaykit/restaurant_bits/kitchencounter_straight_B.gltf"
-model_fit_size = Vector3(2.2, 1.1, 1.0)
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 2)
 script = ExtResource("5_station")
+model = "res://assets/third_party/kaykit/restaurant_bits/kitchencounter_straight_B.gltf"
+model_fit_size = Vector3(2.2, 1.1, 1.0)
 kind = &"DONATE"
 color = Color(0.4, 0.3, 0.5, 1)
 size = Vector3(2, 1.1, 0.8)

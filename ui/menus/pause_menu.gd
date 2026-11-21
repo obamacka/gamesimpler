@@ -7,7 +7,7 @@ var grid: GridContainer
 
 
 func build() -> void:
-	var p := MenuBase.panel(Vector2(760, 560))
+	var p := MenuBase.panel(Vector2(730, 500))
 	add_child(p)
 	grid = GridContainer.new()
 	grid.columns = 3

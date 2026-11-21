@@ -166,8 +166,14 @@ static func item_color(item_id: StringName) -> Color:
 	return Color(0.75, 0.7, 0.6)
 
 
+## Short caption for an item: "item_piece_wall_door" -> "Wall door" (spec 12.4: captions are
+## extras under pictures, so short and plain).
 static func item_name(item_id: StringName) -> String:
-	return String(item_id).trim_prefix("item_").replace("_", " ")
+	var s := String(item_id).trim_prefix("item_")
+	for p in ["piece_", "outfit_", "petacc_", "seed_"]:
+		if s.begins_with(p):
+			s = s.trim_prefix(p) + (" seeds" if p == "seed_" else "")
+	return s.replace("_", " ").capitalize() if s.length() > 0 else s
 
 
 ## Debug focus check (spec 5.1 rule 4): every enabled visible button must take focus.

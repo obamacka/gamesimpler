@@ -50,6 +50,23 @@ static func build(text_scale: float = 1.0) -> Theme:
 	t.set_stylebox("background", "ProgressBar", bg)
 	t.set_stylebox("fill", "ProgressBar", fill)
 
+	# Tabs: rounded, the selected one light and the rest muted.
+	var tab_on := box(BUTTON, 16, 3, FOCUS, 0)
+	tab_on.corner_radius_bottom_left = 0
+	tab_on.corner_radius_bottom_right = 0
+	var tab_off := box(Color(INK, 0.12), 16, 0, Color.TRANSPARENT, 0)
+	tab_off.corner_radius_bottom_left = 0
+	tab_off.corner_radius_bottom_right = 0
+	for tt in ["TabContainer", "TabBar"]:
+		t.set_stylebox("tab_selected", tt, tab_on)
+		t.set_stylebox("tab_unselected", tt, tab_off)
+		t.set_stylebox("tab_hovered", tt, box(Color("fff3d6"), 16, 0, Color.TRANSPARENT, 0))
+		t.set_stylebox("tab_focus", tt, focus_box())
+		t.set_color("font_selected_color", tt, INK)
+		t.set_color("font_unselected_color", tt, Color(INK, 0.65))
+		t.set_color("font_hovered_color", tt, INK)
+	t.set_stylebox("panel", "TabContainer", box(Color(1, 1, 1, 0.5), 18, 0, Color.TRANSPARENT, 0))
+
 	var grab := box(Color(INK, 0.45), 10, 0, Color.TRANSPARENT, 0)
 	t.set_stylebox("grabber", "VScrollBar", grab)
 	t.set_stylebox("grabber_highlight", "VScrollBar", box(FOCUS, 10, 0, Color.TRANSPARENT, 0))

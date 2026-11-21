@@ -156,18 +156,22 @@ func _make_terrain(s: GameSession) -> Node:
 		generator = DeepMineGenerator.new(_material_ids(), bmin.y, bmax.y, DeepMineGenerator.day_seed(s.rng.seed_value, s.day()))
 	else:
 		var og := OverworldGenerator.new(_material_ids(), bmin.y, hash([s.rng.seed_value, String(zone_id)]))
+		# Towns are level at one height so the baked navmesh is walkable (spec 9.4). In a zone
+		# with a town, the spawn, the building pads and the plots share that height too, so the
+		# village is one level (spec 12.3); elsewhere each is level at its own centre height.
+		var vols := find_children("*", "ProtectionVolume", true, false)
+		var town_h := -100000
+		for v in vols:
+			if v.reason == &"TOWN":
+				town_h = og.add_flat(Rect2i(v.min_cell.x, v.min_cell.z, v.max_cell.x - v.min_cell.x + 1, v.max_cell.z - v.min_cell.z + 1), town_h)
 		for p in Database.plots.values():
 			if p.zone_id == zone_id:   # plots are level, with a 1-cell border
 				var a: Vector3i = p.min_cell - Vector3i(1, 0, 1)
 				var b: Vector3i = p.max_cell + Vector3i(2, 0, 2)
-				og.add_flat(Rect2i(a.x, a.z, b.x - a.x, b.z - a.z))
-		var town_h := -100000
-		for v in find_children("*", "ProtectionVolume", true, false):
-			if v.reason == &"TOWN":   # towns are level, at one height, so the baked navmesh is walkable (spec 9.4)
-				town_h = og.add_flat(Rect2i(v.min_cell.x, v.min_cell.z, v.max_cell.x - v.min_cell.x + 1, v.max_cell.z - v.min_cell.z + 1), town_h)
-		for v in find_children("*", "ProtectionVolume", true, false):
-			if v.reason == &"BUILDING":   # buildings stand on a level pad (spec 12.3)
-				og.add_flat(Rect2i(v.min_cell.x, v.min_cell.z, v.max_cell.x - v.min_cell.x + 1, v.max_cell.z - v.min_cell.z + 1))
+				og.add_flat(Rect2i(a.x, a.z, b.x - a.x, b.z - a.z), town_h)
+		for v in vols:
+			if v.reason in [&"BUILDING", &"SPAWN"]:
+				og.add_flat(Rect2i(v.min_cell.x, v.min_cell.z, v.max_cell.x - v.min_cell.x + 1, v.max_cell.z - v.min_cell.z + 1), town_h)
 		for bp in Database.blueprints.values():
 			if bp.zone_id == zone_id:   # job sites are level too
 				og.add_flat(Rect2i(bp.site_min.x, bp.site_min.z, bp.site_max.x - bp.site_min.x + 1, bp.site_max.z - bp.site_min.z + 1))

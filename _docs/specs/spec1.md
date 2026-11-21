@@ -2,8 +2,8 @@
 
 | Field | Value |
 |---|---|
-| Status | DRAFT rev 3.12, all decisions resolved |
-| Revision | rev 1: core systems. rev 2: kid-friendly, accessibility, forgiving logic, expression systems, integration tests. rev 3: D1 to D4 resolved (dig-anywhere blocky voxels, jump and double jump, context-aware interaction with dedicated critical states, crafting flow confirmed). rev 3.1: D16 to D19 confirmed. rev 3.2: D5 to D15 resolved (farming system added, pets on day 2, keep last tool), min-spec hardware, test command note. rev 3.3: D20 to D25 resolved (macOS min spec M1 16 GB; 30 fps on min spec, 60 fps on recommended spec). rev 3.4: D26 recommended spec. rev 3.5: Phase 2B farming details (farm events, save shape, extra 10.4 rows, Home Meadow). rev 3.6: Phase 3 build lattice layers, socket attach transforms, support rule, `build` save shape (`build_rev36` replaces the per-plot list). rev 3.7: Phase 4 `jobs` save shape (ranks nested under `jobs.jobs`, contract origin_y); job sites are build zones and flattened; starting coins 150. rev 3.8: Phase 5 details (pet settles at 80% of follow_distance; never-expire mail kinds; mail prune after delivery; NPC straight steering where no navmesh is baked; generated instrument tones; care letters signed by the best friend). rev 3.9: Phase 6 (save layout with per-slot voxel directories and epochs, schema v2 with migration from v1, zone navigation baking, level town volumes, curator Y donates, static zones drop the previous terrain). rev 3.10: section 11 art assets (smooth low-poly, CC0 packs, model wiring). rev 3.11 (owner 2026-11-20): one world scale 0.75 m per KayKit unit, player 1.7 m, Quaternius free characters (11.4 to 11.7). rev 3.12: pets, crops, tools, block textures (11.8 to 11.10) |
+| Status | DRAFT rev 3.13, all decisions resolved |
+| Revision | rev 1: core systems. rev 2: kid-friendly, accessibility, forgiving logic, expression systems, integration tests. rev 3: D1 to D4 resolved (dig-anywhere blocky voxels, jump and double jump, context-aware interaction with dedicated critical states, crafting flow confirmed). rev 3.1: D16 to D19 confirmed. rev 3.2: D5 to D15 resolved (farming system added, pets on day 2, keep last tool), min-spec hardware, test command note. rev 3.3: D20 to D25 resolved (macOS min spec M1 16 GB; 30 fps on min spec, 60 fps on recommended spec). rev 3.4: D26 recommended spec. rev 3.5: Phase 2B farming details (farm events, save shape, extra 10.4 rows, Home Meadow). rev 3.6: Phase 3 build lattice layers, socket attach transforms, support rule, `build` save shape (`build_rev36` replaces the per-plot list). rev 3.7: Phase 4 `jobs` save shape (ranks nested under `jobs.jobs`, contract origin_y); job sites are build zones and flattened; starting coins 150. rev 3.8: Phase 5 details (pet settles at 80% of follow_distance; never-expire mail kinds; mail prune after delivery; NPC straight steering where no navmesh is baked; generated instrument tones; care letters signed by the best friend). rev 3.9: Phase 6 (save layout with per-slot voxel directories and epochs, schema v2 with migration from v1, zone navigation baking, level town volumes, curator Y donates, static zones drop the previous terrain). rev 3.10: section 11 art assets (smooth low-poly, CC0 packs, model wiring). rev 3.11 (owner 2026-11-20): one world scale 0.75 m per KayKit unit, player 1.7 m, Quaternius free characters (11.4 to 11.7). rev 3.12: pets, crops, tools, block textures (11.8 to 11.10). rev 3.13 (owner 2026-11-21): title screen, new games start outdoors, dressed world, picture-first menus (section 12) |
 | Engine | Godot 4.7 stable (4.7.2 latest patch found, 2026-08-18), GDScript |
 | Physics | Jolt Physics (built-in module) |
 | Voxels | Zylann Voxel Tools 1.7, GDExtension edition (MIT), released 2026-08-20, targets Godot 4.5+ |
@@ -1777,3 +1777,52 @@ Composition (`CharacterRig`):
 - The equipped tool hangs on a `BoneAttachment3D` on the character's `hand_r` bone, scaled to 0.6 m long, and is hidden when the equipped tool has no model.
 - Source: Kenney "Voxel Pack" (CC0, OpenGameArt): 128 px block tiles. `VoxelMaterialDef.tiles`: `{"top", "side", "bottom"}` file names (side used for missing entries), an optional `top_tint` that recolours the top tile and the green fringe of the side tile, keeping their brightness pattern (grass: the pack's mint green becomes meadow green #6aa84f), and an optional `tint` multiplied into all faces. `VoxelLibraryBuilder` packs each material's three tiles into a 3 x 1 atlas texture at load (nearest filtering) and sets the cube's tiles; materials without tiles keep their flat colour.
 - Mapping: grass grass_top / dirt_grass / dirt; dirt dirt; sand sand; clay redsand; stone stone; hard stone greystone; copper ore stone_browniron; iron ore stone_iron; quartz ore stone_silver; geode rock greystone_ruby; chest block wood; bedrock rock tinted dark; farmland dirt tinted dark.
+
+---
+
+## 12. First Play: Title Screen, Start Location, Dressed World, Picture-First Menus (owner request 2026-11-21)
+
+Players are young children who cannot read well yet. Everything a child must choose is a picture first; words are a small caption under the picture.
+
+### 12.1 Title screen
+- The game boots into a title screen, not straight into a session. No `GameSession` exists until the child picks Play.
+- Backdrop: a small 3D vista (the player character waving next to a KayKit house, a tree, the dog), the camera slowly circling. `reduce_motion` stops the circling.
+- Big picture tiles in one row, gamepad focus left to right, A chooses, mouse click chooses:
+  - **Play** (green, play arrow): continues the most recent save if one exists, otherwise starts a new game. One tile, so the child never has to choose between "new" and "continue".
+  - **New** (blue, plus): only shown when a save exists; asks a yes/no confirm with pictures (check and cross).
+  - **Settings** (purple, gear): the settings menu.
+  - **Quit** (red, power): desktop only; asks a yes/no confirm.
+- Initial focus is Play. Starting fades to black, builds the session, loads the zone, fades in.
+- The pause menu gets a "Title" tile (home icon) that saves to the autosave slot and returns to the title.
+
+### 12.2 Start location
+- A new game starts outdoors in Home Meadow at `spawn_new_game`, in front of the cabin, facing the town, so the first frame shows the textured world, the cabin, the town and the player from behind. Sleeping and waking still use the cabin bed (unchanged).
+- Every spawn marker sets the player's facing (marker rotation), and the camera starts behind the player, so the camera never starts inside a wall.
+
+### 12.3 Dressed world
+Source: KayKit Medieval Hexagon Pack 1.0 (CC0, GitHub), same toy style and texture atlas as the furniture. World objects keep their gameplay colliders and interactions; only the visual changes. Models are fitted (11.3 fit rule) to a per-object size, not the furniture world scale, because the hex pack is tabletop scale.
+| Object | Model |
+|---|---|
+| Cabin exterior (BuildingShell) | `building_home_A_blue`, collider from the fitted model |
+| Town buildings (decor) | market (general store), lumbermill (builder supply), home B (tailor), church (museum, its door is the museum entrance), tavern, windmill |
+| Well | `building_well` |
+| Mine entrance | `building_mine` |
+| Zone doors (cabin, wilderness path, museum) | a glowing door mat plus a picture sign (Kenney Survival Kit signpost); no box panel |
+| Timber tree / stump / fallen log | `tree_single_A` or `_B`; chopped: `tree_single_A_cut`; log: `resource_lumber` |
+| Apple tree | Quaternius crops `Apple_4` with fruit, `Apple_Harvested` without |
+| Treasure chest | Kenney Survival Kit `chest` |
+| Mailbox, job board, plot sign | Kenney Survival Kit `signpost-single`, `signpost` |
+| Sprinkler | KayKit hex `bucket_water` |
+| Cabin bed | KayKit `bed_double_A` |
+| Museum pedestal / display case | KayKit `table_small` / `cabinet_medium` |
+- `DecorProp` (new): a non-interactive model with an optional box collider, placed in zone scenes: trees, rocks, fences, barrels, crates, sacks, wheelbarrow, flags. Decor sits inside protected volumes so it is never undermined by digging.
+- Static rooms (cabin, museum) get textured floors and walls (Voxel Pack wood planks and bricks, world-space triplanar UVs at 1 m) and KayKit furniture as decor.
+
+### 12.4 Picture-first menus
+- One `Theme` (`res://ui/theme/kid_theme.tres` built in code by `KidTheme`): Nunito-like rounded default font at 28 px minimum (text_scale multiplies), rounded panels (radius 24), big rounded buttons (min 96 px tall), focused control: thick white outline plus a gentle scale pulse (off with `reduce_motion`), colour coded by meaning (green go, red stop or back, blue choose, yellow money).
+- `MenuBase.add_row` and `add_tile` take an icon: a Kenney Game Icons picture, an item picture, or a colour swatch. Icons sit left of a short caption; captions are optional extras, never the only cue.
+- Item pictures (`ItemIcons`): rendered once from the item's model (world model, piece model, crop ripe model, tool model) or the block tile for block items, in an offscreen viewport at 128 px, cached for the session. Items without any art get a rounded tile in the item colour with its category icon.
+- Pause menu: a 2 x 3 grid of picture tiles (Resume, Save, Load, Settings, Home, Title).
+- Confirm dialogs: two big tiles, check (green) and cross (red); the question also has a picture where one exists.
+- HUD: picture counters (coin icon and number, sun or moon clock face for the day time, stamina as a bar with a heart icon) instead of text lines; the debug overlay is hidden unless toggled (F3) in debug builds and never shown in release builds.
+- Spoken labels: when `tts_enabled` is on, focusing a tile speaks its caption (existing TTS setting, default off, D14).

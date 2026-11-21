@@ -2,10 +2,10 @@
 
 | Field | Value |
 |---|---|
-| Spec | `_docs/specs/spec1.md` rev 3.12 |
+| Spec | `_docs/specs/spec1.md` rev 3.13 |
 | Plan | `_docs/plans/plan1.md` |
-| Active phase | Phase A (art pass) automated work done (PA1 to PA4); owner review items open All six phases have their automated work done (Phases 3 to 6 started on owner request before earlier gates passed); manual checklists for Phases 1 to 6, Phase 0 hardware checks and the release-candidate checklist pending |
-| Last updated | 2026-11-20 |
+| Active phase | Phase B (first play: title screen, outdoor start, dressed world, picture menus) in progress All six phases have their automated work done (Phases 3 to 6 started on owner request before earlier gates passed); manual checklists for Phases 1 to 6, Phase 0 hardware checks and the release-candidate checklist pending |
+| Last updated | 2026-11-21 |
 
 ## How to update
 1. After finishing a task, tick it in `plan1.md` and in the phase table below, with the date and commit SHA.
@@ -146,6 +146,16 @@ Status values: `Not started`, `In progress`, `Blocked`, `Done`.
 | PA4.2 Tools in hand | Done | 2026-11-20 | 91fe7bf | tool world_model (upgraded for tier 2+); hand_r attachment, 0.6 m, oriented on the Idle hand pose |
 | PA4.3 Block textures | Done | 2026-11-20 | d313df0 | per-material 3 x 1 atlas; grass top and side fringe recoloured to meadow green; bedrock and farmland tinted |
 | PA4.4 Tests | Done | 2026-11-20 | d313df0 | full suite 588 cases exit 0 |
+
+### Phase B (first play)
+| Task | Status | Date | Commit | Notes |
+|---|---|---|---|---|
+| PB1 Vendor hex pack, icons, props | In progress | | | |
+| PB2 Title screen | Not started | | | |
+| PB3 Outdoor start | Not started | | | |
+| PB4 Dressed world | Not started | | | |
+| PB5 Picture-first menus | Not started | | | |
+| PB6 Tests and release 0.2.0 | Not started | | | |
 
 ## Test run log
 | Date | Commit | Phase | Command | Exit code | Failures | Notes |

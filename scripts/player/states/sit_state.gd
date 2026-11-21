@@ -1,8 +1,10 @@
-## Sit (spec 4.5, 7.3): snap to a seat marker, collider off, stamina regen, stand at a
+## Sit (spec 4.5, 7.3, 12.6): snap to a seat marker, collider off, stamina regen, stand at a
 ## validated exit point. Exits on duck, move > 0.5 or jump (the jump does not also jump).
+## Works with any seat provider (built pieces, room decor): `seats`, `exits`, `free_seat`,
+## `seat_regen`.
 extends PlayerState
 
-var piece: PieceView
+var piece: Node3D
 var seat := -1
 var regen := 0.5
 var _acc := 0.0
@@ -10,12 +12,13 @@ var _acc := 0.0
 
 func enter(_msg: Dictionary = {}) -> void:
 	var focus := player.focused_interactable()
-	piece = focus.get_parent() as PieceView if focus else null
+	var host: Node = focus.get_parent() if focus else null
+	piece = host as Node3D if host and host.has_method("free_seat") else null
 	seat = piece.free_seat(player) if piece else -1
 	_acc = 0.0
 	if seat < 0:
 		return
-	regen = float(piece.def.interaction(&"SIT").get("stamina_regen_per_sec", Database.stamina.sit_regen_per_sec))
+	regen = float(piece.seat_regen()) if piece.has_method("seat_regen") else Database.stamina.sit_regen_per_sec
 	player.velocity = Vector3.ZERO
 	player.global_position = piece.seats[seat]
 	player.set_seated(true)

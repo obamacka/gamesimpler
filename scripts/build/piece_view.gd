@@ -201,6 +201,10 @@ func resolve_interaction(spec: InteractionSpec, player: Node) -> void:
 				s.housing.set_home_bed(SceneRouter.current_zone_id, StringName(uid))
 
 
+func seat_regen() -> float:
+	return float(def.interaction(&"SIT").get("stamina_regen_per_sec", Database.stamina.sit_regen_per_sec))
+
+
 ## Index of the nearest seat nobody else uses (single player: any seat), or -1.
 func free_seat(player: Node) -> int:
 	var best := -1

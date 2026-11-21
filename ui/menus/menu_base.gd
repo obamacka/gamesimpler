@@ -75,12 +75,80 @@ static func make_tile(caption: String, icon_name: String, color: Color, size := 
 static func add_pulse(b: Button) -> void:
 	b.resized.connect(func(): b.pivot_offset = b.size * 0.5)
 	b.focus_entered.connect(func():
-		Accessibility.speak(b.text)
+		Accessibility.speak(b.text if b.text != "" else b.tooltip_text)
 		if not Accessibility.reduce_motion() and b.is_inside_tree():
 			b.create_tween().tween_property(b, "scale", Vector2(1.06, 1.06), 0.12))
 	b.focus_exited.connect(func():
 		if b.is_inside_tree():
 			b.create_tween().tween_property(b, "scale", Vector2.ONE, 0.1))
+
+
+## Item tile (spec 12.5): the item picture fills the tile; under it a big badge, either a
+## count ("x12") or a coin and a price. Empty slots (item_id &"") and unavailable tiles are
+## dimmed. The item name is the tooltip and the spoken caption.
+static func make_item_tile(item_id: StringName, badge: String = "", price: int = -1, size := Vector2(132, 132)) -> Button:
+	var b := Button.new()
+	b.focus_mode = Control.FOCUS_ALL
+	b.custom_minimum_size = size
+	b.tooltip_text = item_name(item_id) if item_id != &"" else ""
+	var v := VBoxContainer.new()
+	v.set_anchors_preset(Control.PRESET_FULL_RECT)
+	v.alignment = BoxContainer.ALIGNMENT_CENTER
+	v.add_theme_constant_override("separation", 2)
+	v.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	b.add_child(v)
+	var pic := TextureRect.new()
+	pic.name = "Picture"
+	pic.custom_minimum_size = Vector2(size.x * 0.6, size.y * 0.6)
+	pic.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	pic.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	pic.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	pic.texture = item_icon(item_id) if item_id != &"" else null
+	v.add_child(pic)
+	var row := HBoxContainer.new()
+	row.alignment = BoxContainer.ALIGNMENT_CENTER
+	row.add_theme_constant_override("separation", 4)
+	row.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	v.add_child(row)
+	if price >= 0:
+		var c := TextureRect.new()
+		c.texture = UiIcons.coin(28)
+		c.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		c.stretch_mode = TextureRect.STRETCH_KEEP_CENTERED
+		row.add_child(c)
+		badge = str(price)
+	var l := Label.new()
+	l.name = "Badge"
+	l.text = badge
+	l.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	row.add_child(l)
+	if item_id == &"":
+		b.modulate = Color(1, 1, 1, 0.45)
+	b.mouse_entered.connect(func(): if b.is_inside_tree() and not b.disabled: b.grab_focus())
+	add_pulse(b)
+	return b
+
+
+## Sets a tile's availability: dimmed and unpressable when unavailable (sold out, too dear).
+static func set_tile_enabled(b: Button, on: bool) -> void:
+	b.disabled = not on
+	b.modulate = Color.WHITE if on else Color(1, 1, 1, 0.45)
+
+
+## A scrolling grid page inside a TabContainer (spec 12.5).
+static func grid_page(tabs: TabContainer, title: String, columns: int, icon: Texture2D = null) -> GridContainer:
+	var sc := ScrollContainer.new()
+	sc.name = title
+	sc.follow_focus = true
+	sc.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	tabs.add_child(sc)
+	var g := GridContainer.new()
+	g.columns = columns
+	g.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	sc.add_child(g)
+	if icon:
+		tabs.set_tab_icon(tabs.get_tab_count() - 1, icon)
+	return g
 
 
 ## Picture of an item for rows (spec 12.4).

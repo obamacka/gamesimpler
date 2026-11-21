@@ -9,7 +9,15 @@
 [ext_resource type="Script" path="res://scripts/world/decor_prop.gd" id="90_decor"]
 [ext_resource type="Texture2D" path="res://assets/third_party/kenney/voxel_pack/stone.png" id="91_floor_tex"]
 [ext_resource type="Texture2D" path="res://assets/third_party/kenney/voxel_pack/brick_grey.png" id="92_wall_tex"]
+[ext_resource type="Script" path="res://scripts/safety/safety_volume.gd" id="93_safety"]
 
+
+[sub_resource type="StandardMaterial3D" id="door_mat"]
+albedo_texture = ExtResource("91_floor_tex")
+albedo_color = Color(0.72, 0.52, 0.36, 1)
+uv1_triplanar = true
+uv1_world_triplanar = true
+texture_filter = 4
 [sub_resource type="StandardMaterial3D" id="floor_mat"]
 albedo_texture = ExtResource("91_floor_tex")
 uv1_triplanar = true
@@ -43,6 +51,16 @@ size = Vector3(11.0, 4, 0.3)
 material = SubResource("wall_mat")
 size = Vector3(11.0, 4, 0.3)
 
+
+[sub_resource type="BoxShape3D" id="door_shape"]
+size = Vector3(2, 4, 0.3)
+
+[sub_resource type="BoxMesh" id="door_mesh"]
+material = SubResource("door_mat")
+size = Vector3(2, 4, 0.24)
+
+[sub_resource type="BoxShape3D" id="room_kill_shape"]
+size = Vector3(120, 4, 120)
 [node name="Museum" type="Node3D"]
 script = ExtResource("1_zone")
 zone_id = &"zone_museum"
@@ -206,3 +224,19 @@ model = "res://assets/third_party/kaykit/hexagon/flag_green.gltf"
 yaw_deg = 0
 size = Vector3(0.8, 2.4, 0.8)
 solid = false
+
+[node name="DoorPanel" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, 12)
+
+[node name="Shape" type="CollisionShape3D" parent="DoorPanel"]
+shape = SubResource("door_shape")
+
+[node name="Mesh" type="MeshInstance3D" parent="DoorPanel"]
+mesh = SubResource("door_mesh")
+
+[node name="KillPlane" type="Area3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -12, 0)
+script = ExtResource("93_safety")
+
+[node name="Shape" type="CollisionShape3D" parent="KillPlane"]
+shape = SubResource("room_kill_shape")

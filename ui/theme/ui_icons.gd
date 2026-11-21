@@ -14,6 +14,27 @@ static func icon(name: String) -> Texture2D:
 	return load(path) as Texture2D if ResourceLoader.exists(path) else null
 
 
+## A gold coin picture (prices, the Sell tab).
+static func coin(size: int = SIZE) -> Texture2D:
+	var key := "coin|%d" % size
+	if _cache.has(key):
+		return _cache[key]
+	var img := Image.create(size, size, false, Image.FORMAT_RGBA8)
+	var c := Vector2(size, size) * 0.5
+	for y in size:
+		for x in size:
+			var d := Vector2(x + 0.5, y + 0.5).distance_to(c)
+			var r := size * 0.46
+			if d <= r:
+				var col := Color("d99a1e") if d > r * 0.78 else Color("ffcf40")
+				if absf(x + 0.5 - c.x) < size * 0.07 and absf(y + 0.5 - c.y) < size * 0.22:
+					col = Color("d99a1e")
+				img.set_pixel(x, y, Color(col, clampf(r - d, 0.0, 1.0)))
+	var out := ImageTexture.create_from_image(img)
+	_cache[key] = out
+	return out
+
+
 ## Rounded square in `color`, optionally with the named white icon centred on it.
 static func tile(color: Color, icon_name: String = "", size: int = SIZE) -> Texture2D:
 	var key := "%s|%s|%d" % [color.to_html(), icon_name, size]

@@ -1,16 +1,16 @@
-## Inventory (spec 5.8): Backpack, Outfit, Jobs, Map (placeholder); Pet and Collection
-## tabs are stubs until Phases 5 and 6.
+## Inventory (spec 5.8, 12.5): the Backpack is a grid of item picture tiles with count
+## badges; Outfit, Jobs, Pet, Collection and Map keep their pages.
 extends MenuBase
 
 var tabs: TabContainer
-var backpack: VBoxContainer
+var backpack: GridContainer
 var outfit: VBoxContainer
 var jobs: VBoxContainer
 var selected := -1
 
 
 func build() -> void:
-	var p := MenuBase.panel(Vector2(760, 520))
+	var p := MenuBase.panel(Vector2(820, 600))
 	add_child(p)
 	var v := VBoxContainer.new()
 	p.add_child(v)
@@ -19,7 +19,7 @@ func build() -> void:
 	tabs = TabContainer.new()
 	tabs.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	v.add_child(tabs)
-	backpack = _page("Backpack")
+	backpack = MenuBase.grid_page(tabs, "Backpack", 5, UiIcons.tile(KidTheme.CHOOSE, "shoppingBasket", 40))
 	outfit = _page("Outfit")
 	jobs = _page("Jobs")
 	_page("Pet").add_child(_note("Your pet arrives on day 2."))
@@ -56,8 +56,11 @@ func refresh() -> void:
 	for i in inv.slots.size():
 		var st = inv.slots[i]
 		var idx := i
-		var text := "%d. %s" % [i + 1, "empty" if st == null else "%s x%d" % [MenuBase.item_name(st["item_id"]), st["qty"]]]
-		add_row(text, MenuBase.item_color(st["item_id"]) if st else Color(0.3, 0.3, 0.3), func(): activate(idx), true, backpack, MenuBase.item_icon(st["item_id"]) if st else null)
+		var t := MenuBase.make_item_tile(st["item_id"] if st else &"", ("x%d" % st["qty"]) if st and int(st["qty"]) > 1 else "")
+		if i == selected:
+			t.add_theme_stylebox_override("normal", KidTheme.box(Color("ffe1a8"), 20, 4, KidTheme.FOCUS, 2))
+		t.pressed.connect(func(): activate(idx))
+		backpack.add_child(t)
 	for slot in OutfitDef.SLOTS:
 		var w = s.outfit.model.slots[slot]
 		var sl: StringName = slot
@@ -70,7 +73,10 @@ func refresh() -> void:
 
 
 func initial_focus() -> Control:
-	return first_enabled(backpack)
+	for c in backpack.get_children():
+		if c is Button and not (c as Button).disabled:
+			return c
+	return null
 
 
 ## A on a backpack slot: wear outfits; otherwise select it, and a second slot moves/swaps.

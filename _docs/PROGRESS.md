@@ -2,9 +2,9 @@
 
 | Field | Value |
 |---|---|
-| Spec | `_docs/specs/spec1.md` rev 3.13 |
+| Spec | `_docs/specs/spec1.md` rev 3.14 |
 | Plan | `_docs/plans/plan1.md` |
-| Active phase | Phase B done (release 0.2.0); manual checklists and owner review items open All six phases have their automated work done (Phases 3 to 6 started on owner request before earlier gates passed); manual checklists for Phases 1 to 6, Phase 0 hardware checks and the release-candidate checklist pending |
+| Active phase | Phase C (picture shop and inventory, seats, room safety, art review) in progress All six phases have their automated work done (Phases 3 to 6 started on owner request before earlier gates passed); manual checklists for Phases 1 to 6, Phase 0 hardware checks and the release-candidate checklist pending |
 | Last updated | 2026-11-21 |
 
 ## How to update
@@ -156,6 +156,15 @@ Status values: `Not started`, `In progress`, `Blocked`, `Done`.
 | PB4 Dressed world | Done | 2026-11-21 | 173b974 | world objects use models; DecorProp town (church museum, market, lumbermill, tavern, homes, windmill, trees, rocks, props); one-level village; furnished textured cabin and museum; scene property-order bug fixed |
 | PB5 Picture-first menus | Done | 2026-11-21 | 173b974 | KidTheme merged into the engine default theme (CanvasLayer menus never had a theme), icon tiles, item pictures, picture pause grid and confirms, picture HUD, debug overlay hidden (F3 in debug builds) |
 | PB6 Tests and release 0.2.0 | Done | 2026-11-21 | 1487c82 | first play 8, kid UI 6, updated art/accessibility tests; full suite 602 cases exit 0; screenshots of title, spawn, cabin outside and inside, pause, inventory |
+
+### Phase C
+| Task | Status | Date | Commit | Notes |
+|---|---|---|---|---|
+| PC1 Shop and inventory tiles | In progress | | | |
+| PC2 Sittable decor | Not started | | | |
+| PC3 Closed doorways, kill planes | Not started | | | |
+| PC4 Art research and decision | Not started | | | |
+| PC5 Tests, suite, release | Not started | | | |
 
 ## Test run log
 | Date | Commit | Phase | Command | Exit code | Failures | Notes |

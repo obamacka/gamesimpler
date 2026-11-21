@@ -432,6 +432,16 @@ Integration:
 - [x] **PB5** `KidTheme`, icon rows and tiles in `MenuBase`, `ItemIcons`, picture pause menu and confirm, picture HUD, debug overlay hidden by default.
 - [x] **PB6** Tests (title flow, new game spawn and facing, decor and object models, theme and icons, HUD) and full suite; release 0.2.0.
 
+## Phase C: Kid menus 2, seats, room safety, art review (owner request 2026-11-21)
+
+**Spec:** 12.5 to 12.7.
+
+- [ ] **PC1** Shop and inventory as picture-tile grids.
+- [ ] **PC2** Sittable seating decor; Sit state uses any seat provider.
+- [ ] **PC3** Room doorways closed with a solid door; kill planes under static rooms.
+- [ ] **PC4** Research less cartoony CC0 or affordable packs for buildings and objects; comparison renders; owner decision before replacing art.
+- [ ] **PC5** Tests and full suite; release.
+
 ### Release-candidate checklist (end of Phase 6)
 - [x] Release pipeline (owner request 2026-11-20): `export_presets.cfg` (Windows x86_64, Linux x86_64, macOS universal), `ci/export_release.sh`, `.github/workflows/release.yml` (a push that changes `VERSION`: tests, export, ad-hoc macOS signing on a macOS runner, then the workflow creates tag `v<VERSION>` and the GitHub release; 0.x versions are pre-releases).
 - [ ] Exports for Windows x86_64, Linux x86_64, macOS (universal) launch, save and load.

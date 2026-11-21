@@ -16,7 +16,7 @@ func _ready() -> void:
 	show_title()
 	# Smoke tests and screenshots: `-- --autoplay` presses Play after a moment (debug builds).
 	if OS.is_debug_build() and "--autoplay" in OS.get_cmdline_user_args():
-		get_tree().create_timer(2.0).timeout.connect(func(): start_game(-1))
+		get_tree().create_timer(2.0, false).timeout.connect(func(): start_game(-1))
 
 
 func _exit_tree() -> void:

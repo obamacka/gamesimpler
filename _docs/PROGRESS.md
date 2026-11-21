@@ -182,6 +182,7 @@ Status values: `Not started`, `In progress`, `Blocked`, `Done`.
 | 2026-11-20 | c6d2514 | A | `ci/run_tests.sh` | 0 | 0 | 576 cases (PA2) |
 | 2026-11-20 | d313df0 | A | `ci/run_tests.sh` | 0 | 0 | 588 cases (PA3, PA4) |
 | 2026-11-21 | 1487c82 | B | `ci/run_tests.sh` | 0 | 0 | 602 cases (Phase B) |
+| 2026-11-21 | 5919248 | B | release workflow (GitHub Actions run 44888524412) | 0 | 0 | test gate, exports, macOS signing and publish succeeded; v0.2.0 pre-release |
 | 2026-11-20 | 1e66c69 | A | release workflow (GitHub Actions run 44786213773) | 0 | 0 | test gate, exports, macOS ad-hoc signing and publish all succeeded |
 
 ## Decisions

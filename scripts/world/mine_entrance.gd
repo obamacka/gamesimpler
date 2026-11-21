@@ -4,18 +4,26 @@ extends WorldObject
 
 @export var target_zone: StringName = &"zone_deep_mine"
 @export var target_spawn: StringName = &"spawn_entry"
-## Optional model (spec 12.3, e.g. the KayKit mine) fitted into model_size; doors without one
+## Optional model (spec 12.3, 12.8) fitted into model_size, or shown at `model_scale` with its
+## own pivot (mouth at the origin facing +Z) moved by model_offset; doors without one
 ## show a glowing mat on the ground so children see where to walk.
-@export_file("*.gltf", "*.glb", "*.fbx") var model := ""
+@export_file("*.gltf", "*.glb", "*.fbx", "*.tscn") var model := ""
 @export var model_size := Vector3(4, 3.5, 4)
 @export var model_yaw_deg := 0
 @export var model_offset := Vector3.ZERO   # e.g. set the mine back so its mouth is at the door
+@export var model_scale := 0.0
 
 var mat: MeshInstance3D
 
 
 func _ready() -> void:
-	if not model.is_empty():
+	if not model.is_empty() and model_scale > 0.0:
+		var holder := add_art_at(self, model, model_scale, model_yaw_deg)
+		if holder:
+			holder.position = model_offset
+			# the rock mound behind the mouth is solid (spec 12.8)
+			add_static_box(self, Vector3(6, 3, 3.2), model_offset + Vector3(0, 1.5, -2.6))
+	elif not model.is_empty():
 		add_art(self, model, AABB(model_offset + Vector3(-model_size.x * 0.5, 0, -model_size.z * 0.5), model_size), model_yaw_deg)
 	mat = door_mat()
 	add_child(mat)

@@ -34,6 +34,29 @@ static func add_art(parent: Node3D, path: String, box: AABB, yaw_deg: int = 0) -
 	return holder
 
 
+## Art at a fixed scale with the model's own pivot kept (spec 12.8: assembled houses and
+## metric props), turned by yaw_deg, under a holder named "Art". Null when the model is missing.
+static func add_art_at(parent: Node3D, path: String, scale: float = 1.0, yaw_deg: int = 0) -> Node3D:
+	var m := ModelFit.instantiate(path)
+	if m == null:
+		return null
+	var holder := Node3D.new()
+	holder.name = "Art"
+	parent.add_child(holder)
+	m.transform = Transform3D(Basis(Vector3.UP, deg_to_rad(yaw_deg)).scaled(Vector3.ONE * scale), Vector3.ZERO)
+	holder.add_child(m)
+	return holder
+
+
+## Collider box for an art holder (local to its parent): the model's own `collision_box()`
+## when it has one (houses: walls without the roof overhang), else its bounds.
+static func art_collision(holder: Node3D) -> AABB:
+	var m: Node3D = holder.get_child(0)
+	if m.has_method("collision_box"):
+		return holder.transform * (m.transform * (m.call("collision_box") as AABB))
+	return art_bounds(holder)
+
+
 ## Box spanned by a fitted art holder (local to its parent).
 static func art_bounds(holder: Node3D) -> AABB:
 	var m: Node3D = holder.get_child(0)

@@ -7,12 +7,17 @@ extends WorldObject
 
 const HEX := "res://assets/third_party/kaykit/hexagon/"
 
-@export_file("*.gltf", "*.glb", "*.fbx") var model := ""
+@export_file("*.gltf", "*.glb", "*.fbx", "*.tscn") var model := ""
 @export var size := Vector3(1, 1, 1)
 @export var yaw_deg := 0
 @export var solid := true
 ## Furniture: show at the KayKit world scale (spec 11.4) instead of fitting into `size`.
 @export var use_world_scale := false
+## Non-zero: show the model at this fixed scale with its own pivot (spec 12.8: houses, metric
+## props) instead of fitting it into `size`.
+@export var model_scale := 0.0
+## Non-zero: the collider box (standing on the origin) instead of the model's box (trees: trunk).
+@export var collider := Vector3.ZERO
 ## Seats side by side across the model's width (chairs 1, sofas 2); 0 = not a seat.
 @export var seat_count := 0
 
@@ -31,11 +36,16 @@ func _ready() -> void:
 			add_child(art)
 			art.add_child(m)
 			ModelFit.place(m, AABB(), yaw_deg)
+	elif model_scale > 0.0:
+		art = add_art_at(self, model, model_scale, yaw_deg)
 	else:
 		art = add_art(self, model, AABB(Vector3(-size.x * 0.5, 0, -size.z * 0.5), size), yaw_deg)
 	if art and solid:
-		var b := art_bounds(art)
-		add_static_box(self, b.size, b.get_center())
+		if collider != Vector3.ZERO:
+			add_static_box(self, collider, Vector3(0, collider.y * 0.5, 0))
+		else:
+			var b := art_collision(art)
+			add_static_box(self, b.size, b.get_center())
 	var s := session()
 	if s and s.terrain and s.terrain.rules:
 		s.terrain.rules.protect_support(base_cell(), "decor:%s/%s" % [SceneRouter.current_zone_id, name])

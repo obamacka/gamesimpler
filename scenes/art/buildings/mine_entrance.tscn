@@ -1,0 +1,45 @@
+[gd_scene load_steps=8 format=3]
+
+[ext_resource type="PackedScene" path="res://assets/third_party/quaternius/village/Corner_Exterior_Wood.gltf" id="1"]
+[ext_resource type="PackedScene" path="res://assets/third_party/quaternius/nature/Rock_Medium_1.gltf" id="2"]
+[ext_resource type="PackedScene" path="res://assets/third_party/quaternius/nature/Rock_Medium_2.gltf" id="3"]
+[ext_resource type="PackedScene" path="res://assets/third_party/quaternius/nature/Rock_Medium_3.gltf" id="4"]
+[ext_resource type="PackedScene" path="res://assets/third_party/quaternius/props/Lantern_Wall.gltf" id="5"]
+
+[sub_resource type="StandardMaterial3D" id="dark"]
+shading_mode = 0
+albedo_color = Color(0.04, 0.03, 0.03, 1)
+
+[sub_resource type="BoxMesh" id="mouth"]
+material = SubResource("dark")
+size = Vector3(2.1, 2.5, 0.4)
+
+[node name="MineEntrance" type="Node3D"]
+
+[node name="Mouth" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.25, -0.7)
+mesh = SubResource("mouth")
+
+[node name="PostL" parent="." instance=ExtResource("1")]
+transform = Transform3D(1, 0, 0, 0, 0.88, 0, 0, 0, 1, -1.15, 0, -0.4)
+
+[node name="PostR" parent="." instance=ExtResource("1")]
+transform = Transform3D(1, 0, 0, 0, 0.88, 0, 0, 0, 1, 1.15, 0, -0.4)
+
+[node name="Beam" parent="." instance=ExtResource("1")]
+transform = Transform3D(0, -1, 0, 1, 0, 0, 0, 0, 1, 1.5, 2.64, -0.4)
+
+[node name="RockL" parent="." instance=ExtResource("2")]
+transform = Transform3D(0.952628, 0, 0.55, 0, 1.4, 0, -0.55, 0, 0.952628, -2.6, 0, -1.8)
+
+[node name="RockR" parent="." instance=ExtResource("4")]
+transform = Transform3D(1.03366, 0, -0.376222, 0, 1.4, 0, 0.376222, 0, 1.03366, 2.6, 0, -1.8)
+
+[node name="RockTop" parent="." instance=ExtResource("3")]
+transform = Transform3D(0, 0, 1.3, 0, 1.3, 0, -1.2, 0, 0, 0, 1.9, -2.4)
+
+[node name="RockBack" parent="." instance=ExtResource("2")]
+transform = Transform3D(1.5, 0, 0, 0, 1.6, 0, 0, 0, 1.3, 0, 0, -3.6)
+
+[node name="Lantern" parent="." instance=ExtResource("5")]
+transform = Transform3D(0.8, 0, 0, 0, 0.8, 0, 0, 0, 0.8, 1.15, 1.2, -0.25)

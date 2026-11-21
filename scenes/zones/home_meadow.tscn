@@ -33,10 +33,11 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.5, 0, 3.5)
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11.5, 0, 8.5)
 
 [node name="CabinExterior" type="Node3D" parent="Surface"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.5, 0, -2.5)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.5, 0, -1.9)
 script = ExtResource("6_shell")
-model = "res://assets/third_party/kaykit/hexagon/building_home_A_blue.gltf"
+model = "res://scenes/art/buildings/cabin.tscn"
 size = Vector3(7, 6, 6)
+model_scale = 1.0
 
 [node name="CabinDoor" type="Node3D" parent="Surface"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.5, 0, 0.7)
@@ -140,53 +141,60 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.5, 0, 10.3)
 
 
 [node name="Museum" type="Node3D" parent="Surface"]
-transform = Transform3D(-1, 0, 1.22465e-16, 0, 1, 0, -1.22465e-16, 0, -1, 6.5, 0, 16.8)
+transform = Transform3D(-1, 0, 1.22465e-16, 0, 1, 0, -1.22465e-16, 0, -1, 6.5, 0, 16.4)
 script = ExtResource("90_decor")
-model = "res://assets/third_party/kaykit/hexagon/building_church_blue.gltf"
+model = "res://scenes/art/buildings/museum_hall.tscn"
 yaw_deg = 0
 size = Vector3(7, 9, 7)
+model_scale = 1.0
 
 [node name="Market" type="Node3D" parent="Surface"]
 transform = Transform3D(-1, 0, 1.22465e-16, 0, 1, 0, -1.22465e-16, 0, -1, -2.5, 0, 14.5)
 script = ExtResource("90_decor")
-model = "res://assets/third_party/kaykit/hexagon/building_market_green.gltf"
+model = "res://scenes/art/buildings/market.tscn"
 yaw_deg = 0
 size = Vector3(5.5, 3.5, 4)
+model_scale = 1.0
 
-[node name="Lumbermill" type="Node3D" parent="Surface"]
+[node name="Workshop" type="Node3D" parent="Surface"]
 transform = Transform3D(-1, 0, 1.22465e-16, 0, 1, 0, -1.22465e-16, 0, -1, -9.5, 0, 14)
 script = ExtResource("90_decor")
-model = "res://assets/third_party/kaykit/hexagon/building_lumbermill_yellow.gltf"
+model = "res://scenes/art/buildings/workshop.tscn"
 yaw_deg = 0
 size = Vector3(6, 5, 6)
+model_scale = 1.0
 
 [node name="Tavern" type="Node3D" parent="Surface"]
 transform = Transform3D(-1, 0, 1.22465e-16, 0, 1, 0, -1.22465e-16, 0, -1, 14.5, 0, 15.5)
 script = ExtResource("90_decor")
-model = "res://assets/third_party/kaykit/hexagon/building_tavern_red.gltf"
+model = "res://scenes/art/buildings/tavern.tscn"
 yaw_deg = 0
 size = Vector3(6, 6.5, 6)
+model_scale = 1.0
 
 [node name="TailorHouse" type="Node3D" parent="Surface"]
 transform = Transform3D(-1.83697e-16, 0, -1, 0, 1, 0, 1, 0, -1.83697e-16, 20.5, 0, 9.5)
 script = ExtResource("90_decor")
-model = "res://assets/third_party/kaykit/hexagon/building_home_B_yellow.gltf"
+model = "res://scenes/art/buildings/tailor_house.tscn"
 yaw_deg = 0
 size = Vector3(5, 6.5, 5)
+model_scale = 1.0
 
-[node name="Windmill" type="Node3D" parent="Surface"]
+[node name="Tower" type="Node3D" parent="Surface"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, -0, 0, 1, 25, 0, -2)
 script = ExtResource("90_decor")
-model = "res://assets/third_party/kaykit/hexagon/building_windmill_yellow.gltf"
+model = "res://scenes/art/buildings/tower.tscn"
 yaw_deg = 0
 size = Vector3(6, 10, 6)
+model_scale = 1.0
 
 [node name="NeighborHouse" type="Node3D" parent="Surface"]
 transform = Transform3D(6.12323e-17, 0, 1, 0, 1, 0, -1, 0, 6.12323e-17, -16, 0, -2)
 script = ExtResource("90_decor")
-model = "res://assets/third_party/kaykit/hexagon/building_home_A_red.gltf"
+model = "res://scenes/art/buildings/neighbor_house.tscn"
 yaw_deg = 0
 size = Vector3(5, 6, 5)
+model_scale = 1.0
 
 [node name="Tree1" type="Node3D" parent="Surface"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, -0, 0, 1, -13, 0, -8)
@@ -450,7 +458,7 @@ min_cell = Vector3i(-6, -40, 12)
 max_cell = Vector3i(0, 64, 16)
 reason = &"BUILDING"
 
-[node name="ProtectLumbermill" type="Node3D" parent="."]
+[node name="ProtectWorkshop" type="Node3D" parent="."]
 script = ExtResource("3_prot")
 min_cell = Vector3i(-13, -40, 11)
 max_cell = Vector3i(-7, 64, 17)
@@ -468,7 +476,7 @@ min_cell = Vector3i(18, -40, 7)
 max_cell = Vector3i(22, 64, 12)
 reason = &"BUILDING"
 
-[node name="ProtectWindmill" type="Node3D" parent="."]
+[node name="ProtectTower" type="Node3D" parent="."]
 script = ExtResource("3_prot")
 min_cell = Vector3i(22, -40, -5)
 max_cell = Vector3i(27, 64, 1)

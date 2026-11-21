@@ -1,0 +1,11 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/world/village_house.gd" id="1_house"]
+
+[node name="NeighborHouse" type="Node3D"]
+script = ExtResource("1_house")
+width = 2
+depth = 3
+storeys = 2
+styles = PackedStringArray("brick", "plaster")
+chimney = true

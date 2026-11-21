@@ -31,10 +31,13 @@ func _put(id: StringName, anchor: Vector3i, r: int, state: StringName, uid: Stri
 
 func test_rotation_matrix_single_and_multi_cell() -> void:
 	var a := Vector3i(5, 0, 5)
-	var sofa := [[Vector3i(5, 0, 5), Vector3i(6, 0, 5)], [Vector3i(5, 0, 5), Vector3i(5, 0, 4)],
-		[Vector3i(5, 0, 5), Vector3i(4, 0, 5)], [Vector3i(5, 0, 5), Vector3i(5, 0, 6)]]
-	var bed := [[Vector3i(5, 0, 5), Vector3i(5, 0, 6)], [Vector3i(5, 0, 5), Vector3i(6, 0, 5)],
-		[Vector3i(5, 0, 5), Vector3i(5, 0, 4)], [Vector3i(5, 0, 5), Vector3i(4, 0, 5)]]
+	# spec 12.8: the sofa (bench) is 3 x 1 cells, the bed 2 x 2
+	var sofa := [[Vector3i(5, 0, 5), Vector3i(6, 0, 5), Vector3i(7, 0, 5)], [Vector3i(5, 0, 5), Vector3i(5, 0, 4), Vector3i(5, 0, 3)],
+		[Vector3i(5, 0, 5), Vector3i(4, 0, 5), Vector3i(3, 0, 5)], [Vector3i(5, 0, 5), Vector3i(5, 0, 6), Vector3i(5, 0, 7)]]
+	var bed := [[Vector3i(5, 0, 5), Vector3i(6, 0, 5), Vector3i(5, 0, 6), Vector3i(6, 0, 6)],
+		[Vector3i(5, 0, 5), Vector3i(5, 0, 4), Vector3i(6, 0, 5), Vector3i(6, 0, 4)],
+		[Vector3i(5, 0, 5), Vector3i(4, 0, 5), Vector3i(5, 0, 4), Vector3i(4, 0, 4)],
+		[Vector3i(5, 0, 5), Vector3i(5, 0, 6), Vector3i(4, 0, 5), Vector3i(4, 0, 6)]]
 	for r in 4:
 		assert_array(BuildGrid.cells(_p(&"piece_sofa"), a, r)).contains_exactly(sofa[r])
 		assert_array(BuildGrid.cells(_p(&"piece_bed"), a, r)).contains_exactly(bed[r])

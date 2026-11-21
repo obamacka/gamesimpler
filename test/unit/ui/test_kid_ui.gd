@@ -60,7 +60,7 @@ func test_item_pictures() -> void:
 	assert_str(tile.resource_path).starts_with(VoxelLibraryBuilder.TILE_DIR)
 	# items with art get a picture (a placeholder tile until rendered; headless never renders)
 	assert_str(ItemIcons.model_for(Database.item(&"item_pickaxe_basic"))).ends_with(".glb")
-	assert_str(ItemIcons.model_for(Database.item(&"item_piece_chair"))).contains("chair_A")
+	assert_str(ItemIcons.model_for(Database.item(&"item_piece_chair"))).contains("Chair_1")
 	assert_str(ItemIcons.model_for(Database.item(&"item_seed_carrot"))).contains("Carrot")
 	var pic := ItemIcons.texture(&"item_pickaxe_basic")
 	assert_object(pic).is_not_null()

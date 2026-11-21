@@ -1816,13 +1816,15 @@ Source: KayKit Medieval Hexagon Pack 1.0 (CC0, GitHub), same toy style and textu
 | Cabin bed | KayKit `bed_double_A` |
 | Museum pedestal / display case | KayKit `table_small` / `cabinet_medium` |
 - `DecorProp` (new): a non-interactive model with an optional box collider, placed in zone scenes: trees, rocks, fences, barrels, crates, sacks, wheelbarrow, flags. Decor sits inside protected volumes so it is never undermined by digging.
+- In a zone with a town, the spawn area, building pads and farm plots are flattened to the town height, so the village is one level; elsewhere building pads are level at their own centre height.
+- Scene files must set a script's properties after its `script =` line; properties written before it are dropped on load (a test guards every zone scene).
 - Static rooms (cabin, museum) get textured floors and walls (Voxel Pack wood planks and bricks, world-space triplanar UVs at 1 m) and KayKit furniture as decor.
 
 ### 12.4 Picture-first menus
-- One `Theme` (`res://ui/theme/kid_theme.tres` built in code by `KidTheme`): Nunito-like rounded default font at 28 px minimum (text_scale multiplies), rounded panels (radius 24), big rounded buttons (min 96 px tall), focused control: thick white outline plus a gentle scale pulse (off with `reduce_motion`), colour coded by meaning (green go, red stop or back, blue choose, yellow money).
+- One `Theme` built in code by `KidTheme`: the engine's default font emboldened at 26 px (text_scale multiplies), rounded panels (radius 32), big rounded buttons (at least 84 px tall), rounded tabs, focused control: a thick orange outline plus a gentle 6% grow (off with `reduce_motion`), colour coded by meaning (green go, red stop or back, blue choose, yellow money, purple settings). `Accessibility` merges it into the engine default theme, because menus, the title and the HUD live in CanvasLayers that the root window's theme does not reach (found 2026-11-21: the earlier text-scale theme never reached any menu).
 - `MenuBase.add_row` and `add_tile` take an icon: a Kenney Game Icons picture, an item picture, or a colour swatch. Icons sit left of a short caption; captions are optional extras, never the only cue.
-- Item pictures (`ItemIcons`): rendered once from the item's model (world model, piece model, crop ripe model, tool model) or the block tile for block items, in an offscreen viewport at 128 px, cached for the session. Items without any art get a rounded tile in the item colour with its category icon.
-- Pause menu: a 2 x 3 grid of picture tiles (Resume, Save, Load, Settings, Home, Title).
+- Item pictures (`ItemIcons`): rendered once from the item's model (world model, piece model, crop ripe model, tool model, first outfit part) or the block tile for block items, in an offscreen viewport at 128 px, cached for the session. Items without any art (structural pieces, some materials) get a rounded tile in the item colour. Captions are short ("Wall door", "Carrot seeds").
+- Pause menu: a 3 x 2 grid of picture tiles (Play, Home, Save, Load, Settings, Title); Quit lives on the title screen.
 - Confirm dialogs: two big tiles, check (green) and cross (red); the question also has a picture where one exists.
 - HUD: picture counters (coin icon and number, sun or moon clock face for the day time, stamina as a bar with a heart icon) instead of text lines; the debug overlay is hidden unless toggled (F3) in debug builds and never shown in release builds.
 - Spoken labels: when `tts_enabled` is on, focusing a tile speaks its caption (existing TTS setting, default off, D14).

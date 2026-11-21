@@ -160,10 +160,10 @@ Status values: `Not started`, `In progress`, `Blocked`, `Done`.
 ### Phase C
 | Task | Status | Date | Commit | Notes |
 |---|---|---|---|---|
-| PC1 Shop and inventory tiles | In progress | | | |
-| PC2 Sittable decor | Not started | | | |
-| PC3 Closed doorways, kill planes | Not started | | | |
-| PC4 Art research and decision | Not started | | | |
+| PC1 Shop and inventory tiles | Done | 2026-11-21 | 6fadbf9 | shop buy/sell and backpack are picture-tile grids with coin prices, count badges, dimmed sold-out/unsellable tiles; spoken tooltips |
+| PC2 Sittable decor | Done | 2026-11-21 | 6fadbf9 | DecorProp seat_count, seats/exits, SIT interaction; SitState works with any host; cabin chairs and armchair sittable |
+| PC3 Closed doorways, kill planes | Done | 2026-11-21 | 6fadbf9 | door panels close the south gap in cabin and museum; room kill planes return the player; full suite 607 cases exit 0 |
+| PC4 Art research and decision | In progress | | | Quaternius Medieval Village and Fantasy Props rendered against KayKit; waiting on user decision |
 | PC5 Tests, suite, release | Not started | | | |
 
 ## Test run log

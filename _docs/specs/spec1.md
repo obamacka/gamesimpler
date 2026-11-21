@@ -3,7 +3,7 @@
 | Field | Value |
 |---|---|
 | Status | DRAFT rev 3.14, all decisions resolved |
-| Revision | rev 1: core systems. rev 2: kid-friendly, accessibility, forgiving logic, expression systems, integration tests. rev 3: D1 to D4 resolved (dig-anywhere blocky voxels, jump and double jump, context-aware interaction with dedicated critical states, crafting flow confirmed). rev 3.1: D16 to D19 confirmed. rev 3.2: D5 to D15 resolved (farming system added, pets on day 2, keep last tool), min-spec hardware, test command note. rev 3.3: D20 to D25 resolved (macOS min spec M1 16 GB; 30 fps on min spec, 60 fps on recommended spec). rev 3.4: D26 recommended spec. rev 3.5: Phase 2B farming details (farm events, save shape, extra 10.4 rows, Home Meadow). rev 3.6: Phase 3 build lattice layers, socket attach transforms, support rule, `build` save shape (`build_rev36` replaces the per-plot list). rev 3.7: Phase 4 `jobs` save shape (ranks nested under `jobs.jobs`, contract origin_y); job sites are build zones and flattened; starting coins 150. rev 3.8: Phase 5 details (pet settles at 80% of follow_distance; never-expire mail kinds; mail prune after delivery; NPC straight steering where no navmesh is baked; generated instrument tones; care letters signed by the best friend). rev 3.9: Phase 6 (save layout with per-slot voxel directories and epochs, schema v2 with migration from v1, zone navigation baking, level town volumes, curator Y donates, static zones drop the previous terrain). rev 3.10: section 11 art assets (smooth low-poly, CC0 packs, model wiring). rev 3.11 (owner 2026-11-20): one world scale 0.75 m per KayKit unit, player 1.7 m, Quaternius free characters (11.4 to 11.7). rev 3.12: pets, crops, tools, block textures (11.8 to 11.10). rev 3.13 (owner 2026-11-21): title screen, new games start outdoors, dressed world, picture-first menus (section 12). rev 3.14 (owner 2026-11-21): picture-tile shop and inventory, sitting on room furniture, closed room doorways (12.5 to 12.7) |
+| Revision | rev 1: core systems. rev 2: kid-friendly, accessibility, forgiving logic, expression systems, integration tests. rev 3: D1 to D4 resolved (dig-anywhere blocky voxels, jump and double jump, context-aware interaction with dedicated critical states, crafting flow confirmed). rev 3.1: D16 to D19 confirmed. rev 3.2: D5 to D15 resolved (farming system added, pets on day 2, keep last tool), min-spec hardware, test command note. rev 3.3: D20 to D25 resolved (macOS min spec M1 16 GB; 30 fps on min spec, 60 fps on recommended spec). rev 3.4: D26 recommended spec. rev 3.5: Phase 2B farming details (farm events, save shape, extra 10.4 rows, Home Meadow). rev 3.6: Phase 3 build lattice layers, socket attach transforms, support rule, `build` save shape (`build_rev36` replaces the per-plot list). rev 3.7: Phase 4 `jobs` save shape (ranks nested under `jobs.jobs`, contract origin_y); job sites are build zones and flattened; starting coins 150. rev 3.8: Phase 5 details (pet settles at 80% of follow_distance; never-expire mail kinds; mail prune after delivery; NPC straight steering where no navmesh is baked; generated instrument tones; care letters signed by the best friend). rev 3.9: Phase 6 (save layout with per-slot voxel directories and epochs, schema v2 with migration from v1, zone navigation baking, level town volumes, curator Y donates, static zones drop the previous terrain). rev 3.10: section 11 art assets (smooth low-poly, CC0 packs, model wiring). rev 3.11 (owner 2026-11-20): one world scale 0.75 m per KayKit unit, player 1.7 m, Quaternius free characters (11.4 to 11.7). rev 3.12: pets, crops, tools, block textures (11.8 to 11.10). rev 3.13 (owner 2026-11-21): title screen, new games start outdoors, dressed world, picture-first menus (section 12). rev 3.14 (owner 2026-11-21): picture-tile shop and inventory, sitting on room furniture, closed room doorways (12.5 to 12.7). rev 3.15 (owner 2026-11-21): Quaternius art for buildings, furniture, props and nature replaces KayKit (12.8) |
 | Engine | Godot 4.7 stable (4.7.2 latest patch found, 2026-08-18), GDScript |
 | Physics | Jolt Physics (built-in module) |
 | Voxels | Zylann Voxel Tools 1.7, GDExtension edition (MIT), released 2026-08-20, targets Godot 4.5+ |
@@ -1830,7 +1830,7 @@ Source: KayKit Medieval Hexagon Pack 1.0 (CC0, GitHub), same toy style and textu
 - Spoken labels: when `tts_enabled` is on, focusing a tile speaks its caption (existing TTS setting, default off, D14).
 
 ### 12.5 Shop and inventory as picture tiles (owner request 2026-11-21)
-- Both menus use a grid of square item tiles (4 per row in the inventory, 3 per row in the shop, 150 px): the item picture fills the tile, a big count badge (x12) or price badge (coin icon and number) sits under it, and the short caption is optional extra text.
+- Both menus use a grid of square item tiles (5 per row in the inventory at 132 px, 4 per row in the shop at 150 px): the item picture fills the tile, a big count badge (x12) or price badge (coin icon and number) sits under it, and the short caption is optional extra text.
 - Shop: two big tabs as pictures (shopping basket = buy, coin = sell); a tile you cannot afford or that is sold out is dimmed. A, or a click, buys or sells one.
 - Inventory: the backpack is the tile grid (empty slots are faint tiles); the other tabs keep their current content.
 - Focus moves through the grid with the stick or arrows (GridContainer neighbours), wraps to the next row.
@@ -1842,3 +1842,51 @@ Source: KayKit Medieval Hexagon Pack 1.0 (CC0, GitHub), same toy style and textu
 ### 12.7 Closed doorways in rooms
 - A static room's doorway is filled by a solid door (a wooden door panel); the door interaction (X) is on the inside. Walking into the doorway cannot leave the floor.
 - Every static room also has a kill plane below its floor (6.3), so any other gap returns the player to safe ground.
+
+### 12.8 Quaternius art for buildings, objects and nature (owner decision 2026-11-21: "Full Quaternius")
+The KayKit models read as too cartoony next to the Quaternius characters. Every KayKit building, furniture, prop and tree is replaced by the free (Standard) Quaternius MegaKits, CC0, same author as the characters (comparison renders reviewed by the owner 2026-11-21). The models are metric, so they are shown at 1 m per model unit: `ModelFit.WORLD_SCALE` becomes 1.0 and the KayKit packs are removed.
+
+| Pack (Standard, CC0) | Use | Source |
+|---|---|---|
+| Medieval Village MegaKit | house walls, floors, doors, windows, roofs, chimneys, fences, supports, wagon | quaternius.com, quaternius.itch.io/medieval-village-megakit |
+| Fantasy Props MegaKit | furniture, crates, barrels, sacks, stalls, chests, candles, produce | quaternius.com, opengameart.org/content/fantasy-props-megakit |
+| Stylized Nature MegaKit | trees, rocks, bushes, flowers, plants | quaternius.com |
+
+Vendoring (11.2 rules): only the glTF files used, their `.bin` and textures. Textures are downscaled to at most 1024 px. Normal maps must use the OpenGL convention (green up) that Godot's glTF importer expects: the Village kit's glTF folder ships DirectX normals (green channel inverted against its `Normals Godot-Unity` set, checked 2026-11-21), so the Godot-Unity set is vendored under the same file names; the Props kit's default normals are already OpenGL (its separate set is the Unreal one).
+
+**Houses (`VillageHouse`).** A house is assembled at load from Village modules on a 2 m grid: walls are 2 m wide and 3 m high, one storey is 3 m.
+- Parameters: width and depth in modules (2, 3 or 4, i.e. 4, 6 or 8 m), storeys (1 or 2), wall style per storey (plaster or uneven brick), door module (front, +Z), window pattern, chimney, porch roof.
+- Layout (pure, testable): floor tiles, perimeter walls facing out (front +Z yaw 0, back 180, left -90, right 90), corner posts, one door wall with a door, window walls with shutters, an upper floor and walls per extra storey, the roof matching the footprint (`Roof_RoundTiles_<w>x<d>` for 4x4, 4x6, 6x4, 6x6, 6x8, 8x8, 8x10) centred on the footprint by its bounds, and gable fronts (`Roof_Front_Brick<w>`) on the front and back walls.
+- Collision: one box over the walls (footprint by storeys x 3 m), not the roof overhang. Doors in the town are zone doors (door mat in front), so houses are not entered through their model.
+- `door_point()`: the local point 0.6 m in front of the door, used to place zone doors and NPC home markers.
+- Town buildings: cabin exterior 6 x 4 one storey (plaster, brick chimney); tailor house 4 x 4 two storeys; neighbour house 4 x 6 (brick ground floor, plaster upper); tavern 6 x 6 two storeys with a porch; museum hall 8 x 8 brick with a round door; builder workshop 6 x 4 brick; the windmill is replaced by a 4 x 4 three-storey tower with the round tower roof; the market is two empty stalls and a cart with crates.
+- Well: a 2 m stone border square, a bucket and a small wooden roof on two supports. Mine entrance: two supports and a log beam over the door mat, with rocks either side.
+
+**Placement scale.** `DecorProp.model_scale` and `BuildingShell.model_scale` (0 = fit into `size` as before) place a model at a fixed scale. A model root may provide `collision_box() -> AABB` (local), which replaces the box from its bounds. `DecorProp.collider` (non-zero) gives an explicit box for trees (trunk only).
+
+**Furniture pieces (11.3, 11.4 at 1 m per unit).** Item ids and interactions stay; names follow the new pictures.
+| Piece | Model | Footprint (cells) | Notes |
+|---|---|---|---|
+| chair | `Chair_1` | 1 x 1 | seat 0.50 m |
+| sofa (now "Bench") | `Bench` | 3 x 1 | 3 seats at 0.51 m, no backrest |
+| armchair (now "Stool") | `Stool` | 1 x 1 | seat 0.58 m, no backrest |
+| table | `Table_Large` | 3 x 1 | |
+| bed / double bed | `Bed_Twin1` / `Bed_Twin2` | 2 x 2 | |
+| lamp (now "Candle stand") | `CandleStick_Stand` | 1 x 1 | toggles its light |
+| chest | `Chest_Wood` | 1 x 1 | |
+| cabinet | `Cabinet` | 1 x 1 | |
+| shelf (wall) | `Shelf_Arch` | 1 x 1, wall box 0.8 to 2.4 m | |
+| plant | Nature `Plant_1` | 1 x 1 | |
+| counter (now "Workbench") | `Workbench` | 2 x 1 | |
+| stove (now "Cauldron") | `Cauldron` | 1 x 1 | toggles |
+| fridge (now "Bookcase") | `Bookcase_2` | per overhang rule | storage |
+- `ModelFit.MAX_OVERHANG` becomes 0.25 m (the beds are 2.41 m long: 0.205 m per side over two cells).
+- Seat heights come from the model (the highest vertex over the front 40% of the seat), stored in the piece's seats; the seat part top equals the seat height. The backrest check (backs toward -Z) applies to pieces with a backrest part.
+- Structural pieces (walls, floors, doors, roofs) keep placeholder geometry: the Village walls are 2 x 3 m modules, while the build lattice uses 1 m cells (owner review).
+
+**World objects and props.** Sprinkler `Bucket_Wooden_1`; treasure chest `Chest_Wood`; cabin bed `Bed_Twin2`; museum pedestal `Table_Large`, display case `Cabinet`; shop counters (general store, builder supply, tailor) `Stall_Empty`; workbench `Workbench`; tailor bench `Table_Large`; barrels `Barrel` and `Barrel_Apples`; crates `Crate_Wooden`, `FarmCrate_Apple`, `FarmCrate_Carrot`; sacks `Bag`; wheelbarrow `Prop_Wagon`; flags `Banner_1`; fences `Prop_WoodenFence_Single`; carrot produce Props `Carrot`, tomato produce Quaternius crops `Tomato_Crop`. Signposts (Kenney) stay until a matching sign exists (owner review).
+
+**Nature.** Timber trees `CommonTree_1` to `_5` (by key hash), fitted to 4 x 7 x 4 m with a 0.6 m trunk collider; fallen log: a bark-textured cylinder (Nature `Bark_NormalTree`), 2 m by 0.5 m; town and wilderness trees `CommonTree_*` and `Pine_*`; rocks `Rock_Medium_1` to `_3`; bushes, flowers and ferns as decoration without colliders.
+
+**Rooms.** Cabin and museum walls use the Village plaster and brick textures, floors the dark wood planks texture (world-space UVs at 2 m, matching the modules); furniture decor uses the pieces above.
+

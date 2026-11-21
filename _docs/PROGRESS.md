@@ -163,8 +163,8 @@ Status values: `Not started`, `In progress`, `Blocked`, `Done`.
 | PC1 Shop and inventory tiles | Done | 2026-11-21 | 6fadbf9 | shop buy/sell and backpack are picture-tile grids with coin prices, count badges, dimmed sold-out/unsellable tiles; spoken tooltips |
 | PC2 Sittable decor | Done | 2026-11-21 | 6fadbf9 | DecorProp seat_count, seats/exits, SIT interaction; SitState works with any host; cabin chairs and armchair sittable |
 | PC3 Closed doorways, kill planes | Done | 2026-11-21 | 6fadbf9 | door panels close the south gap in cabin and museum; room kill planes return the player; full suite 607 cases exit 0 |
-| PC4 Art research and decision | In progress | | | Quaternius Medieval Village and Fantasy Props rendered against KayKit; waiting on user decision |
-| PC5 Tests, suite, release | Not started | | | |
+| PC4 Art research and decision | Done | 2026-11-21 | | Quaternius Medieval Village and Fantasy Props rendered against KayKit; owner chose the full Quaternius swap (Phase D) |
+| PC5 Tests, suite, release | Folded into PD5 | | | |
 
 ## Test run log
 | Date | Commit | Phase | Command | Exit code | Failures | Notes |
@@ -234,3 +234,12 @@ Status values: `Not started`, `In progress`, `Blocked`, `Done`.
 | 2026-11-15 | Min-spec hardware undefined | owner, P0.7 | Closed 2026-11-16 (Windows/Linux and macOS) |
 | 2026-11-16 | Recommended spec for the 60 fps target undefined (D26) | owner | Closed 2026-11-16 |
 | 2026-11-16 | i7-3770 has no AVX2; Voxel Tools GDExtension instruction-set requirement unverified | P0.8 j | Open |
+
+### Phase D
+| Task | Status | Date | Commit | Notes |
+|---|---|---|---|---|
+| PD1 Vendor Quaternius kits | Not started | | | |
+| PD2 Village houses and town | Not started | | | |
+| PD3 Furniture, objects, rooms | Not started | | | |
+| PD4 Nature | Not started | | | |
+| PD5 Tests, suite, release 0.3.0 | Not started | | | |

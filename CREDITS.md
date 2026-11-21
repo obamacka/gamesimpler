@@ -13,5 +13,7 @@ Third-party assets are vendored under `assets/third_party/`. Each pack folder ke
 | Nature Crops Pack | Quaternius | CC0 1.0 | `assets/third_party/quaternius/crops/` |
 | Survival Kit | Kenney (kenney.nl) | CC0 1.0 | `assets/third_party/kenney/survival_kit/` |
 | Voxel Pack | Kenney | CC0 1.0 | `assets/third_party/kenney/voxel_pack/` |
+| KayKit Medieval Hexagon Pack 1.0 | Kay Lousberg | CC0 1.0 | `assets/third_party/kaykit/hexagon/` |
+| Game Icons | Kenney | CC0 1.0 | `assets/third_party/kenney/game_icons/` |
 
 Tools: Godot Engine (MIT), gdUnit4 (MIT), Voxel Tools by Zylann (MIT).

@@ -165,6 +165,9 @@ func _make_terrain(s: GameSession) -> Node:
 		for v in find_children("*", "ProtectionVolume", true, false):
 			if v.reason == &"TOWN":   # towns are level, at one height, so the baked navmesh is walkable (spec 9.4)
 				town_h = og.add_flat(Rect2i(v.min_cell.x, v.min_cell.z, v.max_cell.x - v.min_cell.x + 1, v.max_cell.z - v.min_cell.z + 1), town_h)
+		for v in find_children("*", "ProtectionVolume", true, false):
+			if v.reason == &"BUILDING":   # buildings stand on a level pad (spec 12.3)
+				og.add_flat(Rect2i(v.min_cell.x, v.min_cell.z, v.max_cell.x - v.min_cell.x + 1, v.max_cell.z - v.min_cell.z + 1))
 		for bp in Database.blueprints.values():
 			if bp.zone_id == zone_id:   # job sites are level too
 				og.add_flat(Rect2i(bp.site_min.x, bp.site_min.z, bp.site_max.x - bp.site_min.x + 1, bp.site_max.z - bp.site_min.z + 1))

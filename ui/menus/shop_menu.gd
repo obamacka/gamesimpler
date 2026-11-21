@@ -50,7 +50,7 @@ func refresh() -> void:
 		var left := s.economy.remaining(shop_id, id)
 		var price := s.economy.tx.buy_quote(shop_id, id, 1)
 		add_row("%s  %d coins  %s" % [MenuBase.item_name(id), price, "" if left < 0 else "(%d left)" % left],
-			MenuBase.item_color(id), func(): buy(id, 1), left != 0, buy_list)
+			MenuBase.item_color(id), func(): buy(id, 1), left != 0, buy_list, MenuBase.item_icon(id))
 	var seen := {}
 	for st in s.inventory.model.slots:
 		if st == null or seen.has(st["item_id"]):
@@ -59,7 +59,7 @@ func refresh() -> void:
 		seen[id] = true
 		var it := Database.item(id)
 		add_row("%s x%d  %d coins each" % [MenuBase.item_name(id), s.inventory.count(id), s.economy.tx.sell_quote(shop_id, id, 1)],
-			MenuBase.item_color(id), func(): sell(id, 1), it.sellable, sell_list)
+			MenuBase.item_color(id), func(): sell(id, 1), it.sellable, sell_list, MenuBase.item_icon(id))
 
 
 func initial_focus() -> Control:

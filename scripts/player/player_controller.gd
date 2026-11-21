@@ -580,6 +580,14 @@ func last_frame_alt() -> bool:
 	return _last_alt
 
 
+## Turns the body and the camera to `yaw` at once (spawns, spec 12.2).
+func face_yaw(yaw: float) -> void:
+	_facing_yaw = yaw
+	visual.rotation.y = yaw
+	camera_rig.yaw = yaw
+	camera_rig.rotation = Vector3(0.0, yaw, 0.0)
+
+
 func face_towards(target: Vector3) -> void:
 	var d := target - global_position
 	if Vector2(d.x, d.z).length() > 0.01:

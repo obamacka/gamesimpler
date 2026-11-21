@@ -5,16 +5,25 @@ extends WorldObject
 @export var key := ""
 @export var def_id: StringName = &"tree_apple"
 
-var _fruit_mesh: MeshInstance3D
+const ART_FRUIT := "res://assets/third_party/quaternius/crops/Apple_4.fbx"
+const ART_PICKED := "res://assets/third_party/quaternius/crops/Apple_Harvested.fbx"
+
+var _fruit_mesh: Node3D          # shown while the tree has fruit
+var _picked_art: Node3D          # shown once picked (model art only)
 
 
 func _ready() -> void:
 	if key == "":
 		key = "%s/%s" % [SceneRouter.current_zone_id, name]
-	add_child(box_mesh(Vector3(0.4, 2.0, 0.4), Color(0.45, 0.3, 0.15), Vector3(0, 1.0, 0)))
-	add_child(box_mesh(Vector3(2.2, 1.6, 2.2), Color(0.3, 0.6, 0.25), Vector3(0, 2.6, 0)))
-	_fruit_mesh = box_mesh(Vector3(2.3, 0.3, 2.3), Color(0.85, 0.15, 0.15), Vector3(0, 2.0, 0))
-	add_child(_fruit_mesh)
+	var box := AABB(Vector3(-1.5, 0, -1.5), Vector3(3.0, 3.6, 3.0))
+	_fruit_mesh = add_art(self, ART_FRUIT, box)
+	if _fruit_mesh:
+		_picked_art = add_art(self, ART_PICKED, box)
+	else:
+		add_child(box_mesh(Vector3(0.4, 2.0, 0.4), Color(0.45, 0.3, 0.15), Vector3(0, 1.0, 0)))
+		add_child(box_mesh(Vector3(2.2, 1.6, 2.2), Color(0.3, 0.6, 0.25), Vector3(0, 2.6, 0)))
+		_fruit_mesh = box_mesh(Vector3(2.3, 0.3, 2.3), Color(0.85, 0.15, 0.15), Vector3(0, 2.0, 0))
+		add_child(_fruit_mesh)
 	add_static_box(self, Vector3(0.4, 2.0, 0.4), Vector3(0, 1.0, 0))
 	make_interactable(key, &"FORAGE", 1.6)
 	make_tool_zone(key, ToolTypes.FRUIT_PICKER, &"fruit_tree", 20, 3.0)
@@ -26,6 +35,8 @@ func _ready() -> void:
 
 func _process(_delta: float) -> void:
 	_fruit_mesh.visible = fruit() > 0
+	if _picked_art:
+		_picked_art.visible = not _fruit_mesh.visible
 
 
 func fruit() -> int:

@@ -6,18 +6,42 @@
 [ext_resource type="Script" path="res://scripts/museum/trophy_pedestal.gd" id="4_trophy"]
 [ext_resource type="Script" path="res://scripts/world/menu_station.gd" id="5_station"]
 [ext_resource type="Script" path="res://scripts/npc/npc.gd" id="6_npc"]
+[ext_resource type="Script" path="res://scripts/world/decor_prop.gd" id="90_decor"]
+[ext_resource type="Texture2D" path="res://assets/third_party/kenney/voxel_pack/stone.png" id="91_floor_tex"]
+[ext_resource type="Texture2D" path="res://assets/third_party/kenney/voxel_pack/brick_grey.png" id="92_wall_tex"]
 
 [sub_resource type="BoxShape3D" id="floor_shape"]
 size = Vector3(24, 1, 24)
 
 [sub_resource type="BoxMesh" id="floor_mesh"]
+material = SubResource("floor_mat")
 size = Vector3(24, 1, 24)
 
 [sub_resource type="BoxShape3D" id="wall_shape"]
 size = Vector3(24, 4, 0.3)
 
 [sub_resource type="BoxMesh" id="wall_mesh"]
+material = SubResource("wall_mat")
 size = Vector3(24, 4, 0.3)
+
+[sub_resource type="StandardMaterial3D" id="floor_mat"]
+albedo_texture = ExtResource("91_floor_tex")
+uv1_triplanar = true
+uv1_world_triplanar = true
+texture_filter = 4
+
+[sub_resource type="StandardMaterial3D" id="wall_mat"]
+albedo_texture = ExtResource("92_wall_tex")
+uv1_triplanar = true
+uv1_world_triplanar = true
+texture_filter = 4
+
+[sub_resource type="BoxShape3D" id="south_shape"]
+size = Vector3(11.0, 4, 0.3)
+
+[sub_resource type="BoxMesh" id="south_mesh"]
+material = SubResource("wall_mat")
+size = Vector3(11.0, 4, 0.3)
 
 [node name="Museum" type="Node3D"]
 script = ExtResource("1_zone")
@@ -109,6 +133,8 @@ script = ExtResource("4_trophy")
 trophy_id = &"trophy_all"
 
 [node name="DonationDesk" type="Node3D" parent="."]
+model = "res://assets/third_party/kaykit/restaurant_bits/kitchencounter_straight_B.gltf"
+model_fit_size = Vector3(2.2, 1.1, 1.0)
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 2)
 script = ExtResource("5_station")
 kind = &"DONATE"
@@ -124,3 +150,59 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 11.6)
 script = ExtResource("2_door")
 target_zone = &"zone_home_meadow"
 target_spawn = &"spawn_from_museum"
+
+[node name="WallSouthWest" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.5, 2, 12)
+
+[node name="Shape" type="CollisionShape3D" parent="WallSouthWest"]
+shape = SubResource("south_shape")
+
+[node name="Mesh" type="MeshInstance3D" parent="WallSouthWest"]
+mesh = SubResource("south_mesh")
+
+[node name="WallSouthEast" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.5, 2, 12)
+
+[node name="Shape" type="CollisionShape3D" parent="WallSouthEast"]
+shape = SubResource("south_shape")
+
+[node name="Mesh" type="MeshInstance3D" parent="WallSouthEast"]
+mesh = SubResource("south_mesh")
+
+[node name="Rug" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, -0, 0, 1, 0, 0, 6.5)
+script = ExtResource("90_decor")
+model = "res://assets/third_party/kaykit/furniture_bits/rug_rectangle_A.gltf"
+yaw_deg = 0
+size = Vector3(4, 0.1, 2.8)
+solid = false
+
+[node name="PlantW" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, -0, 0, 1, -10.8, 0, 10.5)
+script = ExtResource("90_decor")
+model = "res://assets/third_party/kaykit/furniture_bits/cactus_medium_A.gltf"
+yaw_deg = 0
+use_world_scale = true
+
+[node name="PlantE" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, -0, 0, 1, 10.8, 0, 10.5)
+script = ExtResource("90_decor")
+model = "res://assets/third_party/kaykit/furniture_bits/cactus_medium_A.gltf"
+yaw_deg = 0
+use_world_scale = true
+
+[node name="FlagW" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, -0, 0, 1, -2.2, 0, 10.8)
+script = ExtResource("90_decor")
+model = "res://assets/third_party/kaykit/hexagon/flag_green.gltf"
+yaw_deg = 0
+size = Vector3(0.8, 2.4, 0.8)
+solid = false
+
+[node name="FlagE" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, -0, 0, 1, 2.2, 0, 10.8)
+script = ExtResource("90_decor")
+model = "res://assets/third_party/kaykit/hexagon/flag_green.gltf"
+yaw_deg = 0
+size = Vector3(0.8, 2.4, 0.8)
+solid = false

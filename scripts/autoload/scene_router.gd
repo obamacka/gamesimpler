@@ -104,6 +104,10 @@ func place_player(spawn_key: StringName) -> void:
 		player.global_position = marker.global_position
 		if player is CharacterBody3D:
 			player.velocity = Vector3.ZERO
+		# Face where the marker faces (its -Z); the camera starts behind the player (spec 12.2).
+		if player.has_method("face_yaw"):
+			var fwd := -marker.global_transform.basis.z
+			player.face_yaw(atan2(-fwd.x, -fwd.z))
 
 
 ## Zone travel with the transition pause (mine entrance, doors).

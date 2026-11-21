@@ -4,7 +4,8 @@ extends WorldObject
 
 
 func _ready() -> void:
-	add_child(box_mesh(Vector3(0.4, 1.1, 0.4), Color(0.2, 0.35, 0.7), Vector3(0, 0.55, 0)))
+	if add_art(self, "res://assets/third_party/kenney/survival_kit/signpost-single.glb", AABB(Vector3(-0.35, 0, -0.35), Vector3(0.7, 1.3, 0.7))) == null:
+		add_child(box_mesh(Vector3(0.4, 1.1, 0.4), Color(0.2, 0.35, 0.7), Vector3(0, 0.55, 0)))
 	make_interactable(String(name), &"MAILBOX", 1.0)
 
 

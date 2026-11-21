@@ -49,6 +49,9 @@ script = ExtResource("2_timber")
 def_id = &"log_fallen"
 
 [node name="MineEntrance" type="Node3D" parent="Surface"]
+model = "res://assets/third_party/kaykit/hexagon/building_mine_blue.gltf"
+model_size = Vector3(6, 4.5, 6)
+model_offset = Vector3(0, 0, -3.4)
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.5, 0, -13)
 script = ExtResource("3_door")
 

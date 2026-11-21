@@ -2,10 +2,13 @@
 class_name Well
 extends WorldObject
 
+const ART := "res://assets/third_party/kaykit/hexagon/building_well_blue.gltf"
+
 
 func _ready() -> void:
-	add_child(box_mesh(Vector3(1.2, 0.9, 1.2), Color(0.5, 0.5, 0.55), Vector3(0, 0.45, 0)))
-	add_child(box_mesh(Vector3(0.9, 0.05, 0.9), Color(0.2, 0.4, 0.8), Vector3(0, 0.88, 0)))
+	if add_art(self, ART, AABB(Vector3(-0.9, 0, -0.9), Vector3(1.8, 2.6, 1.8))) == null:
+		add_child(box_mesh(Vector3(1.2, 0.9, 1.2), Color(0.5, 0.5, 0.55), Vector3(0, 0.45, 0)))
+		add_child(box_mesh(Vector3(0.9, 0.05, 0.9), Color(0.2, 0.4, 0.8), Vector3(0, 0.88, 0)))
 	add_static_box(self, Vector3(1.2, 0.9, 1.2), Vector3(0, 0.45, 0))
 	make_tool_zone(String(name), ToolTypes.WATERING_CAN, &"refill", 15, 1.6)
 	make_interactable(String(name), &"REFILL", 1.4)

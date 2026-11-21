@@ -40,21 +40,52 @@ static func focus_later(c: Control) -> void:
 			x.grab_focus()).call_deferred()
 
 
-static func make_button(text: String, color: Color = Color(0.85, 0.85, 0.85)) -> Button:
+## A row button (spec 12.4): a picture on the left (an item picture, an icon tile, or a colour
+## swatch) and a short caption. Hover moves focus; focus gently grows the button.
+static func make_button(text: String, color: Color = Color(0.85, 0.85, 0.85), icon: Texture2D = null) -> Button:
 	var b := Button.new()
 	b.text = text
 	b.focus_mode = Control.FOCUS_ALL
-	b.custom_minimum_size = Vector2(140, 56)
-	var icon := GradientTexture2D.new()
-	icon.width = 24
-	icon.height = 24
-	var g := Gradient.new()
-	g.set_color(0, color)
-	g.set_color(1, color)
-	icon.gradient = g
-	b.icon = icon
+	b.custom_minimum_size = Vector2(160, 84)
+	b.icon = icon if icon else UiIcons.tile(color)
+	b.expand_icon = false
 	b.mouse_entered.connect(func(): if b.is_inside_tree() and not b.disabled: b.grab_focus())   # hover moves focus (spec 5.9)
+	add_pulse(b)
 	return b
+
+
+## A big picture tile (spec 12.4): coloured by meaning, white icon on top, caption below.
+static func make_tile(caption: String, icon_name: String, color: Color, size := Vector2(200, 200)) -> Button:
+	var b := Button.new()
+	b.text = caption
+	b.focus_mode = Control.FOCUS_ALL
+	b.custom_minimum_size = size
+	b.icon = UiIcons.icon(icon_name)
+	b.expand_icon = true
+	b.icon_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	b.vertical_icon_alignment = VERTICAL_ALIGNMENT_TOP
+	b.add_theme_constant_override("icon_max_width", int(size.x * 0.55))
+	KidTheme.tile_styles(b, color)
+	b.mouse_entered.connect(func(): if b.is_inside_tree() and not b.disabled: b.grab_focus())
+	add_pulse(b)
+	return b
+
+
+## Focused buttons grow 6% (none with reduce_motion) and speak their caption when TTS is on.
+static func add_pulse(b: Button) -> void:
+	b.resized.connect(func(): b.pivot_offset = b.size * 0.5)
+	b.focus_entered.connect(func():
+		Accessibility.speak(b.text)
+		if not Accessibility.reduce_motion() and b.is_inside_tree():
+			b.create_tween().tween_property(b, "scale", Vector2(1.06, 1.06), 0.12))
+	b.focus_exited.connect(func():
+		if b.is_inside_tree():
+			b.create_tween().tween_property(b, "scale", Vector2.ONE, 0.1))
+
+
+## Picture of an item for rows (spec 12.4).
+static func item_icon(item_id: StringName) -> Texture2D:
+	return ItemIcons.texture(item_id)
 
 
 ## A titled, scrollable list column: title, status line, rows (spec 5.1 icon-first).
@@ -70,6 +101,7 @@ func make_list(title: String, min_size := Vector2(640, 480)) -> VBoxContainer:
 	p.add_child(v)
 	title_label = Label.new()
 	title_label.text = title
+	title_label.add_theme_font_size_override("font_size", int(KidTheme.BASE_FONT * 1.5 * Accessibility.text_scale()))
 	v.add_child(title_label)
 	status = Label.new()
 	v.add_child(status)
@@ -84,10 +116,18 @@ func make_list(title: String, min_size := Vector2(640, 480)) -> VBoxContainer:
 	return list
 
 
-func add_row(text: String, color: Color, on_press: Callable, enabled := true, parent: Control = null) -> Button:
-	var b := MenuBase.make_button(text, color)
+func add_row(text: String, color: Color, on_press: Callable, enabled := true, parent: Control = null, icon: Texture2D = null) -> Button:
+	var b := MenuBase.make_button(text, color, icon)
 	b.disabled = not enabled
 	b.alignment = HORIZONTAL_ALIGNMENT_LEFT
+	if on_press.is_valid():
+		b.pressed.connect(on_press)
+	(parent if parent else list).add_child(b)
+	return b
+
+
+func add_tile(caption: String, icon_name: String, color: Color, on_press: Callable, parent: Control = null, size := Vector2(200, 200)) -> Button:
+	var b := MenuBase.make_tile(caption, icon_name, color, size)
 	if on_press.is_valid():
 		b.pressed.connect(on_press)
 	(parent if parent else list).add_child(b)

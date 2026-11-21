@@ -19,6 +19,27 @@ static func box_mesh(size: Vector3, color: Color, offset: Vector3 = Vector3.ZERO
 	return m
 
 
+## Art for a world object (spec 12.3): `path` fitted into `box` (local space) and added under
+## `parent` in a holder named "Art". Returns the holder, or null when the model is missing
+## (callers then keep their placeholder box).
+static func add_art(parent: Node3D, path: String, box: AABB, yaw_deg: int = 0) -> Node3D:
+	var m := ModelFit.instantiate(path)
+	if m == null:
+		return null
+	var holder := Node3D.new()
+	holder.name = "Art"
+	parent.add_child(holder)
+	holder.add_child(m)
+	ModelFit.fit(m, box, yaw_deg)
+	return holder
+
+
+## Box spanned by a fitted art holder (local to its parent).
+static func art_bounds(holder: Node3D) -> AABB:
+	var m: Node3D = holder.get_child(0)
+	return holder.transform * (m.transform * ModelFit.local_aabb(m))
+
+
 static func add_static_box(parent: Node3D, size: Vector3, offset: Vector3) -> StaticBody3D:
 	var b := StaticBody3D.new()
 	b.collision_layer = 1

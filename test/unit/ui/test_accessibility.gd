@@ -30,7 +30,11 @@ func test_text_scale_applies_to_root_theme() -> void:
 	var a: Accessibility = auto_free(Accessibility.new())
 	add_child(a)
 	Settings.set_value("accessibility", "text_scale", 1.5)
-	assert_int(get_tree().root.theme.default_font_size).is_equal(24)
+	assert_int(get_tree().root.theme.default_font_size).is_equal(int(round(KidTheme.BASE_FONT * 1.5)))
+	# the picture-first theme (spec 12.4): rounded buttons with a visible focus outline
+	var focus := get_tree().root.theme.get_stylebox("focus", "Button") as StyleBoxFlat
+	assert_that(focus.border_color).is_equal(KidTheme.FOCUS)
+	assert_int(focus.border_width_top).is_greater_equal(6)
 	Settings.set_value("accessibility", "text_scale", 1.25)
 	get_tree().root.theme = null
 

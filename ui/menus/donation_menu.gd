@@ -53,7 +53,7 @@ func refresh() -> void:
 		add_row("Donate all new (%d)" % ids.size(), Color(0.95, 0.85, 0.3), func(): ask(ids), true, donate_list)
 	for id in ids:
 		var i: StringName = id
-		add_row(MenuBase.item_name(i), MenuBase.item_color(i), func(): ask([i]), true, donate_list)
+		add_row(MenuBase.item_name(i), MenuBase.item_color(i), func(): ask([i]), true, donate_list, MenuBase.item_icon(i))
 	if ids.is_empty():
 		var l := Label.new()
 		l.text = "Nothing new to donate. Keep exploring!"

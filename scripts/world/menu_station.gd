@@ -16,6 +16,9 @@ const MENUS := {&"DONATE": &"donation", &"SHOP": &"shop", &"JOB_BOARD": &"job_bo
 ## takes the model's size, otherwise `size`.
 @export_file("*.gltf", "*.glb", "*.tscn") var model := ""
 @export var model_yaw_deg := 0
+## Non-zero: fit the model into this box instead of the furniture world scale (spec 12.3,
+## signposts from the Survival Kit).
+@export var model_fit_size := Vector3.ZERO
 
 var visual: Node3D
 
@@ -25,7 +28,12 @@ func _ready() -> void:
 	if visual:
 		visual.name = "Model"
 		add_child(visual)
-		var b := ModelFit.place(visual, AABB(), model_yaw_deg)
+		var b: AABB
+		if model_fit_size != Vector3.ZERO:
+			ModelFit.fit(visual, AABB(Vector3(-model_fit_size.x * 0.5, 0, -model_fit_size.z * 0.5), model_fit_size), model_yaw_deg)
+			b = visual.transform * ModelFit.local_aabb(visual)
+		else:
+			b = ModelFit.place(visual, AABB(), model_yaw_deg)
 		size = b.size
 		add_static_box(self, size, b.get_center())
 	else:

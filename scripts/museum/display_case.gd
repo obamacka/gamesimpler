@@ -7,7 +7,7 @@ extends WorldObject
 
 var slots: Array[Marker3D] = []
 var entries: Array = []   # item ids in slot order
-var shell: MeshInstance3D
+var shell: Node3D
 
 
 func _ready() -> void:
@@ -45,8 +45,19 @@ func refresh() -> void:
 	if shell:
 		shell.queue_free()
 	var width := maxf(1.2, entries.size() * 0.6)
-	shell = box_mesh(Vector3(width, 1.0, 0.8), Color(0.55, 0.45, 0.35) if unlocked() else Color(0.15, 0.15, 0.18), Vector3(width * 0.5 - 0.3, 0.5, 0))
-	add_child(shell)
+	# spec 12.3: a KayKit cabinet, darkened while the case is locked
+	shell = add_art(self, "res://assets/third_party/kaykit/furniture_bits/cabinet_medium.gltf", AABB(Vector3(-0.3, 0, -0.4), Vector3(width, 1.0, 0.8)))
+	if shell:
+		if not unlocked():
+			var dark := StandardMaterial3D.new()
+			dark.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+			dark.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+			dark.albedo_color = Color(0.05, 0.05, 0.08, 0.7)
+			for mi in ModelFit.mesh_instances(shell):
+				mi.material_overlay = dark
+	else:
+		shell = box_mesh(Vector3(width, 1.0, 0.8), Color(0.55, 0.45, 0.35) if unlocked() else Color(0.15, 0.15, 0.18), Vector3(width * 0.5 - 0.3, 0.5, 0))
+		add_child(shell)
 	for i in slots.size():
 		for c in slots[i].get_children():
 			slots[i].remove_child(c)   # free the "Display" name before the new one is added

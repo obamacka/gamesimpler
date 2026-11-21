@@ -8,7 +8,8 @@ var statue: MeshInstance3D
 
 
 func _ready() -> void:
-	add_child(box_mesh(Vector3(0.8, 0.9, 0.8), Color(0.7, 0.7, 0.72), Vector3(0, 0.45, 0)))
+	if add_art(self, "res://assets/third_party/kaykit/furniture_bits/table_small.gltf", AABB(Vector3(-0.45, 0, -0.45), Vector3(0.9, 0.9, 0.9))) == null:
+		add_child(box_mesh(Vector3(0.8, 0.9, 0.8), Color(0.7, 0.7, 0.72), Vector3(0, 0.45, 0)))
 	add_static_box(self, Vector3(0.8, 0.9, 0.8), Vector3(0, 0.45, 0))
 	EventBus.trophy_unlocked.connect(_on_trophy)
 	refresh()

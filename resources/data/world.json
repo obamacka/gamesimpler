@@ -190,5 +190,9 @@
       "owned_from_start": false,
       "price_coins": 500
     }
-  ]
+  ],
+  "new_game": {
+    "zone_id": "zone_home_meadow",
+    "spawn": "spawn_new_game"
+  }
 }

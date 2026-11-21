@@ -43,6 +43,11 @@ func reasons() -> Array:
 	return _reasons.keys()
 
 
+## Releases every reason and unpauses (returning to the title screen, spec 12.1).
+func release_all() -> void:
+	reset_for_tests()
+
+
 ## Releases every reason and unpauses. Call in after_test so a failing test cannot
 ## leave the tree paused for the next one (spec 0.6 item 15).
 func reset_for_tests() -> void:

@@ -57,7 +57,7 @@ func refresh() -> void:
 		var st = inv.slots[i]
 		var idx := i
 		var text := "%d. %s" % [i + 1, "empty" if st == null else "%s x%d" % [MenuBase.item_name(st["item_id"]), st["qty"]]]
-		add_row(text, MenuBase.item_color(st["item_id"]) if st else Color(0.3, 0.3, 0.3), func(): activate(idx), true, backpack)
+		add_row(text, MenuBase.item_color(st["item_id"]) if st else Color(0.3, 0.3, 0.3), func(): activate(idx), true, backpack, MenuBase.item_icon(st["item_id"]) if st else null)
 	for slot in OutfitDef.SLOTS:
 		var w = s.outfit.model.slots[slot]
 		var sl: StringName = slot

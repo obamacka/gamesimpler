@@ -26,9 +26,14 @@ func _on_settings(section: StringName, _k: StringName, _v: Variant) -> void:
 		apply_audio_video()
 
 
+## Picture-first theme (spec 12.4) with the text scale applied. Menus, the title and the HUD
+## live in CanvasLayers, which the root window's theme does not reach, so the theme is merged
+## into the engine default theme that every Control falls back to; the root keeps a copy.
 func apply() -> void:
-	var t := Theme.new()
-	t.default_font_size = int(round(16.0 * text_scale()))
+	var t := KidTheme.build(text_scale())
+	ThemeDB.get_default_theme().merge_with(t)
+	ThemeDB.get_default_theme().default_font_size = t.default_font_size
+	ThemeDB.get_default_theme().default_font = t.default_font
 	get_tree().root.theme = t
 
 

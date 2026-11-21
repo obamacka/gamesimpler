@@ -5,18 +5,42 @@
 [ext_resource type="Script" path="res://scripts/world/mailbox.gd" id="3_mail"]
 [ext_resource type="Script" path="res://scripts/world/mine_entrance.gd" id="4_door"]
 [ext_resource type="Script" path="res://scripts/world/menu_station.gd" id="5_station"]
+[ext_resource type="Script" path="res://scripts/world/decor_prop.gd" id="90_decor"]
+[ext_resource type="Texture2D" path="res://assets/third_party/kenney/voxel_pack/wood.png" id="91_floor_tex"]
+[ext_resource type="Texture2D" path="res://assets/third_party/kenney/voxel_pack/trunk_side.png" id="92_wall_tex"]
 
 [sub_resource type="BoxShape3D" id="floor_shape"]
 size = Vector3(12, 1, 12)
 
 [sub_resource type="BoxMesh" id="floor_mesh"]
+material = SubResource("floor_mat")
 size = Vector3(12, 1, 12)
 
 [sub_resource type="BoxShape3D" id="wall_shape"]
 size = Vector3(12, 3.5, 0.3)
 
 [sub_resource type="BoxMesh" id="wall_mesh"]
+material = SubResource("wall_mat")
 size = Vector3(12, 3.5, 0.3)
+
+[sub_resource type="StandardMaterial3D" id="floor_mat"]
+albedo_texture = ExtResource("91_floor_tex")
+uv1_triplanar = true
+uv1_world_triplanar = true
+texture_filter = 4
+
+[sub_resource type="StandardMaterial3D" id="wall_mat"]
+albedo_texture = ExtResource("92_wall_tex")
+uv1_triplanar = true
+uv1_world_triplanar = true
+texture_filter = 4
+
+[sub_resource type="BoxShape3D" id="south_shape"]
+size = Vector3(5.0, 3.5, 0.3)
+
+[sub_resource type="BoxMesh" id="south_mesh"]
+material = SubResource("wall_mat")
+size = Vector3(5.0, 3.5, 0.3)
 
 [node name="StarterCabin" type="Node3D"]
 script = ExtResource("1_zone")
@@ -87,8 +111,101 @@ target_zone = &"zone_home_meadow"
 target_spawn = &"spawn_from_cabin"
 
 [node name="Wardrobe" type="Node3D" parent="."]
+model = "res://assets/third_party/kaykit/furniture_bits/cabinet_medium_decorated.gltf"
+model_fit_size = Vector3(1.8, 2.0, 0.8)
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.5, 0, -4.5)
 script = ExtResource("5_station")
 kind = &"WARDROBE"
 color = Color(0.5, 0.35, 0.25, 1)
 size = Vector3(1.2, 2.0, 0.6)
+
+[node name="WallSouthWest" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.5, 1.75, 6)
+
+[node name="Shape" type="CollisionShape3D" parent="WallSouthWest"]
+shape = SubResource("south_shape")
+
+[node name="Mesh" type="MeshInstance3D" parent="WallSouthWest"]
+mesh = SubResource("south_mesh")
+
+[node name="WallSouthEast" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.5, 1.75, 6)
+
+[node name="Shape" type="CollisionShape3D" parent="WallSouthEast"]
+shape = SubResource("south_shape")
+
+[node name="Mesh" type="MeshInstance3D" parent="WallSouthEast"]
+mesh = SubResource("south_mesh")
+
+[node name="Rug" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, -0, 0, 1, 0, 0, 0.5)
+script = ExtResource("90_decor")
+model = "res://assets/third_party/kaykit/furniture_bits/rug_rectangle_A.gltf"
+yaw_deg = 0
+use_world_scale = true
+solid = false
+
+[node name="Table" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, -0, 0, 1, 2.6, 0, -2.2)
+script = ExtResource("90_decor")
+model = "res://assets/third_party/kaykit/furniture_bits/table_medium.gltf"
+yaw_deg = 0
+use_world_scale = true
+
+[node name="ChairW" type="Node3D" parent="."]
+transform = Transform3D(6.12323e-17, 0, 1, 0, 1, 0, -1, 0, 6.12323e-17, 1.5, 0, -2.2)
+script = ExtResource("90_decor")
+model = "res://assets/third_party/kaykit/furniture_bits/chair_A.gltf"
+yaw_deg = 0
+use_world_scale = true
+
+[node name="ChairE" type="Node3D" parent="."]
+transform = Transform3D(-1.83697e-16, 0, -1, 0, 1, 0, 1, 0, -1.83697e-16, 3.7, 0, -2.2)
+script = ExtResource("90_decor")
+model = "res://assets/third_party/kaykit/furniture_bits/chair_A.gltf"
+yaw_deg = 0
+use_world_scale = true
+
+[node name="Lamp" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, -0, 0, 1, -5.2, 0, -5.2)
+script = ExtResource("90_decor")
+model = "res://assets/third_party/kaykit/furniture_bits/lamp_standing.gltf"
+yaw_deg = 0
+use_world_scale = true
+
+[node name="Shelf" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, -0, 0, 1, 0.5, 1.4, -5.55)
+script = ExtResource("90_decor")
+model = "res://assets/third_party/kaykit/furniture_bits/shelf_B_large_decorated.gltf"
+yaw_deg = 0
+use_world_scale = true
+solid = false
+
+[node name="Plant" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, -0, 0, 1, 5.2, 0, 2.6)
+script = ExtResource("90_decor")
+model = "res://assets/third_party/kaykit/furniture_bits/cactus_medium_A.gltf"
+yaw_deg = 0
+use_world_scale = true
+
+[node name="Armchair" type="Node3D" parent="."]
+transform = Transform3D(6.12323e-17, 0, 1, 0, 1, 0, -1, 0, 6.12323e-17, -4.6, 0, 3)
+script = ExtResource("90_decor")
+model = "res://assets/third_party/kaykit/furniture_bits/armchair.gltf"
+yaw_deg = 0
+use_world_scale = true
+
+[node name="SideTable" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, -0, 0, 1, -4.9, 0, 1.4)
+script = ExtResource("90_decor")
+model = "res://assets/third_party/kaykit/furniture_bits/table_small.gltf"
+yaw_deg = 0
+use_world_scale = true
+
+[node name="TableLamp" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, -0, 0, 1, -4.9, 0.75, 1.4)
+script = ExtResource("90_decor")
+model = "res://assets/third_party/kaykit/furniture_bits/lamp_table.gltf"
+yaw_deg = 0
+use_world_scale = true
+solid = false

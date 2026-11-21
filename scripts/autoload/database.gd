@@ -45,6 +45,9 @@ var discovery := DiscoveryConfig.new()
 var starter_tools: Array[StringName] = []
 var home_zone: StringName = &"zone_starter_cabin"
 var home_bed_key: StringName = &"bed_01"
+## Where a new game starts (spec 12.2): outdoors, in front of the cabin.
+var new_game_zone: StringName = &"zone_home_meadow"
+var new_game_spawn: StringName = &"spawn_new_game"
 var load_errors: Array[String] = []
 
 
@@ -127,6 +130,9 @@ func load_all(dir: String) -> void:
 	var home: Dictionary = world.get("home", {})
 	home_zone = StringName(home.get("zone_id", "zone_starter_cabin"))
 	home_bed_key = StringName(home.get("bed_key", "bed_01"))
+	var ng: Dictionary = world.get("new_game", {})
+	new_game_zone = StringName(ng.get("zone_id", "zone_home_meadow"))
+	new_game_spawn = StringName(ng.get("spawn", "spawn_new_game"))
 	for d in _read(dir.path_join("mail_templates.json")).get("mail_templates", []):
 		var m := MailTemplateDef.new()
 		m.id = StringName(d["id"]); m.sender_id = StringName(d.get("sender_id", "system")); m.kind = StringName(d.get("kind", "LETTER"))
@@ -246,6 +252,8 @@ func validate() -> Array[String]:
 			errors.append("zone %s persists edits but has no stream_db_key" % id)
 		if z.treasure_table != &"" and not treasure_tables.has(z.treasure_table):
 			errors.append("zone %s uses unknown treasure table" % id)
+	if not zones.has(new_game_zone):
+		errors.append("new game zone %s unknown" % new_game_zone)
 	if not zones.has(home_zone):
 		errors.append("home zone %s unknown" % home_zone)
 	for t in ["pool_care_exhausted", "pool_care_exhausted_repeat"]:

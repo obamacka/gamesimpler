@@ -34,13 +34,13 @@ func refresh() -> void:
 		var st = inv.slots[i]
 		if st:
 			var idx := i
-			add_row("%s x%d >" % [MenuBase.item_name(st["item_id"]), st["qty"]], MenuBase.item_color(st["item_id"]), func(): store(idx, int(inv.slots[idx]["qty"])), true, mine)
+			add_row("%s x%d >" % [MenuBase.item_name(st["item_id"]), st["qty"]], MenuBase.item_color(st["item_id"]), func(): store(idx, int(inv.slots[idx]["qty"])), true, mine, MenuBase.item_icon(st["item_id"]))
 	var c := s.storage.container(uid)
 	for i in c.slots.size():
 		var st = c.slots[i]
 		var idx := i
 		add_row("< %s" % ("empty" if st == null else "%s x%d" % [MenuBase.item_name(st["item_id"]), st["qty"]]),
-			MenuBase.item_color(st["item_id"]) if st else Color(0.3, 0.3, 0.3), func(): take(idx, int(c.slots[idx]["qty"])), st != null, theirs)
+			MenuBase.item_color(st["item_id"]) if st else Color(0.3, 0.3, 0.3), func(): take(idx, int(c.slots[idx]["qty"])), st != null, theirs, MenuBase.item_icon(st["item_id"]) if st else null)
 
 
 func initial_focus() -> Control:

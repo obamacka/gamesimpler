@@ -29,7 +29,7 @@ func refresh() -> void:
 		if c["reason"] == CraftModel.LOCKED:
 			text = "??? (not learned yet)"
 		var rid: StringName = r.id
-		add_row(text, MenuBase.item_color(r.outputs[0]["item"]), func(): choose(rid), c["reason"] != CraftModel.LOCKED)
+		add_row(text, MenuBase.item_color(r.outputs[0]["item"]), func(): choose(rid), c["reason"] != CraftModel.LOCKED, null, MenuBase.item_icon(r.outputs[0]["item"]))
 
 
 func initial_focus() -> Control:

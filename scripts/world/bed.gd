@@ -5,7 +5,8 @@ extends WorldObject
 
 
 func _ready() -> void:
-	add_child(box_mesh(Vector3(1.2, 0.5, 2.2), Color(0.55, 0.55, 0.8), Vector3(0, 0.25, -1.4)))
+	if add_art(self, "res://assets/third_party/kaykit/furniture_bits/bed_double_A.gltf", AABB(Vector3(-0.9, 0, -2.6), Vector3(1.8, 1.0, 2.4))) == null:
+		add_child(box_mesh(Vector3(1.2, 0.5, 2.2), Color(0.55, 0.55, 0.8), Vector3(0, 0.25, -1.4)))
 	make_interactable(String(name), &"BED", 1.4, Vector3(0, 0.6, -1.4))
 
 

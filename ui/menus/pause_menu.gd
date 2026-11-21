@@ -1,17 +1,24 @@
-## Pause menu (spec 5.8): Resume, Go Home (D19), Save and Load (Phase 6), Settings, Quit.
+## Pause menu (spec 5.8, 12.4): a 3 x 2 grid of picture tiles. Resume, Go Home (D19), Save,
+## Load, Settings, and Title (autosaves, then the title screen; Quit lives on the title).
 extends MenuBase
 
 var resume_btn: Button
+var grid: GridContainer
 
 
 func build() -> void:
-	make_list("Paused", Vector2(420, 460))
-	resume_btn = add_row("Resume", Color(0.5, 0.8, 0.5), func(): close())
-	add_row("Go Home", Color(0.9, 0.7, 0.4), go_home)
-	add_row("Save", Color(0.6, 0.8, 0.6), func(): MenuStack.instance.push(&"save_load", {"mode": &"save"}))
-	add_row("Load", Color(0.6, 0.7, 0.8), func(): MenuStack.instance.push(&"save_load", {"mode": &"load"}))
-	add_row("Settings", Color(0.6, 0.7, 0.9), func(): MenuStack.instance.push(&"settings"))
-	add_row("Quit", Color(0.8, 0.4, 0.4), func(): get_tree().quit())
+	var p := MenuBase.panel(Vector2(760, 560))
+	add_child(p)
+	grid = GridContainer.new()
+	grid.columns = 3
+	p.add_child(grid)
+	var t := Vector2(210, 210)
+	resume_btn = add_tile("Play", "right", KidTheme.GO, func(): close(), grid, t)
+	add_tile("Home", "home", KidTheme.MONEY, go_home, grid, t)
+	add_tile("Save", "save", KidTheme.CHOOSE, func(): MenuStack.instance.push(&"save_load", {"mode": &"save"}), grid, t)
+	add_tile("Load", "open", KidTheme.CHOOSE, func(): MenuStack.instance.push(&"save_load", {"mode": &"load"}), grid, t)
+	add_tile("Settings", "gear", KidTheme.EXTRA, func(): MenuStack.instance.push(&"settings"), grid, t)
+	add_tile("Title", "exitLeft", KidTheme.STOP, to_title, grid, t)
 
 
 func initial_focus() -> Control:
@@ -31,3 +38,12 @@ func _do_go_home() -> void:
 	var s := GameSession.current
 	if s:
 		stack.after_resume(func(): s.sleep.go_home())
+
+
+func to_title() -> void:
+	MenuStack.instance.push(&"confirm", {"text": "Back to the start screen? Your game is saved.", "icon": "exitLeft", "default_yes": true,
+		"on_close": func(r):
+			if r == &"yes":
+				var m := get_tree().get_first_node_in_group(&"main")
+				if m and m.has_method("return_to_title"):
+					m.return_to_title()})

@@ -25,7 +25,7 @@ func refresh() -> void:
 			continue
 		seen[it.id] = true
 		var id: StringName = it.id
-		add_row(MenuBase.item_name(id), MenuBase.item_color(id), func(): give(id))
+		add_row(MenuBase.item_name(id), MenuBase.item_color(id), func(): give(id), true, null, MenuBase.item_icon(id))
 
 
 func initial_focus() -> Control:

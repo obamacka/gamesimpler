@@ -48,6 +48,21 @@ func has_save(slot: int) -> bool:
 	return FileAccess.file_exists(p["json"]) or FileAccess.file_exists(p["bak"])
 
 
+## Newest manual or autosave slot by file time, or -1 (title Play, spec 12.1).
+func latest_slot() -> int:
+	var best := -1
+	var best_t := -1
+	for slot in [AUTOSAVE_SLOT] + SLOTS:
+		var p := paths(slot)
+		for k in ["json", "bak"]:
+			if FileAccess.file_exists(p[k]):
+				var t := FileAccess.get_modified_time(p[k])
+				if t > best_t:
+					best_t = t
+					best = slot
+	return best
+
+
 ## Small summary for the save/load menu: {"exists", "day", "coins"}.
 func slot_info(slot: int) -> Dictionary:
 	var r := _read_json(paths(slot)["json"])

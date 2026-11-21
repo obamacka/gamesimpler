@@ -73,7 +73,7 @@ func refresh() -> void:
 		if OutfitModel.outfit_of(st["item_id"]).slot != current_slot:
 			continue
 		var idx := i
-		add_row("Wear %s" % MenuBase.item_name(st["item_id"]), MenuBase.item_color(st["item_id"]), func(): equip_slot(idx), true, items_col)
+		add_row("Wear %s" % MenuBase.item_name(st["item_id"]), MenuBase.item_color(st["item_id"]), func(): equip_slot(idx), true, items_col, MenuBase.item_icon(st["item_id"]))
 	if s.outfit.model.slots[current_slot] != null:
 		for id in Database.dyes:
 			if s.unlocks.model.is_unlocked(&"DYE", id):

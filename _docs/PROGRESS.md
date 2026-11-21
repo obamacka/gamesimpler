@@ -238,8 +238,8 @@ Status values: `Not started`, `In progress`, `Blocked`, `Done`.
 ### Phase D
 | Task | Status | Date | Commit | Notes |
 |---|---|---|---|---|
-| PD1 Vendor Quaternius kits | Not started | | | |
-| PD2 Village houses and town | Not started | | | |
-| PD3 Furniture, objects, rooms | Not started | | | |
-| PD4 Nature | Not started | | | |
-| PD5 Tests, suite, release 0.3.0 | Not started | | | |
+| PD1 Vendor Quaternius kits | Done | 2026-11-21 | 8ad57a0 | Village, Fantasy Props, Stylized Nature subsets; textures 1024 px; Village normals from the OpenGL set |
+| PD2 Village houses and town | Done | 2026-11-21 | 0e3de2d | VillageHouse layout and builder; cabin, museum hall, tavern, tailor and neighbour houses, workshop, tower, market, well, mine; wall colliders; doors at zone doors |
+| PD3 Furniture, objects, rooms | Done | 2026-11-21 | 9053904 | pieces at 1 m per unit with re-derived footprints and seats; renamed captions; stations, props, produce; plaster/brick rooms, floor modules, Village door |
+| PD4 Nature | Done | 2026-11-21 | 9053904 | Stylized Nature trees, rocks, plants; bark logs; title backdrop |
+| PD5 Tests, suite, release 0.3.0 | Done | 2026-11-21 | 689cc4c | house layout, town and no-KayKit tests; full suite 617 cases exit 0; screenshots; VERSION 0.3.0 |

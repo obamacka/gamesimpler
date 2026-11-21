@@ -441,17 +441,17 @@ Integration:
 - [ ] **PC3** Room doorways closed with a solid door; kill planes under static rooms.
 - [x] **PC1** to **PC3** done (6fadbf9).
 - [x] **PC4** Research less cartoony CC0 or affordable packs for buildings and objects; comparison renders; owner decision 2026-11-21: full Quaternius swap (Phase D).
-- [ ] **PC5** Tests and full suite; release (folded into PD5).
+- [x] **PC5** Tests and full suite; release (folded into PD5).
 
 ## Phase D: Quaternius art swap (owner decision 2026-11-21)
 
 **Spec:** 12.8.
 
-- [ ] **PD1** Vendor the Village, Props and Nature subsets (glTF, textures at most 1024 px, OpenGL normals), LICENSE, SOURCE, CREDITS, import files.
-- [ ] **PD2** `VillageHouse` (pure layout plus builder), `model_scale` and `collision_box()` in DecorProp and BuildingShell; town buildings, well, mine entrance, market; zone doors and NPC markers moved to the new doors; title backdrop.
-- [ ] **PD3** Furniture pieces at 1 m per unit (footprints, parts, seats re-derived), item names; stations, world objects, props, produce; cabin and museum decor and textures.
-- [ ] **PD4** Nature: timber trees, log, town and wilderness trees, rocks, plants.
-- [ ] **PD5** Tests updated (scale, overhang, seats, house layout, no KayKit references); KayKit removed; full suite; screenshots; release 0.3.0.
+- [x] **PD1** Vendor the Village, Props and Nature subsets (glTF, textures at most 1024 px, OpenGL normals), LICENSE, SOURCE, CREDITS, import files.
+- [x] **PD2** `VillageHouse` (pure layout plus builder), `model_scale` and `collision_box()` in DecorProp and BuildingShell; town buildings, well, mine entrance, market; zone doors and NPC markers moved to the new doors; title backdrop.
+- [x] **PD3** Furniture pieces at 1 m per unit (footprints, parts, seats re-derived), item names; stations, world objects, props, produce; cabin and museum decor and textures.
+- [x] **PD4** Nature: timber trees, log, town and wilderness trees, rocks, plants.
+- [x] **PD5** Tests updated (scale, overhang, seats, house layout, no KayKit references); KayKit removed; full suite; screenshots; release 0.3.0.
 
 ### Release-candidate checklist (end of Phase 6)
 - [x] Release pipeline (owner request 2026-11-20): `export_presets.cfg` (Windows x86_64, Linux x86_64, macOS universal), `ci/export_release.sh`, `.github/workflows/release.yml` (a push that changes `VERSION`: tests, export, ad-hoc macOS signing on a macOS runner, then the workflow creates tag `v<VERSION>` and the GitHub release; 0.x versions are pre-releases).

@@ -4,7 +4,7 @@
 |---|---|
 | Spec | `_docs/specs/spec1.md` rev 3.13 |
 | Plan | `_docs/plans/plan1.md` |
-| Active phase | Phase B (first play: title screen, outdoor start, dressed world, picture menus) in progress All six phases have their automated work done (Phases 3 to 6 started on owner request before earlier gates passed); manual checklists for Phases 1 to 6, Phase 0 hardware checks and the release-candidate checklist pending |
+| Active phase | Phase B done (release 0.2.0); manual checklists and owner review items open All six phases have their automated work done (Phases 3 to 6 started on owner request before earlier gates passed); manual checklists for Phases 1 to 6, Phase 0 hardware checks and the release-candidate checklist pending |
 | Last updated | 2026-11-21 |
 
 ## How to update
@@ -150,12 +150,12 @@ Status values: `Not started`, `In progress`, `Blocked`, `Done`.
 ### Phase B (first play)
 | Task | Status | Date | Commit | Notes |
 |---|---|---|---|---|
-| PB1 Vendor hex pack, icons, props | In progress | | | |
-| PB2 Title screen | Not started | | | |
-| PB3 Outdoor start | Not started | | | |
-| PB4 Dressed world | Not started | | | |
-| PB5 Picture-first menus | Not started | | | |
-| PB6 Tests and release 0.2.0 | Not started | | | |
+| PB1 Vendor hex pack, icons, props | Done | 2026-11-21 | bb8b007 | KayKit Medieval Hexagon subset (32 models), Kenney Game Icons (100), Survival Kit chest and signposts, Quaternius apple trees |
+| PB2 Title screen | Done | 2026-11-21 | d4a1887 | picture tiles (Play continues the newest save or starts new; New, Settings, Quit with picture confirms), 3D backdrop, pause Title tile with autosave |
+| PB3 Outdoor start | Done | 2026-11-21 | d4a1887 | new games at spawn_new_game in Home Meadow facing the town; spawns set player and camera facing |
+| PB4 Dressed world | Done | 2026-11-21 | 173b974 | world objects use models; DecorProp town (church museum, market, lumbermill, tavern, homes, windmill, trees, rocks, props); one-level village; furnished textured cabin and museum; scene property-order bug fixed |
+| PB5 Picture-first menus | Done | 2026-11-21 | 173b974 | KidTheme merged into the engine default theme (CanvasLayer menus never had a theme), icon tiles, item pictures, picture pause grid and confirms, picture HUD, debug overlay hidden (F3 in debug builds) |
+| PB6 Tests and release 0.2.0 | Done | 2026-11-21 | 1487c82 | first play 8, kid UI 6, updated art/accessibility tests; full suite 602 cases exit 0; screenshots of title, spawn, cabin outside and inside, pause, inventory |
 
 ## Test run log
 | Date | Commit | Phase | Command | Exit code | Failures | Notes |
@@ -181,6 +181,7 @@ Status values: `Not started`, `In progress`, `Blocked`, `Done`.
 | 2026-11-19 | 44e8742 | A | `ci/run_tests.sh` | 0 | 0 | 563 cases (Phases 0 to 6, PA1) |
 | 2026-11-20 | c6d2514 | A | `ci/run_tests.sh` | 0 | 0 | 576 cases (PA2) |
 | 2026-11-20 | d313df0 | A | `ci/run_tests.sh` | 0 | 0 | 588 cases (PA3, PA4) |
+| 2026-11-21 | 1487c82 | B | `ci/run_tests.sh` | 0 | 0 | 602 cases (Phase B) |
 | 2026-11-20 | 1e66c69 | A | release workflow (GitHub Actions run 44786213773) | 0 | 0 | test gate, exports, macOS ad-hoc signing and publish all succeeded |
 
 ## Decisions
@@ -195,6 +196,7 @@ Status values: `Not started`, `In progress`, `Blocked`, `Done`.
 ## Blockers and open issues
 | Date | Item | Owner | Status |
 |---|---|---|---|
+| 2026-11-21 | Phase B for owner review: menus beyond pause, confirm and title keep their list layout (bigger, themed, item pictures) rather than full picture redesigns; settings is still text-heavy (for grown-ups); structural pieces (floor, wall) show colour tiles in menus (no model); the cabin has no ceiling; Play continues the newest save automatically; the trophy statue is still a gold block; captions are English only | owner review | Open |
 | 2026-11-20 | Release v0.1.0 published as a pre-release (https://github.com/obamacka/gamesimpler/releases/tag/v0.1.0, workflow run 44786213773, commit 1e66c69); exports built in CI; Linux export boots headless (300 frames, no errors) in the cloud session; Windows and macOS exports not launched here (no Windows or macOS machine); macOS is ad-hoc signed, not notarized; Windows is not code-signed; project setting import_etc2_astc enabled for the macOS universal export | owner review | Open |
 | 2026-11-20 | PA3/PA4 for owner review: sunflower uses the pack's generic blue flower and strawberry a berry bush; cotton has no model; dog and cat have only Idle and Walking clips (no sit, sleep or eat); watering can, fruit picker and screwdriver have no hand model; tool grip and angle are a fixed pose on the Idle hand; this session moved to a new personal environment "gamesimpler" (exact hosts for itch, its download mirror and opengameart.org) | owner review | Open |
 | 2026-11-20 | PA2 for owner review: the free Quaternius tier gives semi-realistic adult faces (Superhero heads) next to toy-like KayKit furniture; only the "Dark" skin tone exists for the Regular body; only Peasant and Ranger outfits; player body type and hair are fixed in PlayerConfig until a character creator exists; straw hat and scarf remain placeholder boxes; the free tier has no wave, pickaxe or sleep clips (substitutes in spec 11.7); kitchen modules at 2 x 2 cells leave 0.5 m gaps in a row; the 1.7 m player stands in 2-voxel tunnels and Duck now means 1-voxel crawl spaces; integration tests take about 1 s each now that every player and NPC builds a rig; headless runs log a dummy-renderer "material is null" error per rig (not seen with a real renderer) | owner review | Open |

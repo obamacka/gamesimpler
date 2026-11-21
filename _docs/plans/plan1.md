@@ -425,12 +425,12 @@ Integration:
 **Goal:** a child launches the game, sees a picture title screen, presses Play and lands outdoors in a textured, furnished world; all menus are picture-first (spec 12).
 **Spec:** 12.
 
-- [ ] **PB1** Vendor KayKit Medieval Hexagon Pack subset (buildings, nature, props), Kenney Game Icons (used icons), Kenney Survival Kit props (chest, signposts), Quaternius apple tree models; LICENSE, SOURCE, CREDITS.
-- [ ] **PB2** Title screen and boot flow (title, Play/New/Settings/Quit, confirm, fade, Title from pause with autosave).
-- [ ] **PB3** New games start outdoors (`spawn_new_game`); spawn facing from markers; camera behind the player on spawn.
-- [ ] **PB4** World objects use models; `DecorProp`; Home Meadow town dressing; textured cabin and museum rooms with furniture.
-- [ ] **PB5** `KidTheme`, icon rows and tiles in `MenuBase`, `ItemIcons`, picture pause menu and confirm, picture HUD, debug overlay hidden by default.
-- [ ] **PB6** Tests (title flow, new game spawn and facing, decor and object models, theme and icons, HUD) and full suite; release 0.2.0.
+- [x] **PB1** Vendor KayKit Medieval Hexagon Pack subset (buildings, nature, props), Kenney Game Icons (used icons), Kenney Survival Kit props (chest, signposts), Quaternius apple tree models; LICENSE, SOURCE, CREDITS.
+- [x] **PB2** Title screen and boot flow (title, Play/New/Settings/Quit, confirm, fade, Title from pause with autosave).
+- [x] **PB3** New games start outdoors (`spawn_new_game`); spawn facing from markers; camera behind the player on spawn.
+- [x] **PB4** World objects use models; `DecorProp`; Home Meadow town dressing; textured cabin and museum rooms with furniture.
+- [x] **PB5** `KidTheme`, icon rows and tiles in `MenuBase`, `ItemIcons`, picture pause menu and confirm, picture HUD, debug overlay hidden by default.
+- [x] **PB6** Tests (title flow, new game spawn and facing, decor and object models, theme and icons, HUD) and full suite; release 0.2.0.
 
 ### Release-candidate checklist (end of Phase 6)
 - [x] Release pipeline (owner request 2026-11-20): `export_presets.cfg` (Windows x86_64, Linux x86_64, macOS universal), `ci/export_release.sh`, `.github/workflows/release.yml` (a push that changes `VERSION`: tests, export, ad-hoc macOS signing on a macOS runner, then the workflow creates tag `v<VERSION>` and the GitHub release; 0.x versions are pre-releases).
